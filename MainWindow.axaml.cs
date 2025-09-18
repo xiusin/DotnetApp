@@ -22,6 +22,14 @@ public partial class MainWindow : Window
     private KeyDisplayWindow? _keyDisplayWindow;
     private System.Threading.Timer? _hideTimer;
     
+    // 新功能组件
+    private TextSelectionPopover? _textSelectionPopover;
+    private SimpleEdgeComponent? _edgeSwipeComponent;  // 改为SimpleEdgeComponent
+    private AIChatWindow? _aiChatWindow;
+    private ConfigPopover? _configPopover;
+    private DebugOverlay? _debugOverlay;
+    private Timer? _edgeAutoShowTimer; // 边缘组件自动显示计时器
+    
     // 当前按下的键
     private readonly HashSet<Key> _pressedKeys = new();
     
@@ -31,7 +39,90 @@ public partial class MainWindow : Window
         InitializeComponent();
         InitializeKeyboardHook();
         InitializeSystemTray();
+        InitializeAdditionalFeatures();
+        InitializeDebugFeatures();
         UpdatePreview();
+    }
+    
+    private void InitializeDebugFeatures()
+    {
+        // 添加主窗口的键盘事件监听（用于双击Shift检测）
+        this.AddHandler(KeyDownEvent, OnMainWindowKeyDown, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+    }
+    
+    private DateTime _lastShiftPressTime = DateTime.MinValue;
+    private bool _isFirstShiftPressed = false;
+    private const int DOUBLE_CLICK_INTERVAL = 300; // 毫秒
+    private int _totalShiftDoubleClicks = 0; // 用于统计的双击次数
+    
+    private void OnMainWindowKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+        {
+            var now = DateTime.Now;
+            var timeSinceLastPress = (now - _lastShiftPressTime).TotalMilliseconds;
+            
+            // 添加按键反馈
+            _debugOverlay?.LogEvent($"Shift按键: {e.Key} (距离上次: {timeSinceLastPress:F0}ms)");
+            
+            if (_isFirstShiftPressed && timeSinceLastPress < DOUBLE_CLICK_INTERVAL)
+            {
+                // 双击Shift键检测成功
+                _isFirstShiftPressed = false;
+                _lastShiftPressTime = DateTime.MinValue;
+                _totalShiftDoubleClicks++;
+                
+                _debugOverlay?.LogEvent($"🎉 双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)");
+            StatusTextBlock.Text = $"双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)";
+            
+            // 增强调试信息
+            if (_debugOverlay is EnhancedDebugOverlay enhanced)
+            {
+                enhanced.LogShiftPress(e.Key, timeSinceLastPress);
+            }
+                
+                // 打开AI聊天窗口
+                if (_aiChatWindow != null)
+                {
+                    try
+                    {
+                        _aiChatWindow.ToggleChatWindow();
+                        var newState = _aiChatWindow.IsVisible ? "已打开" : "已隐藏";
+                        _debugOverlay?.LogEvent($"✅ AI聊天窗口{newState}");
+                        StatusTextBlock.Text = $"AI聊天窗口{newState}";
+                    }
+                    catch (Exception ex)
+                    {
+                        _debugOverlay?.LogEvent($"❌ AI聊天窗口错误: {ex.Message}");
+                        StatusTextBlock.Text = $"AI聊天窗口错误: {ex.Message}";
+                    }
+                }
+                else
+                {
+                    _debugOverlay?.LogEvent("❌ AI聊天窗口未初始化");
+                    StatusTextBlock.Text = "AI聊天窗口未初始化";
+                }
+            }
+            else
+            {
+                _isFirstShiftPressed = true;
+                _lastShiftPressTime = now;
+                _debugOverlay?.LogEvent($"第一次Shift按下 (将在{DOUBLE_CLICK_INTERVAL}ms内等待第二次)");
+                
+                // 设置超时
+                Task.Delay(DOUBLE_CLICK_INTERVAL).ContinueWith(_ =>
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (_isFirstShiftPressed)
+                        {
+                            _isFirstShiftPressed = false;
+                            _debugOverlay?.LogEvent("⏰ 双击Shift超时，重置状态");
+                        }
+                    });
+                });
+            }
+        }
     }
     
     private void InitializeKeyboardHook()
@@ -46,13 +137,11 @@ public partial class MainWindow : Window
             _isListening = true;
             if (ListeningToggle != null)
                 ListeningToggle.IsChecked = true;
-            if (StatusText != null)
-                StatusText.Text = "监听中...";
+            StatusTextBlock.Text = "监听中...";
         }
         catch (Exception ex)
         {
-            if (StatusText != null)
-                StatusText.Text = $"键盘钩子初始化失败: {ex.Message}";
+            StatusTextBlock.Text = $"键盘钩子初始化失败: {ex.Message}";
         }
     }
     
@@ -210,8 +299,8 @@ public partial class MainWindow : Window
         // 更新预览
         if (PreviewText != null)
             PreviewText.Text = keyText;
-        if (StatusText != null)
-            StatusText.Text = $"显示按键: {keyText}";
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = $"显示按键: {keyText}";
     }
     
     private void HideKeyDisplay()
@@ -221,8 +310,8 @@ public partial class MainWindow : Window
         {
             _keyDisplayWindow.UpdateContent("", GetSelectedColor(), GetFontSize());
         }
-        if (StatusText != null)
-            StatusText.Text = "监听中...";
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = "监听中...";
     }
     
     private void StartHideTimer()
@@ -250,15 +339,15 @@ public partial class MainWindow : Window
         
         if (_isListening)
         {
-            if (StatusText != null)
-                StatusText.Text = "监听中...";
+            if (StatusTextBlock != null)
+                StatusTextBlock.Text = "监听中...";
             _pressedKeys.Clear();
             HideKeyDisplay();
         }
         else
         {
-            if (StatusText != null)
-                StatusText.Text = "监听已停止";
+            if (StatusTextBlock != null)
+                StatusTextBlock.Text = "监听已停止";
             _pressedKeys.Clear();
             HideKeyDisplay();
             CancelHideTimer();
@@ -273,6 +362,58 @@ public partial class MainWindow : Window
     private void HideButton_Click(object? sender, RoutedEventArgs e)
     {
         HideToBackground();
+    }
+    
+    private void ConfigButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_configPopover != null)
+        {
+            var button = sender as Button;
+            if (button != null)
+            {
+                var screenPoint = button.PointToScreen(new Point(0, button.Bounds.Height));
+                var clientPoint = this.PointToClient(screenPoint);
+                _configPopover.ShowConfig(clientPoint);
+            }
+        }
+    }
+    
+    private void ManualTestButton_Click(object? sender, RoutedEventArgs e)
+    {
+        // 手动测试所有功能
+        _debugOverlay?.LogEvent("🧪 开始手动测试所有功能...");
+        
+        // 测试1: 触发文本选择
+        if (_textSelectionPopover != null)
+        {
+            _debugOverlay?.LogEvent("📋 手动触发文本选择测试...");
+            // 直接调用测试方法
+            _textSelectionPopover.TriggerTest("手动测试文本");
+        }
+        
+        // 测试2: 显示AI聊天窗口
+        if (_aiChatWindow != null)
+        {
+            _debugOverlay?.LogEvent("💬 手动显示AI聊天窗口...");
+            if (!_aiChatWindow.IsVisible)
+            {
+                _aiChatWindow.Show();
+                _aiChatWindow.Activate();
+            }
+        }
+        
+        // 测试3: 触发边缘组件
+        if (_edgeSwipeComponent != null)
+        {
+            if (_debugOverlay is EnhancedDebugOverlay enhanced)
+            {
+                enhanced.LogEvent("🎯 手动触发边缘组件...");
+            }
+            // 强制显示边缘组件
+            _edgeSwipeComponent.ShowEdgeWindow();
+        }
+        
+        StatusTextBlock.Text = "手动测试已执行，查看调试面板获取详细信息";
     }
     
     private void BackgroundColorCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -329,12 +470,153 @@ public partial class MainWindow : Window
         // 键盘监听将在后台继续运行
     }
     
+    private void InitializeAdditionalFeatures()
+    {
+        try
+        {
+            // 初始化文本选择弹出框
+            _textSelectionPopover = new TextSelectionPopover(_debugOverlay as EnhancedDebugOverlay);
+            _textSelectionPopover.CopyRequested += OnTextCopyRequested;
+            _textSelectionPopover.TranslateRequested += OnTextTranslateRequested;
+            
+            // 初始化边缘滑动组件
+            _edgeSwipeComponent = new SimpleEdgeComponent(_debugOverlay as EnhancedDebugOverlay);
+            _edgeSwipeComponent.WindowOpened += OnEdgeWindowOpened;
+            _edgeSwipeComponent.WindowClosed += OnEdgeWindowClosed;
+            
+            // 启动边缘组件自动显示（可选）
+            StartEdgeAutoShow();
+            
+            // 初始化AI聊天窗口
+            _aiChatWindow = new AIChatWindow();
+            
+            // 初始化配置弹出框
+            _configPopover = new ConfigPopover(this);
+            _configPopover.AutoStartChanged += OnAutoStartConfigChanged;
+            _configPopover.MinimizeToTrayChanged += OnMinimizeToTrayConfigChanged;
+            _configPopover.ShowNotificationsChanged += OnShowNotificationsConfigChanged;
+            
+            // 初始化调试覆盖层
+            _debugOverlay = new EnhancedDebugOverlay();
+            _debugOverlay.ShowDebug();
+            
+            if (StatusTextBlock != null)
+                StatusTextBlock.Text = "所有功能已初始化 (增强调试模式)";
+        }
+        catch (Exception ex)
+        {
+            if (StatusTextBlock != null)
+                StatusTextBlock.Text = $"功能初始化失败: {ex.Message}";
+        }
+    }
+    
+    private void OnTextCopyRequested(object? sender, string text)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = $"已复制文本: {text.Substring(0, Math.Min(text.Length, 20))}...";
+        
+        if (_debugOverlay is EnhancedDebugOverlay enhanced)
+        {
+            enhanced.LogTextCopy(text);
+        }
+    }
+    
+    private void OnTextTranslateRequested(object? sender, string text)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = $"翻译请求: {text.Substring(0, Math.Min(text.Length, 20))}...";
+        
+        if (_debugOverlay is EnhancedDebugOverlay enhanced)
+        {
+            enhanced.LogEvent($"翻译请求: {text.Substring(0, Math.Min(text.Length, 10))}...");
+        }
+        // 这里可以集成翻译API
+    }
+    
+    private void OnEdgeWindowOpened(object? sender, EventArgs e)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = "边缘工具栏已打开";
+        
+        if (_debugOverlay is EnhancedDebugOverlay enhanced)
+        {
+            enhanced.LogEdgeWindowShown();
+        }
+    }
+    
+    private void OnEdgeWindowClosed(object? sender, EventArgs e)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = "边缘工具栏已关闭";
+        
+        if (_debugOverlay is EnhancedDebugOverlay enhanced)
+        {
+            enhanced.LogEdgeWindowHidden();
+        }
+    }
+    
+    private void OnAutoStartConfigChanged(object? sender, bool enabled)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = $"开机自启: {(enabled ? "已启用" : "已禁用")}";
+        _debugOverlay?.LogEvent($"开机自启: {(enabled ? "已启用" : "已禁用")}");
+    }
+    
+    private void OnMinimizeToTrayConfigChanged(object? sender, bool enabled)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = $"最小化到托盘: {(enabled ? "已启用" : "已禁用")}";
+        _debugOverlay?.LogEvent($"最小化到托盘: {(enabled ? "已启用" : "已禁用")}");
+    }
+    
+    private void OnShowNotificationsConfigChanged(object? sender, bool enabled)
+    {
+        if (StatusTextBlock != null)
+            StatusTextBlock.Text = $"显示通知: {(enabled ? "已启用" : "已禁用")}";
+        _debugOverlay?.LogEvent($"显示通知: {(enabled ? "已启用" : "已禁用")}");
+    }
+    
+    private void StartEdgeAutoShow()
+    {
+        // 延迟15秒后开始，每15秒一次 - 避免立即触发
+        _edgeAutoShowTimer = new Timer(AutoShowEdgeComponent, null, 15000, 15000);
+        
+        if (_debugOverlay is EnhancedDebugOverlay enhanced)
+        {
+            enhanced.LogEvent("⏰ 边缘组件自动显示已启动（15秒后开始，每15秒一次）");
+        }
+    }
+    
+    private void AutoShowEdgeComponent(object? state)
+    {
+        if (_edgeSwipeComponent != null)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_debugOverlay is EnhancedDebugOverlay enhanced)
+                {
+                    enhanced.LogEvent("⏰ 自动触发边缘组件显示");
+                }
+                _edgeSwipeComponent.TriggerAutoShow();
+            });
+        }
+    }
+    
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
+        
+        // 清理键盘钩子
         _keyboardHook?.Dispose();
         _keyDisplayWindow?.Close();
         CancelHideTimer();
+        
+        // 清理新功能组件
+        _textSelectionPopover?.Dispose();
+        _edgeSwipeComponent?.Dispose();
+        _aiChatWindow?.Close();
+        _configPopover?.Dispose();
+        _edgeAutoShowTimer?.Dispose();
     }
     
     // 添加隐藏窗口但保持监听的功能

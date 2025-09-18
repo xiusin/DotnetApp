@@ -2,100 +2,144 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
         x:Class="ConfigButtonDisplay.MainWindow"
-        Title="键盘按键显示器"
+        Title="键盘按键显示器 - Semi Design"
         WindowStartupLocation="CenterScreen"
-        ShowInTaskbar="True">
+        ShowInTaskbar="True"
+        Background="{DynamicResource SemiBackground}">
     
-    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
-        <!-- 标题栏 -->
-        <Border Grid.Row="0" Background="{DynamicResource SystemAccentColor}" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+        <!-- 标题栏 - Semi Design风格 -->
+        <Border Grid.Row="0" Background="{DynamicResource SemiColorPrimary}" CornerRadius="12" Padding="24" Margin="0,0,0,24">
             <StackPanel>
                 <TextBlock Text="键盘按键显示器" 
-                          FontSize="24" 
-                          FontWeight="SemiBold" 
+                          FontSize="28" 
+                          FontWeight="Bold" 
                           HorizontalAlignment="Center"
-                          Margin="0,0,0,10"
-                          Foreground="White"/>
+                          Margin="0,0,0,12"
+                          Foreground="{DynamicResource SemiColorText0}"/>
                 <TextBlock Text="按下键盘按键，将在屏幕左下角实时显示" 
-                          FontSize="14" 
+                          FontSize="16" 
                           HorizontalAlignment="Center"
-                          Foreground="White"
+                          Foreground="{DynamicResource SemiColorText0}"
                           TextAlignment="Center"
-                          Opacity="0.9"/>
+                          Opacity="0.8"/>
             </StackPanel>
         </Border>
         
-        <!-- 主要内容 -->
-        <Border Grid.Row="1" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}" CornerRadius="8" Padding="20" Margin="0,0,0,20">
-            <StackPanel Spacing="20">
+        <!-- 主要内容 - Semi Design卡片 -->
+        <Border Grid.Row="1" Background="{DynamicResource SemiColorBackground}" CornerRadius="12" Padding="24" Margin="0,0,0,24"
+                BoxShadow="0 2 8 0 #1A000000">
+            <StackPanel Spacing="24">
                 <!-- 状态显示 -->
-                <Grid ColumnDefinitions="*,2*">
-                    <TextBlock Grid.Column="0" Text="监听状态:" 
-                              VerticalAlignment="Center"
-                              FontSize="16"/>
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="监听状态" 
+                                  VerticalAlignment="Center"
+                                  FontSize="16"
+                                  FontWeight="Medium"
+                                  Foreground="{DynamicResource SemiColorText0}"/>
+                        <Border Background="{DynamicResource SemiColorFillSecondary}" 
+                               CornerRadius="12" 
+                               Padding="8,4">
+                            <TextBlock Name="StatusText" 
+                                      Text="准备就绪"
+                                      FontSize="14"
+                                      Foreground="{DynamicResource SemiColorText1}"/>
+                        </Border>
+                    </StackPanel>
                     <ToggleSwitch Grid.Column="1" 
                                    Name="ListeningToggle"
                                    IsChecked="True"
-                                   OffContent="已停止"
                                    OnContent="监听中"
+                                   OffContent="已停止"
                                    IsCheckedChanged="ListeningToggle_Toggled"/>
                 </Grid>
                 
                 <!-- 显示设置 -->
-                <TextBlock Text="显示设置" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                <TextBlock Text="显示设置" FontSize="20" FontWeight="Bold" 
+                          Foreground="{DynamicResource SemiColorText0}" Margin="0,8,0,0"/>
                 
-                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="背景颜色:" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1" Name="BackgroundColorCombo" SelectedIndex="0" SelectionChanged="BackgroundColorCombo_SelectionChanged">
-                        <ComboBoxItem>蓝色</ComboBoxItem>
-                        <ComboBoxItem>绿色</ComboBoxItem>
-                        <ComboBoxItem>红色</ComboBoxItem>
-                        <ComboBoxItem>紫色</ComboBoxItem>
-                        <ComboBoxItem>橙色</ComboBoxItem>
-                    </ComboBox>
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,16">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="背景颜色" VerticalAlignment="Center"
+                              Foreground="{DynamicResource SemiColorText1}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Name="BackgroundColorCombo" SelectedIndex="0" 
+                             SelectionChanged="BackgroundColorCombo_SelectionChanged"
+                             Background="{DynamicResource SemiColorFillSecondary}"
+                             BorderBrush="{DynamicResource SemiColorBorder}"/>
                     
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="显示时长:" VerticalAlignment="Center"/>
-                    <Slider Grid.Row="1" Grid.Column="1" Name="DisplayDurationSlider" 
-                           Minimum="1" Maximum="5" Value="2" TickFrequency="0.5"
-                           IsSnapToTickEnabled="True"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="显示时长" VerticalAlignment="Center"
+                              Foreground="{DynamicResource SemiColorText1}"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Grid.Column="1" Name="DisplayDurationSlider" 
+                               Minimum="1" Maximum="5" Value="2" TickFrequency="0.5"
+                               IsSnapToTickEnabled="True" Width="200"
+                               Background="{DynamicResource SemiColorFillSecondary}"/>
+                        <TextBlock Text="{Binding #DisplayDurationSlider.Value, StringFormat='{}{0:F1}秒'}"
+                                  VerticalAlignment="Center" Foreground="{DynamicResource SemiColorText2}"/>
+                    </StackPanel>
                     
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="字体大小:" VerticalAlignment="Center"/>
-                    <Slider Grid.Row="2" Grid.Column="1" Name="FontSizeSlider" 
-                           Minimum="12" Maximum="48" Value="24" TickFrequency="2"
-                           IsSnapToTickEnabled="True"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="字体大小" VerticalAlignment="Center"
+                              Foreground="{DynamicResource SemiColorText1}"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Grid.Column="1" Name="FontSizeSlider" 
+                               Minimum="12" Maximum="48" Value="24" TickFrequency="2"
+                               IsSnapToTickEnabled="True" Width="200"
+                               Background="{DynamicResource SemiColorFillSecondary}"/>
+                        <TextBlock Text="{Binding #FontSizeSlider.Value, StringFormat='{}{0:F0}px'}"
+                                  VerticalAlignment="Center" Foreground="{DynamicResource SemiColorText2}"/>
+                    </StackPanel>
                 </Grid>
                 
-                <!-- 预览 -->
+                <!-- 预览 - Semi Design风格 -->
                 <Border Name="PreviewBorder" 
-                       Background="{DynamicResource SystemAccentColor}"
-                       CornerRadius="8"
-                       Padding="20"
-                       Margin="0,10,0,0">
+                       Background="{DynamicResource SemiColorPrimary}"
+                       CornerRadius="12"
+                       Padding="24"
+                       Margin="0,16,0,0"
+                       BoxShadow="0 4 12 0 #33000000">
                     <TextBlock Name="PreviewText" 
                               Text="按键预览"
                               FontSize="24"
                               FontWeight="SemiBold"
                               HorizontalAlignment="Center"
-                              Foreground="White"/>
+                              Foreground="{DynamicResource SemiColorText0}"/>
                 </Border>
             </StackPanel>
         </Border>
         
-        <!-- 状态栏 -->
-        <Border Grid.Row="2" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}" CornerRadius="8" Padding="15">
-            <Grid ColumnDefinitions="*,Auto,Auto">
-                <TextBlock Grid.Column="0" Name="StatusText" 
-                          Text="准备就绪 - 点击开始监听"
-                          VerticalAlignment="Center"
-                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                <Button Grid.Column="1" Name="TestButton" 
-                       Content="测试显示"
-                       Click="TestButton_Click" Margin="0,0,10,0"/>
-                <Button Grid.Column="2" Name="HideButton" 
-                       Content="隐藏窗口"
-                       Click="HideButton_Click"/>
+        <!-- 状态栏 - Semi Design按钮 -->
+        <Border Grid.Row="2" Background="{DynamicResource SemiColorBackground}" CornerRadius="12" Padding="20"
+                BoxShadow="0 2 8 0 #1A000000">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                    <PathIcon Width="16" Height="16" 
+                             Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"
+                             Foreground="{DynamicResource SemiColorSuccess}"/>
+                    <TextBlock Name="StatusTextBlock" 
+                              Text="准备就绪 - 点击开始监听"
+                              VerticalAlignment="Center"
+                              Foreground="{DynamicResource SemiColorText2}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                    <Button Name="TestButton" 
+                           Content="测试显示"
+                           Click="TestButton_Click"
+                           Theme="{DynamicResource SemiButtonStyle}"/>
+                    <Button Name="HideButton" 
+                           Content="隐藏窗口"
+                           Click="HideButton_Click"
+                           Theme="{DynamicResource SemiButtonStyle}"/>
+                    <Button Name="ConfigButton"
+                           Content="配置"
+                           Click="ConfigButton_Click"
+                           Theme="{DynamicResource SemiButtonStyle}"/>
+                    <Button Name="ManualTestButton"
+                           Content="手动测试"
+                           Click="ManualTestButton_Click"
+                           Theme="{DynamicResource SemiButtonStyle}"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>
