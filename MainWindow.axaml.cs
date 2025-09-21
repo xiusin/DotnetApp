@@ -566,13 +566,18 @@ public partial class MainWindow : Window
             _noteTagManager.ShowTags();
             System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
             
-            // 延迟2秒后强制显示便签到可见位置（用于测试）
-            Task.Delay(2000).ContinueWith(_ =>
+            // 延迟500ms后验证便签初始状态
+            Task.Delay(500).ContinueWith(_ =>
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    System.Console.WriteLine($"[MainWindow] 2秒后强制显示便签到可见位置...");
-                    _noteTagManager?.ForceShowTags();
+                    System.Console.WriteLine($"[MainWindow] 验证便签初始状态...");
+                    _noteTagManager?.ValidateInitialState();
+                    var status = _noteTagManager?.GetTagStatus();
+                    if (status != null)
+                    {
+                        System.Console.WriteLine($"[MainWindow] 便签状态:\n{status}");
+                    }
                 });
             });
             

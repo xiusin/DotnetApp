@@ -96,17 +96,6 @@ public class NoteTagManager
             Interval = TimeSpan.FromMilliseconds(HOVER_DELAY)
         };
         _hoverTimer.Tick += OnHoverTimerTick;
-
-        // 为每个标签窗口设置鼠标事件
-        for (int i = 0; i < _tagWindows.Length; i++)
-        {
-            if (_tagWindows[i] != null)
-            {
-                int tagIndex = i; // 捕获循环变量
-                _tagWindows[i].PointerEntered += (s, e) => OnTagPointerEnter(tagIndex);
-                _tagWindows[i].PointerExited += (s, e) => OnTagPointerLeave(tagIndex);
-            }
-        }
     }
 
     private void OnHostWindowPointerMoved(object? sender, PointerEventArgs e)
@@ -398,11 +387,27 @@ public class NoteTagManager
                 {
                     window.Position = _hiddenPositions[i]; // 初始位置为只显示10px
                     window.IsVisible = true;
+                    
+                    // 为每个标签窗口设置鼠标事件（在窗口显示后绑定）
+                    int tagIndex = i; // 捕获循环变量
+                    window.PointerEntered += (s, e) => OnTagPointerEnter(tagIndex);
+                    window.PointerExited += (s, e) => OnTagPointerLeave(tagIndex);
+                    
+                    // 确保窗口状态正确
+                    window.Topmost = true;
+                    window.ShowInTaskbar = false;
+                    window.CanResize = false;
+                    window.SystemDecorations = SystemDecorations.None;
+                    window.Background = Brushes.Transparent;
+                    window.IsHitTestVisible = true; // 确保可以接收鼠标事件
+                    window.Focusable = false; // 避免抢夺焦点
+                    
                     System.Console.WriteLine($"[NoteTagManager] 初始化标签 {i + 1} 在部分显示位置 ({_hiddenPositions[i].X}, {_hiddenPositions[i].Y}) - 显示10px");
+                    System.Console.WriteLine($"[NoteTagManager] 标签 {i + 1} 窗口状态: IsVisible={window.IsVisible}, Topmost={window.Topmost}");
                 }
             }
             
-            System.Console.WriteLine($"[NoteTagManager] ShowTags() 完成");
+            System.Console.WriteLine($"[NoteTagManager] ShowTags() 完成，所有标签已初始化并绑定事件");
         }
         catch (Exception ex)
         {
@@ -446,10 +451,36 @@ public class NoteTagManager
         {
             if (_tagWindows[i] != null)
             {
-                status.AppendLine($"标签 {i + 1}: 可见={_tagWindows[i].IsVisible}, 位置=({_tagWindows[i].Position.X}, {_tagWindows[i].Position.Y})");
+                var window = _tagWindows[i];
+                var isSlidOut = _tagSlidOut[i];
+                status.AppendLine($"标签 {i + 1}: 可见={window.IsVisible}, 位置=({window.Position.X}, {window.Position.Y}), 已滑出={isSlidOut}");
             }
         }
         return status.ToString();
+    }
+
+    // 新方法：验证初始状态
+    public void ValidateInitialState()
+    {
+        System.Console.WriteLine($"[NoteTagManager] 验证初始状态:");
+        for (int i = 0; i < _tagWindows.Length; i++)
+        {
+            if (_tagWindows[i] != null)
+            {
+                var window = _tagWindows[i];
+                var expectedHiddenX = _hiddenPositions[i].X;
+                var actualX = window.Position.X;
+                var isCorrectlyPositioned = Math.Abs(actualX - expectedHiddenX) < 5; // 允许5px误差
+                
+                System.Console.WriteLine($"[NoteTagManager] 标签 {i + 1}: 期望X={expectedHiddenX}, 实际X={actualX}, 位置正确={isCorrectlyPositioned}");
+                
+                if (!isCorrectlyPositioned)
+                {
+                    System.Console.WriteLine($"[NoteTagManager] 警告: 标签 {i + 1} 位置不正确，正在修正...");
+                    window.Position = _hiddenPositions[i];
+                }
+            }
+        }
     }
 
     public void HideTags()
@@ -490,10 +521,10 @@ public class NoteTagManager
 
     private void OnTagPointerEnter(int tagIndex)
     {
-        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && !_isAnimating)
+        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && !_isAnimating && _tagWindows[tagIndex] != null)
         {
             _tagHovered[tagIndex] = true;
-            System.Console.WriteLine($"[NoteTagManager] 鼠标进入标签 {tagIndex + 1}");
+            System.Console.WriteLine($"[NoteTagManager] 鼠标进入标签 {tagIndex + 1}，当前位置: ({_tagWindows[tagIndex].Position.X}, {_tagWindows[tagIndex].Position.Y})");
             
             // 标签悬停效果（圆角效果）
             _tags[tagIndex].SetHoverState(true);
@@ -505,7 +536,7 @@ public class NoteTagManager
 
     private void OnTagPointerLeave(int tagIndex)
     {
-        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && !_isAnimating)
+        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && !_isAnimating && _tagWindows[tagIndex] != null)
         {
             _tagHovered[tagIndex] = false;
             System.Console.WriteLine($"[NoteTagManager] 鼠标离开标签 {tagIndex + 1}");
