@@ -27,8 +27,11 @@ public partial class MainWindow : Window
     private SimpleEdgeComponent? _edgeSwipeComponent;  // 改为SimpleEdgeComponent
     private AIChatWindow? _aiChatWindow;
     private ConfigPopover? _configPopover;
-    private DebugOverlay? _debugOverlay;
+    private DebugOverlay? _debugOverlay;  // 使用基类类型
     private Timer? _edgeAutoShowTimer; // 边缘组件自动显示计时器
+    
+    // 创可贴标签组件
+    private NoteTagComponent.NoteTagManager? _noteTagManager;
     
     // 当前按下的键
     private readonly HashSet<Key> _pressedKeys = new();
@@ -73,23 +76,33 @@ public partial class MainWindow : Window
                 _totalShiftDoubleClicks++;
                 
                 _debugOverlay?.LogEvent($"🎉 双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)");
-            StatusTextBlock.Text = $"双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)";
-            
-            // 增强调试信息
-            if (_debugOverlay is EnhancedDebugOverlay enhanced)
-            {
-                enhanced.LogShiftPress(e.Key, timeSinceLastPress);
-            }
+                StatusTextBlock.Text = $"双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)";
                 
-                // 打开AI聊天窗口
+                // 增强调试信息
+                if (_debugOverlay is EnhancedDebugOverlay enhanced)
+                {
+                    enhanced.LogShiftPress(e.Key, timeSinceLastPress);
+                }
+                
+                // 切换AI聊天窗口状态
                 if (_aiChatWindow != null)
                 {
                     try
                     {
-                        _aiChatWindow.ToggleChatWindow();
-                        var newState = _aiChatWindow.IsVisible ? "已打开" : "已隐藏";
-                        _debugOverlay?.LogEvent($"✅ AI聊天窗口{newState}");
-                        StatusTextBlock.Text = $"AI聊天窗口{newState}";
+                        if (_aiChatWindow.IsVisible)
+                        {
+                            // 如果窗口已打开，则关闭
+                            _aiChatWindow.HideChatWindow();
+                            _debugOverlay?.LogEvent($"✅ AI聊天窗口已关闭");
+                            StatusTextBlock.Text = $"AI聊天窗口已关闭";
+                        }
+                        else
+                        {
+                            // 如果窗口已关闭，则打开
+                            _aiChatWindow.ShowChatWindow();
+                            _debugOverlay?.LogEvent($"✅ AI聊天窗口已打开");
+                            StatusTextBlock.Text = $"AI聊天窗口已打开";
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -415,6 +428,48 @@ public partial class MainWindow : Window
         
         StatusTextBlock.Text = "手动测试已执行，查看调试面板获取详细信息";
     }
+
+    private void TagTestButton_Click(object? sender, RoutedEventArgs e)
+    {
+        // 测试标签功能
+        if (_noteTagManager != null)
+        {
+            _debugOverlay?.LogEvent("🏷️ 测试标签显示功能...");
+            
+            try
+            {
+                // 获取当前状态
+                var status = _noteTagManager.GetTagStatus();
+                _debugOverlay?.LogEvent($"📊 {status}");
+                
+                // 强制显示标签
+                _noteTagManager.ForceShowTags();
+                _debugOverlay?.LogEvent("✅ 标签已强制显示");
+                StatusTextBlock.Text = "标签已强制显示 - 查看屏幕左侧 (x=50, y=480)";
+                
+                // 5秒后显示状态
+                Task.Delay(5000).ContinueWith(_ =>
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        var newStatus = _noteTagManager.GetTagStatus();
+                        _debugOverlay?.LogEvent($"📊 5秒后状态: {newStatus}");
+                        StatusTextBlock.Text = $"标签状态已更新: {newStatus}";
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                _debugOverlay?.LogEvent($"❌ 标签测试失败: {ex.Message}");
+                StatusTextBlock.Text = $"标签测试失败: {ex.Message}";
+            }
+        }
+        else
+        {
+            _debugOverlay?.LogEvent("❌ 标签管理器未初始化");
+            StatusTextBlock.Text = "标签管理器未初始化";
+        }
+    }
     
     private void BackgroundColorCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -475,12 +530,12 @@ public partial class MainWindow : Window
         try
         {
             // 初始化文本选择弹出框
-            _textSelectionPopover = new TextSelectionPopover(_debugOverlay as EnhancedDebugOverlay);
+            _textSelectionPopover = new TextSelectionPopover(_debugOverlay);
             _textSelectionPopover.CopyRequested += OnTextCopyRequested;
             _textSelectionPopover.TranslateRequested += OnTextTranslateRequested;
             
             // 初始化边缘滑动组件
-            _edgeSwipeComponent = new SimpleEdgeComponent(_debugOverlay as EnhancedDebugOverlay);
+            _edgeSwipeComponent = new SimpleEdgeComponent(_debugOverlay);
             _edgeSwipeComponent.WindowOpened += OnEdgeWindowOpened;
             _edgeSwipeComponent.WindowClosed += OnEdgeWindowClosed;
             
@@ -499,6 +554,27 @@ public partial class MainWindow : Window
             // 初始化调试覆盖层
             _debugOverlay = new EnhancedDebugOverlay();
             _debugOverlay.ShowDebug();
+            
+            // 初始化创可贴标签组件
+            System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
+            _noteTagManager = new NoteTagComponent.NoteTagManager(this);
+            System.Console.WriteLine($"[MainWindow] 标签管理器创建完成，设置文本...");
+            _noteTagManager.SetTagText(0, "功能标签 1");
+            _noteTagManager.SetTagText(1, "功能标签 2");
+            _noteTagManager.SetTagText(2, "功能标签 3");
+            System.Console.WriteLine($"[MainWindow] 文本设置完成，调用ShowTags...");
+            _noteTagManager.ShowTags();
+            System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
+            
+            // 延迟2秒后强制显示便签到可见位置（用于测试）
+            Task.Delay(2000).ContinueWith(_ =>
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    System.Console.WriteLine($"[MainWindow] 2秒后强制显示便签到可见位置...");
+                    _noteTagManager?.ForceShowTags();
+                });
+            });
             
             if (StatusTextBlock != null)
                 StatusTextBlock.Text = "所有功能已初始化 (增强调试模式)";
@@ -578,12 +654,12 @@ public partial class MainWindow : Window
     
     private void StartEdgeAutoShow()
     {
-        // 延迟15秒后开始，每15秒一次 - 避免立即触发
-        _edgeAutoShowTimer = new Timer(AutoShowEdgeComponent, null, 15000, 15000);
+        // 延迟30秒后开始，每30秒一次 - 减少频率避免干扰
+        _edgeAutoShowTimer = new Timer(AutoShowEdgeComponent, null, 30000, 30000);
         
         if (_debugOverlay is EnhancedDebugOverlay enhanced)
         {
-            enhanced.LogEvent("⏰ 边缘组件自动显示已启动（15秒后开始，每15秒一次）");
+            enhanced.LogEvent("⏰ 边缘组件自动显示已启动（30秒后开始，每30秒一次）");
         }
     }
     
@@ -617,6 +693,9 @@ public partial class MainWindow : Window
         _aiChatWindow?.Close();
         _configPopover?.Dispose();
         _edgeAutoShowTimer?.Dispose();
+        
+        // 清理标签组件
+        _noteTagManager?.Dispose();
     }
     
     // 添加隐藏窗口但保持监听的功能

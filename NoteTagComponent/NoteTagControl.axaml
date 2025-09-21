@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ConfigButtonDisplay.NoteTagComponent.NoteTagControl"
+             Width="160" Height="80">
+    <!-- 便签样式设计 -->
+    <Border Name="TagBorder" 
+            Background="#FFF9C4" 
+            CornerRadius="12" 
+            Padding="12" 
+            BorderBrush="#FFD54F" 
+            BorderThickness="1"
+            Cursor="Hand"
+            ClipToBounds="True">
+        <Border.Styles>
+            <Style Selector="Border:pointerover">
+                <Setter Property="BorderBrush" Value="#FFC107"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="15"/>
+                <Setter Property="BoxShadow" Value="0 4 8 0 #40000000"/>
+            </Style>
+        </Border.Styles>
+        <!-- 便签阴影效果 - 暂时移除，因为Avalonia可能不支持 -->
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 便签顶部装饰线 -->
+            <Border Grid.Row="0" 
+                    Height="2" 
+                    Background="#FFB74D" 
+                    CornerRadius="1"
+                    Margin="0,0,0,8"/>
+            
+            <!-- 便签内容区域 -->
+            <TextBlock Name="TagText" 
+                      Grid.Row="1"
+                      Text="便签内容" 
+                      VerticalAlignment="Center" 
+                      HorizontalAlignment="Center"
+                      Foreground="#5D4037" 
+                      FontWeight="Medium"
+                      FontSize="12"
+                      TextAlignment="Center"
+                      TextWrapping="Wrap"
+                      MaxLines="3"/>
+            
+            <!-- 便签底部小图标 -->
+            <TextBlock Grid.Row="2"
+                      Text="📝"
+                      FontSize="10"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Bottom"
+                      Opacity="0.6"
+                      Margin="0,4,0,0"/>
+        </Grid>
+    </Border>
+</UserControl>

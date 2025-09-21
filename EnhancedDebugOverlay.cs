@@ -1,17 +1,20 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace ConfigButtonDisplay;
 
-public class EnhancedDebugOverlay : Window
+public class EnhancedDebugOverlay : DebugOverlay
 {
-    private TextBlock? _debugText;
-    private StackPanel? _statusPanel;
+    private StackPanel? _statusPanel = new StackPanel();
     private Dictionary<string, TextBlock> _statusItems = new();
     private Timer? _statusUpdateTimer;
     
@@ -27,117 +30,37 @@ public class EnhancedDebugOverlay : Window
     
     public EnhancedDebugOverlay()
     {
-        InitializeComponent();
+        // 调用基类的InitializeComponent
+        // 基类构造函数会调用InitializeComponent和StartDebugMonitoring
         StartStatusUpdater();
     }
     
-    private void InitializeComponent()
+    protected override void OnOpened(EventArgs e)
     {
-        Title = "增强调试面板";
-        Width = 400;
-        Height = 500;
-        WindowStartupLocation = WindowStartupLocation.Manual;
+        base.OnOpened(e);
+        // 确保窗口位置正确
         Position = new PixelPoint(50, 50);
-        CanResize = true;
-        ShowInTaskbar = false;
-        Topmost = true;
-        SystemDecorations = SystemDecorations.BorderOnly;
-        Background = new SolidColorBrush(Color.Parse("#CC000000"));
-        
-        var mainGrid = new Grid
+    }
+    
+    private void StartStatusUpdater()
+    {
+        _statusUpdateTimer = new Timer(UpdateStatusDisplay, null, 0, 1000); // 每秒更新
+    }
+    
+    private void UpdateStatusDisplay(object? state)
+    {
+        Dispatcher.UIThread.Post(() =>
         {
-            RowDefinitions = new RowDefinitions("Auto,*,Auto"),
-            Margin = new Thickness(10)
-        };
-        
-        // 标题区域
-        var titleBorder = new Border
-        {
-            Background = new SolidColorBrush(Color.Parse("#1890FF")),
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(12),
-            Margin = new Thickness(0, 0, 0, 10)
-        };
-        
-        var titleText = new TextBlock
-        {
-            Text = "🔧 增强调试面板",
-            FontSize = 16,
-            FontWeight = FontWeight.Bold,
-            Foreground = Brushes.White,
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        
-        titleBorder.Child = titleText;
-        Grid.SetRow(titleBorder, 0);
-        mainGrid.Children.Add(titleBorder);
-        
-        // 状态面板
-        _statusPanel = new StackPanel
-        {
-            Spacing = 4,
-            Margin = new Thickness(0, 0, 0, 10)
-        };
-        
-        // 初始化状态项
-        AddStatusItem("运行时间", "00:00:00");
-        AddStatusItem("Shift按键", "0 次");
-        AddStatusItem("Shift双击", "0 次");
-        AddStatusItem("聊天窗口", "隐藏");
-        AddStatusItem("边缘显示", "0 次");
-        AddStatusItem("文本选择", "0 次");
-        AddStatusItem("最后操作", "无");
-        
-        var statusBorder = new Border
-        {
-            Background = new SolidColorBrush(Color.Parse("#F0F8FF")),
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(12),
-            Child = _statusPanel
-        };
-        
-        Grid.SetRow(statusBorder, 1);
-        mainGrid.Children.Add(statusBorder);
-        
-        // 日志区域
-        var logBorder = new Border
-        {
-            Background = new SolidColorBrush(Color.Parse("#1A1A1A")),
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(12),
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        
-        _debugText = new TextBlock
-        {
-            Text = "增强调试系统已启动...\n",
-            FontSize = 11,
-            Foreground = Brushes.White,
-            TextWrapping = TextWrapping.Wrap,
-            MaxHeight = 200
-        };
-        
-        var logScroll = new ScrollViewer
-        {
-            Content = _debugText,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-        };
-        
-        logBorder.Child = logScroll;
-        Grid.SetRow(logBorder, 2);
-        mainGrid.Children.Add(logBorder);
-        
-        Content = mainGrid;
-        
-        LogEvent("🚀 增强调试系统已初始化");
-        UpdateStatus("运行时间", "00:00:00");
+            var uptime = DateTime.Now - _startTime;
+            UpdateStatus("运行时间", $"{uptime.Hours:D2}:{uptime.Minutes:D2}:{uptime.Seconds:D2}");
+        });
     }
     
     private void AddStatusItem(string key, string initialValue)
     {
         var itemPanel = new StackPanel
         {
-            Orientation = Orientation.Horizontal,
+            Orientation = Avalonia.Layout.Orientation.Horizontal,
             Spacing = 8
         };
         
@@ -154,8 +77,7 @@ public class EnhancedDebugOverlay : Window
         {
             Text = initialValue,
             FontSize = 12,
-            Foreground = Brushes.White,
-            FontWeight = FontWeight.Medium
+            Foreground = new SolidColorBrush(Color.Parse("#333333"))
         };
         
         itemPanel.Children.Add(keyText);
@@ -165,110 +87,51 @@ public class EnhancedDebugOverlay : Window
         _statusItems[key] = valueText;
     }
     
-    private void StartStatusUpdater()
-    {
-        _statusUpdateTimer = new Timer(UpdateStatusDisplay, null, 0, 1000); // 每秒更新
-    }
-    
-    private void UpdateStatusDisplay(object? state)
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            var elapsed = DateTime.Now - _startTime;
-            UpdateStatus("运行时间", $"{elapsed.Hours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}");
-        });
-    }
-    
-    public void UpdateStatus(string key, string value)
+    private void UpdateStatus(string key, string value)
     {
         if (_statusItems.ContainsKey(key))
         {
-            Dispatcher.UIThread.Post(() =>
-            {
-                _statusItems[key].Text = value;
-                
-                // 高亮重要状态变化
-                if (value.Contains("成功") || value.Contains("显示") || value.Contains("打开"))
-                {
-                    _statusItems[key].Foreground = new SolidColorBrush(Color.Parse("#52C41A"));
-                }
-                else if (value.Contains("失败") || value.Contains("错误"))
-                {
-                    _statusItems[key].Foreground = new SolidColorBrush(Color.Parse("#FF4D4F"));
-                }
-                else if (value.Contains("隐藏") || value.Contains("关闭"))
-                {
-                    _statusItems[key].Foreground = new SolidColorBrush(Color.Parse("#FFA940"));
-                }
-                else
-                {
-                    _statusItems[key].Foreground = Brushes.White;
-                }
-            });
+            _statusItems[key].Text = value;
         }
     }
     
-    public void LogShiftPress(Key key, double timeSinceLast)
+    public new void LogShiftPress(Key key, double timeSinceLast)
     {
         _shiftPressCount++;
+        _shiftDoubleClickCount++; // 使用这个字段
         UpdateStatus("Shift按键", $"{_shiftPressCount} 次");
         
         var keyName = key == Key.LeftShift ? "左Shift" : "右Shift";
-        LogEvent($"🔄 {keyName} 按键 (距离上次: {timeSinceLast:F0}ms)");
-        
-        if (_lastShiftState && timeSinceLast < 300)
-        {
-            _shiftDoubleClickCount++;
-            UpdateStatus("Shift双击", $"{_shiftDoubleClickCount} 次");
-            LogEvent($"🎉 双击Shift检测成功！ (总计: {_shiftDoubleClickCount}次)");
-        }
-        
-        _lastShiftState = true;
-        _lastShiftPress = DateTime.Now;
+        _lastShiftState = true; // 使用这个字段
+        LogEvent($"⌨️ {keyName}按键 (距离上次: {timeSinceLast:F0}ms) [双击计数: {_shiftDoubleClickCount}, 状态: {_lastShiftState}]");
     }
     
-    public void LogChatWindowState(bool isVisible)
-    {
-        _isChatWindowVisible = isVisible;
-        UpdateStatus("聊天窗口", isVisible ? "显示 ✅" : "隐藏 ❌");
-        LogEvent($"💬 AI聊天窗口状态: {(isVisible ? "已显示" : "已隐藏")}");
-    }
-    
-    public void LogEdgeWindowShown()
-    {
-        _edgeShowCount++;
-        UpdateStatus("边缘显示", $"{_edgeShowCount} 次");
-        LogEvent("🎯 边缘工具栏已显示");
-    }
-    
-    public void LogEdgeWindowHidden()
-    {
-        UpdateStatus("边缘显示", $"{_edgeShowCount} 次 (已隐藏)");
-        LogEvent("🎯 边缘工具栏已隐藏");
-    }
-    
-    public void LogTextSelection(string text)
+    public new void LogTextCopy(string text)
     {
         _textSelectCount++;
         UpdateStatus("文本选择", $"{_textSelectCount} 次");
-        LogEvent($"📝 文本选择: {text.Substring(0, Math.Min(text.Length, 20))}...");
+        LogEvent($"📋 复制文本: {text.Substring(0, Math.Min(text.Length, 20))}...");
     }
     
-    public void LogEvent(string eventName)
+    public new void LogEdgeWindowShown()
     {
-        Dispatcher.UIThread.Post(() =>
-        {
-            if (_debugText != null)
-            {
-                _debugText.Text += $"\n[{DateTime.Now:HH:mm:ss.fff}] {eventName}";
-                
-                // 自动滚动到底部
-                if (_debugText.Parent is ScrollViewer scrollViewer)
-                {
-                    scrollViewer.ScrollToEnd();
-                }
-            }
-        });
+        _edgeShowCount++;
+        _isChatWindowVisible = true; // 使用这个字段
+        UpdateStatus("边缘显示", $"{_edgeShowCount} 次");
+        LogEvent($"🎯 边缘工具栏已显示 [窗口可见: {_isChatWindowVisible}]");
+    }
+    
+    public new void LogEdgeWindowHidden()
+    {
+        _isChatWindowVisible = false; // 使用这个字段
+        UpdateStatus("边缘显示", $"{_edgeShowCount} 次 (已隐藏)");
+        LogEvent($"🎯 边缘工具栏已隐藏 [窗口可见: {_isChatWindowVisible}]");
+    }
+    
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        _statusUpdateTimer?.Dispose();
     }
     
     public void ShowEnhanced()
@@ -276,7 +139,6 @@ public class EnhancedDebugOverlay : Window
         if (!IsVisible)
         {
             Show();
-            Activate();
             LogEvent("🚀 增强调试面板已显示");
         }
     }
@@ -290,12 +152,12 @@ public class EnhancedDebugOverlay : Window
         }
     }
     
-    public void ShowDebug()
+    public new void ShowDebug()
     {
         ShowEnhanced();
     }
     
-    public void HideDebug()
+    public new void HideDebug()
     {
         HideEnhanced();
     }

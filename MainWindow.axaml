@@ -10,6 +10,8 @@
         Background="{DynamicResource SemiBackground}">
     
     <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+        <!-- 标签容器 -->
+        <Panel Name="NoteTagContainer" Grid.Row="0" Grid.RowSpan="3" />
         <!-- 标题栏 - Semi Design风格 -->
         <Border Grid.Row="0" Background="{DynamicResource SemiColorPrimary}" CornerRadius="12" Padding="24" Margin="0,0,0,24">
             <StackPanel>
@@ -138,6 +140,10 @@
                     <Button Name="ManualTestButton"
                            Content="手动测试"
                            Click="ManualTestButton_Click"
+                           Theme="{DynamicResource SemiButtonStyle}"/>
+                    <Button Name="TagTestButton"
+                           Content="标签测试"
+                           Click="TagTestButton_Click"
                            Theme="{DynamicResource SemiButtonStyle}"/>
                 </StackPanel>
             </Grid>

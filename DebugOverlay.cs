@@ -169,6 +169,27 @@ public class DebugOverlay : Window
         });
     }
     
+    // 添加虚方法供子类重写
+    public virtual void LogShiftPress(Avalonia.Input.Key key, double timeSinceLast)
+    {
+        LogEvent($"Shift按键: {key} (距离上次: {timeSinceLast:F0}ms)");
+    }
+    
+    public virtual void LogTextCopy(string text)
+    {
+        LogEvent($"复制文本: {text.Substring(0, Math.Min(text.Length, 20))}...");
+    }
+    
+    public virtual void LogEdgeWindowShown()
+    {
+        LogEvent("边缘工具栏已显示");
+    }
+    
+    public virtual void LogEdgeWindowHidden()
+    {
+        LogEvent("边缘工具栏已隐藏");
+    }
+    
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);

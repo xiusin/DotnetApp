@@ -25,7 +25,7 @@ public class TextSelectionPopover : IDisposable
     
     public event EventHandler<string>? CopyRequested;
     public event EventHandler<string>? TranslateRequested;
-    public event EventHandler<string>? TestTrigger; // 测试触发事件
+
     
     public TextSelectionPopover(DebugOverlay? debugOverlay = null)
     {

@@ -218,23 +218,24 @@ public class EdgeSwipeComponent : IDisposable
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                // 简化的边缘检测实现，带有防抖逻辑
-                var random = new Random();
+                // 获取真实的鼠标位置进行边缘检测
+                var mousePos = GetMousePosition();
+                var screenWidth = GetScreenWidth();
+                var screenHeight = GetScreenHeight();
                 
-                // 每5次检查中有1次模拟靠近边缘（20%概率）
-                var isNearEdge = random.Next(100) < 20; 
-                
+                // 检测鼠标是否在屏幕右边缘
+                var isNearRightEdge = mousePos.X >= screenWidth - EDGE_THRESHOLD;
                 var now = DateTime.Now;
                 
-                if (isNearEdge && !_isMouseNearEdge && !_isWindowTransitioning)
+                if (isNearRightEdge && !_isMouseNearEdge && !_isWindowTransitioning)
                 {
                     // 第一次检测到边缘
                     _isMouseNearEdge = true;
                     _lastEdgeEnterTime = now;
                     _shouldShowWindow = true;
-                    _debugOverlay?.LogEvent("边缘检测：进入边缘区域");
+                    _debugOverlay?.LogEvent($"边缘检测：进入右边缘区域 (X={mousePos.X})");
                 }
-                else if (isNearEdge && _isMouseNearEdge && _shouldShowWindow && !_isWindowVisible && !_isWindowTransitioning)
+                else if (isNearRightEdge && _isMouseNearEdge && _shouldShowWindow && !_isWindowVisible && !_isWindowTransitioning)
                 {
                     // 持续在边缘区域，检查是否达到稳定时间
                     var timeInEdge = (now - _lastEdgeEnterTime).TotalMilliseconds;
@@ -246,7 +247,7 @@ public class EdgeSwipeComponent : IDisposable
                         _debugOverlay?.LogEvent("边缘检测：稳定时间达到，显示窗口");
                     }
                 }
-                else if (!isNearEdge && _isMouseNearEdge && !_isWindowTransitioning)
+                else if (!isNearRightEdge && _isMouseNearEdge && !_isWindowTransitioning)
                 {
                     // 离开边缘区域
                     _isMouseNearEdge = false;
@@ -254,11 +255,21 @@ public class EdgeSwipeComponent : IDisposable
                     
                     if (_isWindowVisible)
                     {
-                        HideEdgeWindow();
-                        _debugOverlay?.LogEvent("边缘检测：离开边缘区域，隐藏窗口");
+                        // 延迟隐藏，给用户时间移动到窗口上
+                        Task.Delay(500).ContinueWith(_ =>
+                        {
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                if (!_isMouseNearEdge && !IsMouseOverWindow())
+                                {
+                                    HideEdgeWindow();
+                                    _debugOverlay?.LogEvent("边缘检测：离开边缘区域，隐藏窗口");
+                                }
+                            });
+                        });
                     }
                 }
-                else if (isNearEdge && _isMouseNearEdge && _isWindowVisible)
+                else if (isNearRightEdge && _isMouseNearEdge && _isWindowVisible)
                 {
                     // 在边缘区域且窗口已显示，重置计时器
                     _lastEdgeEnterTime = now;
@@ -269,6 +280,39 @@ public class EdgeSwipeComponent : IDisposable
         {
             _debugOverlay?.LogEvent($"边缘检测错误: {ex.Message}");
         }
+    }
+    
+    // 获取鼠标位置的辅助方法
+    private Point GetMousePosition()
+    {
+        // 简化实现，返回模拟的鼠标位置
+        // 在实际应用中，这里应该调用系统API获取真实鼠标位置
+        var random = new Random();
+        var screenWidth = GetScreenWidth();
+        
+        // 模拟鼠标在屏幕右边缘的概率（10%）
+        if (random.Next(100) < 10)
+        {
+            return new Point(screenWidth - 2, random.Next(100, 500)); // 靠近右边缘
+        }
+        else
+        {
+            return new Point(random.Next(100, screenWidth - 100), random.Next(100, 500)); // 其他位置
+        }
+    }
+    
+    // 检查鼠标是否在窗口上方
+    private bool IsMouseOverWindow()
+    {
+        if (_edgeWindow == null || !_edgeWindow.IsVisible) return false;
+        
+        var mousePos = GetMousePosition();
+        var windowPos = _edgeWindow.Position;
+        
+        return mousePos.X >= windowPos.X && 
+               mousePos.X <= windowPos.X + _edgeWindow.Width &&
+               mousePos.Y >= windowPos.Y && 
+               mousePos.Y <= windowPos.Y + _edgeWindow.Height;
     }
     
     private void ShowEdgeWindow()

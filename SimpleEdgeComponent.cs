@@ -187,26 +187,23 @@ public class SimpleEdgeComponent : IDisposable
             return;
         }
         
+        // 简化逻辑：如果已显示则不重复显示，避免闪烁
         if (_isWindowVisible)
         {
-            _debugOverlay?.LogEvent("🔄 边缘组件已在显示中，先隐藏再显示");
-            HideEdgeWindow();
-            
-            // 延迟后重新显示
-            Task.Delay(1000).ContinueWith(_ =>
-            {
-                Dispatcher.UIThread.Post(() => ShowEdgeWindow());
-            });
+            _debugOverlay?.LogEvent("🔄 边缘组件已在显示中，跳过重复显示");
+            return;
         }
-        else
-        {
-            ShowEdgeWindow();
-        }
+        
+        ShowEdgeWindow();
     }
     
     public void ShowEdgeWindow()
     {
         if (_edgeWindow == null || _isWindowVisible) return;
+        
+        // 取消之前的自动隐藏计时器
+        _autoShowTimer?.Dispose();
+        _autoShowTimer = null;
         
         _isWindowVisible = true;
         WindowOpened?.Invoke(this, EventArgs.Empty);
@@ -219,8 +216,8 @@ public class SimpleEdgeComponent : IDisposable
             UpdateStatus($"第{_showCount}次显示 - {DateTime.Now:HH:mm:ss}");
             _debugOverlay?.LogEvent($"🎉 边缘窗口已显示 (第{_showCount}次)");
             
-            // 8秒后自动隐藏
-            Task.Delay(8000).ContinueWith(_ =>
+            // 设置稳定的自动隐藏计时器（5秒后）
+            _autoShowTimer = new Timer(_ =>
             {
                 Dispatcher.UIThread.Post(() =>
                 {
@@ -229,7 +226,7 @@ public class SimpleEdgeComponent : IDisposable
                         HideEdgeWindow();
                     }
                 });
-            });
+            }, null, 5000, Timeout.Infinite);
         }
         catch (Exception ex)
         {
