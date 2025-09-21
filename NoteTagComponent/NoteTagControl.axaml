@@ -4,7 +4,7 @@
              Width="160" Height="80">
     <!-- 便签样式设计 -->
     <Border Name="TagBorder" 
-            Background="#FFF9C4" 
+            Background="White" 
             CornerRadius="12" 
             Padding="12" 
             BorderBrush="#FFD54F" 
@@ -16,7 +16,8 @@
                 <Setter Property="BorderBrush" Value="#FFC107"/>
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="CornerRadius" Value="15"/>
-                <Setter Property="BoxShadow" Value="0 4 8 0 #40000000"/>
+                <Setter Property="BoxShadow" Value="0 4 8 0 #20000000"/>
+                <Setter Property="Background" Value="#FFFEF7"/>
             </Style>
         </Border.Styles>
         <!-- 便签阴影效果 - 暂时移除，因为Avalonia可能不支持 -->

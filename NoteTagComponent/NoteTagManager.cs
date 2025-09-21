@@ -28,6 +28,7 @@ public class NoteTagManager
     private int _debugCounter = 0; // 调试计数器
     private bool[] _tagHovered = new bool[3]; // 记录每个标签的悬停状态
     private bool[] _tagSlidOut = new bool[3]; // 记录每个标签是否已滑出
+    private DispatcherTimer? _stateCheckTimer; // 状态检查计时器
 
     public NoteTagManager(Window hostWindow)
     {
@@ -35,6 +36,7 @@ public class NoteTagManager
         System.Console.WriteLine($"[NoteTagManager] 初始化开始，主机窗口: {hostWindow?.GetType().Name}");
         InitializeTags();
         SetupHoverDetection();
+        SetupStateCheckTimer(); // 设置状态检查计时器
         System.Console.WriteLine($"[NoteTagManager] 初始化完成");
     }
 
@@ -63,7 +65,7 @@ public class NoteTagManager
                     ShowInTaskbar = false,
                     Topmost = true,
                     CanResize = false,
-                    Background = Brushes.Transparent,
+                    Background = null, // 使用null避免黑色背景
                     Content = noteTagControl,
                     IsVisible = false // 初始隐藏，等待ShowTags调用
                 };
@@ -96,6 +98,49 @@ public class NoteTagManager
             Interval = TimeSpan.FromMilliseconds(HOVER_DELAY)
         };
         _hoverTimer.Tick += OnHoverTimerTick;
+    }
+
+    private void SetupStateCheckTimer()
+    {
+        // 设置状态检查计时器，每2秒检查一次便签状态
+        _stateCheckTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        _stateCheckTimer.Tick += OnStateCheckTimerTick;
+        _stateCheckTimer.Start();
+    }
+
+    private void OnStateCheckTimerTick(object? sender, EventArgs e)
+    {
+        // 定期检查便签状态，修复不一致的情况
+        for (int i = 0; i < _tagWindows.Length; i++)
+        {
+            if (_tagWindows[i] != null && !_isAnimating)
+            {
+                var window = _tagWindows[i];
+                var currentX = window.Position.X;
+                var expectedHiddenX = _hiddenPositions[i].X;
+                var expectedShownX = _positions[i].X;
+                
+                // 检查状态与实际位置是否一致
+                bool isNearHiddenPosition = Math.Abs(currentX - expectedHiddenX) < 10;
+                bool isNearShownPosition = Math.Abs(currentX - expectedShownX) < 10;
+                
+                if (_tagSlidOut[i] && isNearHiddenPosition)
+                {
+                    // 标记为已滑出但实际在隐藏位置，修正状态
+                    System.Console.WriteLine($"[NoteTagManager] 状态检查: 标签 {i + 1} 标记为已滑出但位置在隐藏区域，自动修正状态");
+                    _tagSlidOut[i] = false;
+                }
+                else if (!_tagSlidOut[i] && isNearShownPosition && !_tagHovered[i])
+                {
+                    // 标记为未滑出但实际在显示位置且未悬停，自动收回
+                    System.Console.WriteLine($"[NoteTagManager] 状态检查: 标签 {i + 1} 标记为未滑出但位置在显示区域且未悬停，自动收回");
+                    SlideTagOut(i);
+                }
+            }
+        }
     }
 
     private void OnHostWindowPointerMoved(object? sender, PointerEventArgs e)
@@ -177,9 +222,24 @@ public class NoteTagManager
             
             // 只滑出指定的标签
             await AnimateTagSlideWithBounce(_tagWindows[tagIndex], _hiddenPositions[tagIndex], _positions[tagIndex], 400);
-            _tagSlidOut[tagIndex] = true; // 标记为已滑出
             
-            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 滑出完成");
+            // 确保状态正确更新
+            _tagSlidOut[tagIndex] = true;
+            
+            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 滑出完成，状态已更新");
+            
+            // 动画完成后检查是否还需要收回（处理快速鼠标移动的情况）
+            if (!_tagHovered[tagIndex])
+            {
+                System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 滑出完成但鼠标已离开，准备收回");
+                await Task.Delay(50); // 短暂延迟后收回
+                SlideTagOut(tagIndex);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 滑出异常: {ex.Message}");
+            _tagSlidOut[tagIndex] = false; // 重置状态
         }
         finally
         {
@@ -200,9 +260,24 @@ public class NoteTagManager
             
             // 只收回指定的标签
             await AnimateTagSlide(_tagWindows[tagIndex], _positions[tagIndex], _hiddenPositions[tagIndex], 300);
-            _tagSlidOut[tagIndex] = false; // 标记为已收回
             
-            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 收回完成");
+            // 确保状态正确更新
+            _tagSlidOut[tagIndex] = false;
+            
+            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 收回完成，状态已更新");
+            
+            // 动画完成后检查是否还需要滑出（处理快速鼠标移动的情况）
+            if (_tagHovered[tagIndex])
+            {
+                System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 收回完成但鼠标仍在上面，准备滑出");
+                await Task.Delay(50); // 短暂延迟后滑出
+                SlideTagIn(tagIndex);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 收回异常: {ex.Message}");
+            _tagSlidOut[tagIndex] = true; // 重置状态
         }
         finally
         {
@@ -398,7 +473,7 @@ public class NoteTagManager
                     window.ShowInTaskbar = false;
                     window.CanResize = false;
                     window.SystemDecorations = SystemDecorations.None;
-                    window.Background = Brushes.Transparent;
+                    window.Background = null; // 使用null避免黑色背景问题
                     window.IsHitTestVisible = true; // 确保可以接收鼠标事件
                     window.Focusable = false; // 避免抢夺焦点
                     
@@ -472,12 +547,25 @@ public class NoteTagManager
                 var actualX = window.Position.X;
                 var isCorrectlyPositioned = Math.Abs(actualX - expectedHiddenX) < 5; // 允许5px误差
                 
-                System.Console.WriteLine($"[NoteTagManager] 标签 {i + 1}: 期望X={expectedHiddenX}, 实际X={actualX}, 位置正确={isCorrectlyPositioned}");
+                System.Console.WriteLine($"[NoteTagManager] 标签 {i + 1}: 期望X={expectedHiddenX}, 实际X={actualX}, 位置正确={isCorrectlyPositioned}, 已滑出={_tagSlidOut[i]}");
                 
                 if (!isCorrectlyPositioned)
                 {
                     System.Console.WriteLine($"[NoteTagManager] 警告: 标签 {i + 1} 位置不正确，正在修正...");
                     window.Position = _hiddenPositions[i];
+                    _tagSlidOut[i] = false; // 重置状态
+                }
+                
+                // 修复状态不一致的问题
+                if (_tagSlidOut[i] && Math.Abs(actualX - expectedHiddenX) < 5)
+                {
+                    System.Console.WriteLine($"[NoteTagManager] 警告: 标签 {i + 1} 标记为已滑出但位置在隐藏区域，修正状态...");
+                    _tagSlidOut[i] = false;
+                }
+                else if (!_tagSlidOut[i] && Math.Abs(actualX - _positions[i].X) < 5)
+                {
+                    System.Console.WriteLine($"[NoteTagManager] 警告: 标签 {i + 1} 标记为未滑出但位置在显示区域，修正状态...");
+                    _tagSlidOut[i] = true;
                 }
             }
         }
@@ -521,31 +609,52 @@ public class NoteTagManager
 
     private void OnTagPointerEnter(int tagIndex)
     {
-        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && !_isAnimating && _tagWindows[tagIndex] != null)
+        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && _tagWindows[tagIndex] != null)
         {
             _tagHovered[tagIndex] = true;
-            System.Console.WriteLine($"[NoteTagManager] 鼠标进入标签 {tagIndex + 1}，当前位置: ({_tagWindows[tagIndex].Position.X}, {_tagWindows[tagIndex].Position.Y})");
+            System.Console.WriteLine($"[NoteTagManager] 鼠标进入标签 {tagIndex + 1}，当前位置: ({_tagWindows[tagIndex].Position.X}, {_tagWindows[tagIndex].Position.Y}), 已滑出: {_tagSlidOut[tagIndex]}");
             
             // 标签悬停效果（圆角效果）
             _tags[tagIndex].SetHoverState(true);
             
-            // 滑出标签
-            SlideTagIn(tagIndex);
+            // 只有在未滑出状态且不在动画中时才滑出
+            if (!_tagSlidOut[tagIndex] && !_isAnimating)
+            {
+                SlideTagIn(tagIndex);
+            }
         }
     }
 
     private void OnTagPointerLeave(int tagIndex)
     {
-        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && !_isAnimating && _tagWindows[tagIndex] != null)
+        if (tagIndex >= 0 && tagIndex < _tags.Length && _tags[tagIndex] != null && _tagWindows[tagIndex] != null)
         {
             _tagHovered[tagIndex] = false;
-            System.Console.WriteLine($"[NoteTagManager] 鼠标离开标签 {tagIndex + 1}");
+            System.Console.WriteLine($"[NoteTagManager] 鼠标离开标签 {tagIndex + 1}，已滑出: {_tagSlidOut[tagIndex]}");
             
             // 恢复标签原始状态（移除圆角效果）
             _tags[tagIndex].SetHoverState(false);
             
-            // 收回标签
-            SlideTagOut(tagIndex);
+            // 只有在已滑出状态且不在动画中时才收回
+            if (_tagSlidOut[tagIndex] && !_isAnimating)
+            {
+                SlideTagOut(tagIndex);
+            }
+            else if (_tagSlidOut[tagIndex] && _isAnimating)
+            {
+                // 如果在动画中但应该收回，延迟收回
+                System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 需要收回但正在动画中，延迟处理");
+                Task.Delay(100).ContinueWith(_ =>
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (_tagSlidOut[tagIndex] && !_tagHovered[tagIndex])
+                        {
+                            SlideTagOut(tagIndex);
+                        }
+                    });
+                });
+            }
         }
     }
 
@@ -562,6 +671,13 @@ public class NoteTagManager
         {
             _hoverTimer.Stop();
             _hoverTimer.Tick -= OnHoverTimerTick;
+        }
+
+        // 停止状态检查计时器
+        if (_stateCheckTimer != null)
+        {
+            _stateCheckTimer.Stop();
+            _stateCheckTimer.Tick -= OnStateCheckTimerTick;
         }
 
         // 关闭所有窗口

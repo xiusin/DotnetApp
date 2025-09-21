@@ -75,7 +75,7 @@ public partial class NoteTagControl : UserControl
             if (isHovered)
             {
                 // 悬停时的效果 - 增强圆角和视觉效果
-                border.Background = new SolidColorBrush(Color.Parse("#FFEB3B"));
+                border.Background = new SolidColorBrush(Color.Parse("#FFFEF7")); // 更亮的背景色
                 border.BorderBrush = new SolidColorBrush(Color.Parse("#FFC107"));
                 border.BorderThickness = new Thickness(2); // 增加边框厚度
                 border.CornerRadius = new CornerRadius(15); // 增大圆角半径
@@ -98,7 +98,7 @@ public partial class NoteTagControl : UserControl
             else
             {
                 // 恢复原始便签状态
-                border.Background = new SolidColorBrush(Color.Parse("#FFF9C4"));
+                border.Background = new SolidColorBrush(Color.Parse("White")); // 改为白色背景
                 border.BorderBrush = new SolidColorBrush(Color.Parse("#FFD54F"));
                 border.BorderThickness = new Thickness(1); // 恢复原始边框厚度
                 border.CornerRadius = new CornerRadius(12); // 恢复原始圆角
