@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fluent="using:FluentIcons.Avalonia"
              x:Class="ConfigButtonDisplay.NoteTagComponent.NoteTagControl"
              Width="160" Height="80">
     <!-- 便签样式设计 -->
@@ -49,14 +50,15 @@
                       TextWrapping="Wrap"
                       MaxLines="3"/>
             
-            <!-- 便签底部小图标 -->
-            <TextBlock Grid.Row="2"
-                      Text="📝"
-                      FontSize="10"
-                      HorizontalAlignment="Right"
-                      VerticalAlignment="Bottom"
-                      Opacity="0.6"
-                      Margin="0,4,0,0"/>
+            <!-- 便签底部FluentIcon图标 -->
+            <fluent:SymbolIcon Grid.Row="2"
+                              Symbol="Note"
+                              FontSize="12"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Bottom"
+                              Foreground="#FFB74D"
+                              Opacity="0.7"
+                              Margin="0,4,0,0"/>
         </Grid>
     </Border>
 </UserControl>

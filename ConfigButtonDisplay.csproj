@@ -15,7 +15,11 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.0" />
     
-    <!-- Semi Design for Avalonia -->
+    <!-- Fluent Icons for Avalonia -->
+    <PackageReference Include="FluentIcons.Avalonia" Version="1.1.258" />
+    <PackageReference Include="FluentIcons.Common" Version="1.1.258" />
+    
+    <!-- Semi Design for Avalonia (保留兼容性) -->
     <PackageReference Include="Semi.Avalonia" Version="11.0.0" />
     <PackageReference Include="Semi.Avalonia.DataGrid" Version="11.0.0" />
     

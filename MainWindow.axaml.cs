@@ -30,21 +30,111 @@ public partial class MainWindow : Window
     private DebugOverlay? _debugOverlay;  // 使用基类类型
     private Timer? _edgeAutoShowTimer; // 边缘组件自动显示计时器
     
+    // 状态栏弹窗
+    private PopupWindow? _popupWindow;
+    
     // 创可贴标签组件
     private NoteTagComponent.NoteTagManager? _noteTagManager;
     
     // 当前按下的键
     private readonly HashSet<Key> _pressedKeys = new();
     
+    
     public MainWindow()
     {
+        Console.WriteLine("MainWindow constructor starting...");
         AvaloniaXamlLoader.Load(this);
-        InitializeComponent();
-        InitializeKeyboardHook();
+        Console.WriteLine("AvaloniaXamlLoader.Load completed");
+        
+        InitializeWindowDragBehavior(); // 添加窗口拖拽功能
+        Console.WriteLine("InitializeWindowDragBehavior completed");
         InitializeSystemTray();
+        Console.WriteLine("InitializeSystemTray completed");
         InitializeAdditionalFeatures();
+        Console.WriteLine("InitializeAdditionalFeatures completed");
         InitializeDebugFeatures();
-        UpdatePreview();
+        Console.WriteLine("InitializeDebugFeatures completed");
+        
+        // 延迟初始化键盘钩子，确保控件已加载
+        this.Loaded += OnWindowLoaded;
+        Console.WriteLine("MainWindow constructor completed");
+    }
+
+    private void OnWindowLoaded(object? sender, EventArgs e)
+    {
+        Console.WriteLine("MainWindow Loaded event triggered");
+        
+        // 使用延迟执行确保所有控件都已初始化
+        Dispatcher.UIThread.Post(() =>
+        {
+            Console.WriteLine("Initializing keyboard hook in delayed task");
+            InitializeKeyboardHook();
+            UpdatePreview();
+        }, DispatcherPriority.Render);
+    }
+    
+    /// <summary>
+    /// 初始化窗口拖拽行为（无边框窗口需要）
+    /// </summary>
+    private void InitializeWindowDragBehavior()
+    {
+        // 为整个窗口添加拖拽功能
+        this.PointerPressed += OnWindowPointerPressed;
+        this.PointerMoved += OnWindowPointerMoved;
+        this.PointerReleased += OnWindowPointerReleased;
+    }
+    
+    private bool _isDragging = false;
+    private Point _dragStartPoint;
+    
+    private void OnWindowPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            _isDragging = true;
+            _dragStartPoint = e.GetPosition(this);
+            e.Pointer.Capture(this);
+        }
+    }
+    
+    private void OnWindowPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_isDragging)
+        {
+            var currentPoint = e.GetPosition(this);
+            var deltaX = currentPoint.X - _dragStartPoint.X;
+            var deltaY = currentPoint.Y - _dragStartPoint.Y;
+            
+            this.Position = new PixelPoint(
+                this.Position.X + (int)deltaX,
+                this.Position.Y + (int)deltaY
+            );
+        }
+    }
+    
+    private void OnWindowPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (_isDragging)
+        {
+            _isDragging = false;
+            e.Pointer.Capture(null);
+        }
+    }
+    
+    /// <summary>
+    /// 最小化按钮点击事件
+    /// </summary>
+    private void MinimizeButton_Click(object? sender, RoutedEventArgs e)
+    {
+        this.WindowState = WindowState.Minimized;
+    }
+    
+    /// <summary>
+    /// 关闭按钮点击事件
+    /// </summary>
+    private void CloseButton_Click(object? sender, RoutedEventArgs e)
+    {
+        this.Close();
     }
     
     private void InitializeDebugFeatures()
@@ -76,7 +166,7 @@ public partial class MainWindow : Window
                 _totalShiftDoubleClicks++;
                 
                 _debugOverlay?.LogEvent($"🎉 双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)");
-                StatusTextBlock.Text = $"双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)";
+                this.Get<TextBlock>("StatusTextBlock").Text = $"双击Shift检测成功！ (总计: {_totalShiftDoubleClicks}次)";
                 
                 // 增强调试信息
                 if (_debugOverlay is EnhancedDebugOverlay enhanced)
@@ -94,26 +184,26 @@ public partial class MainWindow : Window
                             // 如果窗口已打开，则关闭
                             _aiChatWindow.HideChatWindow();
                             _debugOverlay?.LogEvent($"✅ AI聊天窗口已关闭");
-                            StatusTextBlock.Text = $"AI聊天窗口已关闭";
+                            this.Get<TextBlock>("StatusTextBlock").Text = $"AI聊天窗口已关闭";
                         }
                         else
                         {
                             // 如果窗口已关闭，则打开
                             _aiChatWindow.ShowChatWindow();
                             _debugOverlay?.LogEvent($"✅ AI聊天窗口已打开");
-                            StatusTextBlock.Text = $"AI聊天窗口已打开";
+                            this.Get<TextBlock>("StatusTextBlock").Text = $"AI聊天窗口已打开";
                         }
                     }
                     catch (Exception ex)
                     {
                         _debugOverlay?.LogEvent($"❌ AI聊天窗口错误: {ex.Message}");
-                        StatusTextBlock.Text = $"AI聊天窗口错误: {ex.Message}";
+                        this.Get<TextBlock>("StatusTextBlock").Text = $"AI聊天窗口错误: {ex.Message}";
                     }
                 }
                 else
                 {
                     _debugOverlay?.LogEvent("❌ AI聊天窗口未初始化");
-                    StatusTextBlock.Text = "AI聊天窗口未初始化";
+                    this.Get<TextBlock>("StatusTextBlock").Text = "AI聊天窗口未初始化";
                 }
             }
             else
@@ -142,6 +232,22 @@ public partial class MainWindow : Window
     {
         try
         {
+            // 添加空值检查
+            try
+            {
+                var statusTextBlock = this.Get<TextBlock>("StatusTextBlock");
+                if (statusTextBlock == null)
+                {
+                    Console.WriteLine("StatusTextBlock is null - delaying keyboard hook initialization");
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("StatusTextBlock not found - delaying keyboard hook initialization");
+                return;
+            }
+            
             _keyboardHook = new KeyboardHook();
             _keyboardHook.KeyDown += OnKeyDown;
             _keyboardHook.KeyUp += OnKeyUp;
@@ -150,11 +256,13 @@ public partial class MainWindow : Window
             _isListening = true;
             if (ListeningToggle != null)
                 ListeningToggle.IsChecked = true;
-            StatusTextBlock.Text = "监听中...";
+            this.Get<TextBlock>("StatusText").Text = "监听中...";
+            this.Get<TextBlock>("StatusTextBlock").Text = "键盘钩子已初始化，开始监听按键";
         }
         catch (Exception ex)
         {
-            StatusTextBlock.Text = $"键盘钩子初始化失败: {ex.Message}";
+            try { this.Get<TextBlock>("StatusTextBlock").Text = $"键盘钩子初始化失败: {ex.Message}"; } 
+            catch { Console.WriteLine($"键盘钩子初始化失败: {ex.Message}"); }
         }
     }
     
@@ -196,6 +304,9 @@ public partial class MainWindow : Window
         }
         
         ShowKeyDisplay(keyText);
+        
+        // 刷新显示计时器（重新触发2秒自动隐藏）
+        _keyDisplayWindow?.RefreshDisplay();
         
         // 立即更新显示，不延迟隐藏
         CancelHideTimer();
@@ -283,48 +394,25 @@ public partial class MainWindow : Window
         if (_keyDisplayWindow == null)
         {
             _keyDisplayWindow = new KeyDisplayWindow();
-            
-            // 设置位置为屏幕左下角，稍微调整位置
-            var screens = Screens?.All;
-            if (screens != null && screens.Count > 0)
-            {
-                var primaryScreen = screens[0];
-                var screenBounds = primaryScreen.Bounds;
-                
-                _keyDisplayWindow.Position = new PixelPoint(
-                    screenBounds.X + 50,
-                    screenBounds.Y + screenBounds.Height - 120
-                );
-            }
-            
-            _keyDisplayWindow.Show();
         }
         
-        // 更新内容
+        // 更新内容（窗口会自动定位到底部居中并调整宽度）
         _keyDisplayWindow.UpdateContent(keyText, GetSelectedColor(), GetFontSize());
-        
-        // 确保窗口可见
-        if (!_keyDisplayWindow.IsVisible)
-        {
-            _keyDisplayWindow.Show();
-        }
         
         // 更新预览
         if (PreviewText != null)
             PreviewText.Text = keyText;
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = $"显示按键: {keyText}";
+        try { this.Get<TextBlock>("StatusTextBlock").Text = $"显示按键: {keyText}"; } catch { }
     }
     
     private void HideKeyDisplay()
     {
-        // 清空显示内容但保持窗口存在
+        // 清空显示内容，窗口会自动隐藏
         if (_keyDisplayWindow != null)
         {
             _keyDisplayWindow.UpdateContent("", GetSelectedColor(), GetFontSize());
         }
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = "监听中...";
+        try { this.Get<TextBlock>("StatusTextBlock").Text = "监听中..."; } catch { }
     }
     
     private void StartHideTimer()
@@ -352,15 +440,15 @@ public partial class MainWindow : Window
         
         if (_isListening)
         {
-            if (StatusTextBlock != null)
-                StatusTextBlock.Text = "监听中...";
+            try { this.Get<TextBlock>("StatusText").Text = "监听中"; } catch { }
+            try { this.Get<TextBlock>("StatusTextBlock").Text = "监听中..."; } catch { }
             _pressedKeys.Clear();
             HideKeyDisplay();
         }
         else
         {
-            if (StatusTextBlock != null)
-                StatusTextBlock.Text = "监听已停止";
+            try { this.Get<TextBlock>("StatusText").Text = "已停止"; } catch { }
+            try { this.Get<TextBlock>("StatusTextBlock").Text = "监听已停止"; } catch { }
             _pressedKeys.Clear();
             HideKeyDisplay();
             CancelHideTimer();
@@ -379,15 +467,37 @@ public partial class MainWindow : Window
     
     private void ConfigButton_Click(object? sender, RoutedEventArgs e)
     {
-        if (_configPopover != null)
+        // 显示状态栏弹窗菜单
+        ShowStatusBarPopup(sender as Button);
+    }
+    
+    /// <summary>
+    /// 显示状态栏弹窗菜单
+    /// </summary>
+    private async void ShowStatusBarPopup(Button? anchorButton)
+    {
+        try
         {
-            var button = sender as Button;
-            if (button != null)
+            if (_popupWindow == null)
             {
-                var screenPoint = button.PointToScreen(new Point(0, button.Bounds.Height));
-                var clientPoint = this.PointToClient(screenPoint);
-                _configPopover.ShowConfig(clientPoint);
+                _popupWindow = new PopupWindow();
             }
+            
+            // 显示弹窗，传入锚点按钮用于定位
+            await _popupWindow.ShowPopupAsync(anchorButton);
+            
+            // 更新状态
+            if (this.Get<TextBlock>("StatusTextBlock") != null)
+                this.Get<TextBlock>("StatusTextBlock").Text = "状态栏菜单已打开";
+            
+            _debugOverlay?.LogEvent("✅ 状态栏弹窗菜单已显示");
+        }
+        catch (Exception ex)
+        {
+            if (this.Get<TextBlock>("StatusTextBlock") != null)
+                this.Get<TextBlock>("StatusTextBlock").Text = $"弹窗显示失败: {ex.Message}";
+            
+            _debugOverlay?.LogEvent($"❌ 状态栏弹窗显示失败: {ex.Message}");
         }
     }
     
@@ -426,7 +536,7 @@ public partial class MainWindow : Window
             _edgeSwipeComponent.ShowEdgeWindow();
         }
         
-        StatusTextBlock.Text = "手动测试已执行，查看调试面板获取详细信息";
+        this.Get<TextBlock>("StatusTextBlock").Text = "手动测试已执行，查看调试面板获取详细信息";
     }
 
     private void TagTestButton_Click(object? sender, RoutedEventArgs e)
@@ -445,7 +555,7 @@ public partial class MainWindow : Window
                 // 强制显示标签
                 _noteTagManager.ForceShowTags();
                 _debugOverlay?.LogEvent("✅ 标签已强制显示");
-                StatusTextBlock.Text = "标签已强制显示 - 查看屏幕左侧 (x=50, y=480)";
+                this.Get<TextBlock>("StatusTextBlock").Text = "标签已强制显示 - 查看屏幕左侧 (x=50, y=480)";
                 
                 // 5秒后显示状态
                 Task.Delay(5000).ContinueWith(_ =>
@@ -454,20 +564,20 @@ public partial class MainWindow : Window
                     {
                         var newStatus = _noteTagManager.GetTagStatus();
                         _debugOverlay?.LogEvent($"📊 5秒后状态: {newStatus}");
-                        StatusTextBlock.Text = $"标签状态已更新: {newStatus}";
+                        this.Get<TextBlock>("StatusTextBlock").Text = $"标签状态已更新: {newStatus}";
                     });
                 });
             }
             catch (Exception ex)
             {
                 _debugOverlay?.LogEvent($"❌ 标签测试失败: {ex.Message}");
-                StatusTextBlock.Text = $"标签测试失败: {ex.Message}";
+                this.Get<TextBlock>("StatusTextBlock").Text = $"标签测试失败: {ex.Message}";
             }
         }
         else
         {
             _debugOverlay?.LogEvent("❌ 标签管理器未初始化");
-            StatusTextBlock.Text = "标签管理器未初始化";
+            this.Get<TextBlock>("StatusTextBlock").Text = "标签管理器未初始化";
         }
     }
     
@@ -500,12 +610,12 @@ public partial class MainWindow : Window
         var selectedIndex = BackgroundColorCombo?.SelectedIndex ?? 0;
         return selectedIndex switch
         {
-            0 => Color.Parse("#0078D4"), // 蓝色
-            1 => Color.Parse("#107C10"), // 绿色
-            2 => Color.Parse("#D13438"), // 红色
-            3 => Color.Parse("#8764B8"), // 紫色
-            4 => Color.Parse("#FF8C00"), // 橙色
-            _ => Color.Parse("#0078D4")
+            0 => Color.Parse("#3182CE"), // 蓝色 - Fluent Design
+            1 => Color.Parse("#38A169"), // 绿色 - Fluent Design
+            2 => Color.Parse("#E53E3E"), // 红色 - Fluent Design
+            3 => Color.Parse("#805AD5"), // 紫色 - Fluent Design
+            4 => Color.Parse("#DD6B20"), // 橙色 - Fluent Design
+            _ => Color.Parse("#3182CE")
         };
     }
     
@@ -516,7 +626,7 @@ public partial class MainWindow : Window
     
     private double GetFontSize()
     {
-        return FontSizeSlider?.Value ?? 24.0;
+        return FontSizeSlider?.Value ?? 28.0; // 默认28px，匹配Fluent Design
     }
     
     private void InitializeSystemTray()
@@ -555,6 +665,10 @@ public partial class MainWindow : Window
             _debugOverlay = new EnhancedDebugOverlay();
             _debugOverlay.ShowDebug();
             
+            // 初始化状态栏弹窗
+            _popupWindow = new PopupWindow();
+            _debugOverlay?.LogEvent("✅ 状态栏弹窗已初始化");
+            
             // 初始化创可贴标签组件
             System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
             _noteTagManager = new NoteTagComponent.NoteTagManager(this);
@@ -581,20 +695,20 @@ public partial class MainWindow : Window
                 });
             });
             
-            if (StatusTextBlock != null)
-                StatusTextBlock.Text = "所有功能已初始化 (增强调试模式)";
+            if (this.Get<TextBlock>("StatusTextBlock") != null)
+                this.Get<TextBlock>("StatusTextBlock").Text = "所有功能已初始化 (Fluent Design)";
         }
         catch (Exception ex)
         {
-            if (StatusTextBlock != null)
-                StatusTextBlock.Text = $"功能初始化失败: {ex.Message}";
+            if (this.Get<TextBlock>("StatusTextBlock") != null)
+                this.Get<TextBlock>("StatusTextBlock").Text = $"功能初始化失败: {ex.Message}";
         }
     }
     
     private void OnTextCopyRequested(object? sender, string text)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = $"已复制文本: {text.Substring(0, Math.Min(text.Length, 20))}...";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = $"已复制文本: {text.Substring(0, Math.Min(text.Length, 20))}...";
         
         if (_debugOverlay is EnhancedDebugOverlay enhanced)
         {
@@ -604,8 +718,8 @@ public partial class MainWindow : Window
     
     private void OnTextTranslateRequested(object? sender, string text)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = $"翻译请求: {text.Substring(0, Math.Min(text.Length, 20))}...";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = $"翻译请求: {text.Substring(0, Math.Min(text.Length, 20))}...";
         
         if (_debugOverlay is EnhancedDebugOverlay enhanced)
         {
@@ -616,8 +730,8 @@ public partial class MainWindow : Window
     
     private void OnEdgeWindowOpened(object? sender, EventArgs e)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = "边缘工具栏已打开";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = "边缘工具栏已打开";
         
         if (_debugOverlay is EnhancedDebugOverlay enhanced)
         {
@@ -627,8 +741,8 @@ public partial class MainWindow : Window
     
     private void OnEdgeWindowClosed(object? sender, EventArgs e)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = "边缘工具栏已关闭";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = "边缘工具栏已关闭";
         
         if (_debugOverlay is EnhancedDebugOverlay enhanced)
         {
@@ -638,22 +752,22 @@ public partial class MainWindow : Window
     
     private void OnAutoStartConfigChanged(object? sender, bool enabled)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = $"开机自启: {(enabled ? "已启用" : "已禁用")}";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = $"开机自启: {(enabled ? "已启用" : "已禁用")}";
         _debugOverlay?.LogEvent($"开机自启: {(enabled ? "已启用" : "已禁用")}");
     }
     
     private void OnMinimizeToTrayConfigChanged(object? sender, bool enabled)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = $"最小化到托盘: {(enabled ? "已启用" : "已禁用")}";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = $"最小化到托盘: {(enabled ? "已启用" : "已禁用")}";
         _debugOverlay?.LogEvent($"最小化到托盘: {(enabled ? "已启用" : "已禁用")}");
     }
     
     private void OnShowNotificationsConfigChanged(object? sender, bool enabled)
     {
-        if (StatusTextBlock != null)
-            StatusTextBlock.Text = $"显示通知: {(enabled ? "已启用" : "已禁用")}";
+        if (this.Get<TextBlock>("StatusTextBlock") != null)
+            this.Get<TextBlock>("StatusTextBlock").Text = $"显示通知: {(enabled ? "已启用" : "已禁用")}";
         _debugOverlay?.LogEvent($"显示通知: {(enabled ? "已启用" : "已禁用")}");
     }
     
@@ -699,6 +813,9 @@ public partial class MainWindow : Window
         _configPopover?.Dispose();
         _edgeAutoShowTimer?.Dispose();
         
+        // 清理状态栏弹窗
+        _popupWindow?.Close();
+        
         // 清理标签组件
         _noteTagManager?.Dispose();
     }
@@ -709,6 +826,7 @@ public partial class MainWindow : Window
         Hide();
         // 键盘监听会继续在后台运行
     }
+    
     
     public void ShowFromBackground()
     {

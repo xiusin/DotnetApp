@@ -29,11 +29,23 @@ public class NoteTagManager
     private bool[] _tagHovered = new bool[3]; // 记录每个标签的悬停状态
     private bool[] _tagSlidOut = new bool[3]; // 记录每个标签是否已滑出
     private DispatcherTimer? _stateCheckTimer; // 状态检查计时器
+    
+    // 新增：动画队列管理
+    private readonly Queue<(int tagIndex, bool slideOut)>[] _animationQueues = new Queue<(int, bool)>[3];
+    private readonly bool[] _tagAnimating = new bool[3]; // 每个标签的动画状态
+    private readonly DispatcherTimer?[] _pendingAnimationTimers = new DispatcherTimer?[3]; // 延迟动画计时器
 
     public NoteTagManager(Window hostWindow)
     {
         _hostWindow = hostWindow;
         System.Console.WriteLine($"[NoteTagManager] 初始化开始，主机窗口: {hostWindow?.GetType().Name}");
+        
+        // 初始化动画队列
+        for (int i = 0; i < 3; i++)
+        {
+            _animationQueues[i] = new Queue<(int, bool)>();
+        }
+        
         InitializeTags();
         SetupHoverDetection();
         SetupStateCheckTimer(); // 设置状态检查计时器
@@ -116,7 +128,7 @@ public class NoteTagManager
         // 定期检查便签状态，修复不一致的情况
         for (int i = 0; i < _tagWindows.Length; i++)
         {
-            if (_tagWindows[i] != null && !_isAnimating)
+            if (_tagWindows[i] != null && !_tagAnimating[i])
             {
                 var window = _tagWindows[i];
                 var currentX = window.Position.X;
@@ -211,10 +223,21 @@ public class NoteTagManager
 
     private async void SlideTagIn(int tagIndex)
     {
-        if (_isAnimating || tagIndex < 0 || tagIndex >= _tagWindows.Length) return;
-        if (_tagWindows[tagIndex] == null || _tagSlidOut[tagIndex]) return; // 如果已经滑出，不再重复滑出
+        if (tagIndex < 0 || tagIndex >= _tagWindows.Length) return;
+        if (_tagWindows[tagIndex] == null) return;
         
-        _isAnimating = true;
+        // 如果该标签正在动画中，加入队列等待
+        if (_tagAnimating[tagIndex])
+        {
+            _animationQueues[tagIndex].Enqueue((tagIndex, false)); // false表示滑出
+            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 正在动画中，滑出请求已加入队列");
+            return;
+        }
+        
+        // 如果已经滑出，不再重复滑出
+        if (_tagSlidOut[tagIndex]) return;
+        
+        _tagAnimating[tagIndex] = true;
 
         try
         {
@@ -228,13 +251,6 @@ public class NoteTagManager
             
             System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 滑出完成，状态已更新");
             
-            // 动画完成后检查是否还需要收回（处理快速鼠标移动的情况）
-            if (!_tagHovered[tagIndex])
-            {
-                System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 滑出完成但鼠标已离开，准备收回");
-                await Task.Delay(50); // 短暂延迟后收回
-                SlideTagOut(tagIndex);
-            }
         }
         catch (Exception ex)
         {
@@ -243,16 +259,30 @@ public class NoteTagManager
         }
         finally
         {
-            _isAnimating = false;
+            _tagAnimating[tagIndex] = false;
+            
+            // 处理队列中的下一个动画
+            ProcessAnimationQueue(tagIndex);
         }
     }
 
     private async void SlideTagOut(int tagIndex)
     {
-        if (_isAnimating || tagIndex < 0 || tagIndex >= _tagWindows.Length) return;
-        if (_tagWindows[tagIndex] == null || !_tagSlidOut[tagIndex]) return; // 如果已经收回，不再重复收回
+        if (tagIndex < 0 || tagIndex >= _tagWindows.Length) return;
+        if (_tagWindows[tagIndex] == null) return;
         
-        _isAnimating = true;
+        // 如果该标签正在动画中，加入队列等待
+        if (_tagAnimating[tagIndex])
+        {
+            _animationQueues[tagIndex].Enqueue((tagIndex, true)); // true表示收回
+            System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 正在动画中，收回请求已加入队列");
+            return;
+        }
+        
+        // 如果已经收回，不再重复收回
+        if (!_tagSlidOut[tagIndex]) return;
+        
+        _tagAnimating[tagIndex] = true;
 
         try
         {
@@ -266,13 +296,6 @@ public class NoteTagManager
             
             System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 收回完成，状态已更新");
             
-            // 动画完成后检查是否还需要滑出（处理快速鼠标移动的情况）
-            if (_tagHovered[tagIndex])
-            {
-                System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 收回完成但鼠标仍在上面，准备滑出");
-                await Task.Delay(50); // 短暂延迟后滑出
-                SlideTagIn(tagIndex);
-            }
         }
         catch (Exception ex)
         {
@@ -281,8 +304,66 @@ public class NoteTagManager
         }
         finally
         {
-            _isAnimating = false;
+            _tagAnimating[tagIndex] = false;
+            
+            // 处理队列中的下一个动画
+            ProcessAnimationQueue(tagIndex);
         }
+    }
+
+    // 新增：处理动画队列
+    private void ProcessAnimationQueue(int tagIndex)
+    {
+        if (_animationQueues[tagIndex].Count > 0)
+        {
+            var (nextTagIndex, slideOut) = _animationQueues[tagIndex].Dequeue();
+            System.Console.WriteLine($"[NoteTagManager] 处理标签 {tagIndex + 1} 队列中的动画: {(slideOut ? "收回" : "滑出")}");
+            
+            // 延迟执行下一个动画，确保平滑过渡
+            Task.Delay(50).ContinueWith(_ =>
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (slideOut)
+                        SlideTagOut(nextTagIndex);
+                    else
+                        SlideTagIn(nextTagIndex);
+                });
+            });
+        }
+    }
+
+    // 新增：设置延迟收回动画
+    private void SetupDelayedSlideOut(int tagIndex)
+    {
+        // 取消之前的延迟计时器
+        if (_pendingAnimationTimers[tagIndex] != null)
+        {
+            _pendingAnimationTimers[tagIndex]!.Stop();
+            _pendingAnimationTimers[tagIndex] = null;
+        }
+
+        // 设置新的延迟计时器，确保鼠标快速移出时保持展开状态
+        _pendingAnimationTimers[tagIndex] = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(150) // 150ms延迟，确保动画完整
+        };
+
+        _pendingAnimationTimers[tagIndex]!.Tick += (s, e) =>
+        {
+            _pendingAnimationTimers[tagIndex]?.Stop();
+            _pendingAnimationTimers[tagIndex] = null;
+
+            // 检查鼠标是否仍然离开且标签仍然滑出
+            if (!_tagHovered[tagIndex] && _tagSlidOut[tagIndex])
+            {
+                System.Console.WriteLine($"[NoteTagManager] 延迟收回标签 {tagIndex + 1}");
+                SlideTagOut(tagIndex);
+            }
+        };
+
+        _pendingAnimationTimers[tagIndex]!.Start();
+        System.Console.WriteLine($"[NoteTagManager] 设置标签 {tagIndex + 1} 延迟收回计时器");
     }
 
     private async void SlideTagsIn()
@@ -614,11 +695,19 @@ public class NoteTagManager
             _tagHovered[tagIndex] = true;
             System.Console.WriteLine($"[NoteTagManager] 鼠标进入标签 {tagIndex + 1}，当前位置: ({_tagWindows[tagIndex].Position.X}, {_tagWindows[tagIndex].Position.Y}), 已滑出: {_tagSlidOut[tagIndex]}");
             
+            // 取消延迟收回计时器（如果存在）
+            if (_pendingAnimationTimers[tagIndex] != null)
+            {
+                _pendingAnimationTimers[tagIndex]!.Stop();
+                _pendingAnimationTimers[tagIndex] = null;
+                System.Console.WriteLine($"[NoteTagManager] 取消标签 {tagIndex + 1} 的延迟收回计时器");
+            }
+            
             // 标签悬停效果（圆角效果）
             _tags[tagIndex].SetHoverState(true);
             
             // 只有在未滑出状态且不在动画中时才滑出
-            if (!_tagSlidOut[tagIndex] && !_isAnimating)
+            if (!_tagSlidOut[tagIndex] && !_tagAnimating[tagIndex])
             {
                 SlideTagIn(tagIndex);
             }
@@ -635,25 +724,11 @@ public class NoteTagManager
             // 恢复标签原始状态（移除圆角效果）
             _tags[tagIndex].SetHoverState(false);
             
-            // 只有在已滑出状态且不在动画中时才收回
-            if (_tagSlidOut[tagIndex] && !_isAnimating)
+            // 关键修复：鼠标快速移出时，保持当前展开状态，延迟收回动画
+            if (_tagSlidOut[tagIndex])
             {
-                SlideTagOut(tagIndex);
-            }
-            else if (_tagSlidOut[tagIndex] && _isAnimating)
-            {
-                // 如果在动画中但应该收回，延迟收回
-                System.Console.WriteLine($"[NoteTagManager] 标签 {tagIndex + 1} 需要收回但正在动画中，延迟处理");
-                Task.Delay(100).ContinueWith(_ =>
-                {
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        if (_tagSlidOut[tagIndex] && !_tagHovered[tagIndex])
-                        {
-                            SlideTagOut(tagIndex);
-                        }
-                    });
-                });
+                // 设置延迟收回计时器，确保动画完整执行
+                SetupDelayedSlideOut(tagIndex);
             }
         }
     }
@@ -678,6 +753,16 @@ public class NoteTagManager
         {
             _stateCheckTimer.Stop();
             _stateCheckTimer.Tick -= OnStateCheckTimerTick;
+        }
+
+        // 停止所有延迟动画计时器
+        for (int i = 0; i < _pendingAnimationTimers.Length; i++)
+        {
+            if (_pendingAnimationTimers[i] != null)
+            {
+                _pendingAnimationTimers[i]!.Stop();
+                _pendingAnimationTimers[i] = null;
+            }
         }
 
         // 关闭所有窗口
