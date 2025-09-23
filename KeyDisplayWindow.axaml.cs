@@ -91,8 +91,9 @@ public partial class KeyDisplayWindow : Window
         {
             if (!string.IsNullOrEmpty(text))
             {
-                // 有内容时显示半透明背景
-                MainBorder.Background = new SolidColorBrush(Color.Parse("#E6000000"));
+                // 有内容时显示半透明主题背景（移除黑底与模糊）
+                var themedBg = new Color(0xCC, backgroundColor.R, backgroundColor.G, backgroundColor.B);
+                MainBorder.Background = new SolidColorBrush(themedBg);
                 MainBorder.BorderBrush = new SolidColorBrush(Color.Parse("#33FFFFFF"));
                 
                 // 动态调整窗口宽度
@@ -118,14 +119,18 @@ public partial class KeyDisplayWindow : Window
     /// </summary>
     private void ShowWindow()
     {
-        if (!this.IsVisible)
-        {
-            this.Show();
-        }
+        Console.WriteLine("[KeyDisplayWindow] ShowWindow()");
+        // 强制显示并确保不透明
+        this.Show();
+        this.Opacity = 1;
+        this.WindowState = WindowState.Normal;
+        PositionWindowAtBottomCenter();
         
-        // 确保窗口在最顶层
+        // 确保窗口在最顶层（不主动抢占焦点）并轻抖刷新Z序
         this.Topmost = true;
-        this.Activate();
+        this.Topmost = false;
+        this.Topmost = true;
+        Console.WriteLine($"[KeyDisplayWindow] Visible={this.IsVisible}, Opacity={this.Opacity}, Topmost={this.Topmost}, State={this.WindowState}, Size={this.Width}x{this.Height}, Position=({this.Position.X},{this.Position.Y})");
     }
     
     /// <summary>
@@ -188,6 +193,17 @@ public partial class KeyDisplayWindow : Window
             // 重新启动计时器
             StartAutoHideTimer();
         }
+    }
+    
+    /// <summary>
+    /// 兜底：确保窗口可见并计时隐藏（用于按钮强制显示）
+    /// </summary>
+    public void EnsureShowVisible()
+    {
+        Console.WriteLine("[KeyDisplayWindow] EnsureShowVisible()");
+        _isContentVisible = true;
+        ShowWindow();
+        StartAutoHideTimer();
     }
     
     protected override void OnClosed(EventArgs e)

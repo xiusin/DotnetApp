@@ -46,7 +46,7 @@ public class ClearEdgeComponent : IDisposable
             WindowStartupLocation = WindowStartupLocation.Manual,
             CanResize = false,
             ShowInTaskbar = false,
-            Topmost = true,
+            Topmost = false,
             SystemDecorations = SystemDecorations.None,
             Background = new SolidColorBrush(Color.Parse("#F8F9FA")),
             IsEnabled = true

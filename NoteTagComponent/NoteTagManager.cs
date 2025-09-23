@@ -542,7 +542,10 @@ public class NoteTagManager
                 if (window != null)
                 {
                     window.Position = _hiddenPositions[i]; // 初始位置为只显示10px
-                    window.IsVisible = true;
+                    if (!window.IsVisible)
+                    {
+                        window.Show();
+                    }
                     
                     // 为每个标签窗口设置鼠标事件（在窗口显示后绑定）
                     int tagIndex = i; // 捕获循环变量
@@ -580,7 +583,7 @@ public class NoteTagManager
             if (_tagWindows[i] != null)
             {
                 _tagWindows[i].Position = _positions[i];
-                _tagWindows[i].IsVisible = true;
+                _tagWindows[i].Show();
                 System.Console.WriteLine($"[NoteTagManager] 强制显示标签 {i + 1}，位置: ({_positions[i].X}, {_positions[i].Y})");
             }
         }
@@ -594,6 +597,7 @@ public class NoteTagManager
             if (_tagWindows[i] != null)
             {
                 _tagWindows[i].Position = _hiddenPositions[i];
+                _tagWindows[i].Hide();
                 System.Console.WriteLine($"[NoteTagManager] 强制隐藏标签 {i + 1}，位置: ({_hiddenPositions[i].X}, {_hiddenPositions[i].Y})");
             }
         }

@@ -23,10 +23,7 @@
             Margin="8"
             BoxShadow="0 8 32 0 #40000000">
         
-        <!-- 毛玻璃背景效果 -->
-        <Border.Effect>
-            <BlurEffect Radius="20"/>
-        </Border.Effect>
+
         
         <Grid RowDefinitions="Auto,*,Auto">
             <!-- 标签容器 -->

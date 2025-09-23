@@ -36,7 +36,7 @@ public class AIChatWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         CanResize = true;
         ShowInTaskbar = false;
-        Topmost = true;
+        Topmost = false;
         SystemDecorations = SystemDecorations.BorderOnly;
         Background = new SolidColorBrush(Color.Parse("#FFFFFF"));
         
@@ -219,8 +219,7 @@ public class AIChatWindow : Window
                     if (!IsVisible)
                     {
                         Show();
-                        Activate();
-                        _messageInput?.Focus();
+                        // 不主动抢占焦点
                     }
                     else
                     {
@@ -424,12 +423,7 @@ public class AIChatWindow : Window
         if (!IsVisible)
         {
             Show();
-            Activate();
-            Focus();
-            if (_messageInput != null)
-            {
-                _messageInput.Focus();
-            }
+            // 不主动抢占焦点，保持 Topmost 可见
         }
     }
     

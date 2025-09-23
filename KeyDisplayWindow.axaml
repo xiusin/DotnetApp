@@ -13,24 +13,19 @@
         MaxWidth="400"
         Height="80"
         SystemDecorations="None"
-        IsEnabled="False"
-        Background="{x:Null}"
+        Focusable="False"
+        Background="Transparent"
         SizeToContent="Width">
     
     <!-- 半透明圆角窗体设计 -->
     <Border Name="MainBorder" 
-            Background="#E6000000"
+            Background="Transparent"
             CornerRadius="20"
             BorderThickness="1"
             BorderBrush="#33FFFFFF"
             Margin="0"
             Padding="24,16"
             BoxShadow="0 8 32 0 #40000000">
-        
-        <!-- 毛玻璃效果背景 -->
-        <Border.Effect>
-            <BlurEffect Radius="10"/>
-        </Border.Effect>
         
         <TextBlock Name="DisplayTextBlock" 
                   Text=""

@@ -458,6 +458,7 @@ public partial class MainWindow : Window
     private void TestButton_Click(object? sender, RoutedEventArgs e)
     {
         ShowKeyDisplay("Ctrl + Shift + A");
+        _keyDisplayWindow?.EnsureShowVisible();
     }
     
     private void HideButton_Click(object? sender, RoutedEventArgs e)
@@ -521,7 +522,7 @@ public partial class MainWindow : Window
             if (!_aiChatWindow.IsVisible)
             {
                 _aiChatWindow.Show();
-                _aiChatWindow.Activate();
+                // 不主动抢占焦点
             }
         }
         
@@ -831,6 +832,6 @@ public partial class MainWindow : Window
     public void ShowFromBackground()
     {
         Show();
-        Activate();
+        // 不主动抢占焦点
     }
 }

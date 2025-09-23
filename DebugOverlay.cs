@@ -31,7 +31,7 @@ public class DebugOverlay : Window
         Position = new PixelPoint(100, 100);
         CanResize = false;
         ShowInTaskbar = false;
-        Topmost = true;
+        Topmost = false;
         SystemDecorations = SystemDecorations.None;
         Background = new SolidColorBrush(Color.Parse("#CC000000"));
         
@@ -146,7 +146,7 @@ public class DebugOverlay : Window
         if (!IsVisible)
         {
             Show();
-            Activate();
+            // 移除 Activate，避免抢占输入焦点
         }
     }
     

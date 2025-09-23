@@ -49,7 +49,7 @@ public class EdgeSwipeComponent : IDisposable
             WindowStartupLocation = WindowStartupLocation.Manual,
             CanResize = false,
             ShowInTaskbar = false,
-            Topmost = true,
+            Topmost = false,
             SystemDecorations = SystemDecorations.None,
             Background = Brushes.White,
             IsEnabled = true

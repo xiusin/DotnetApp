@@ -1,0 +1,37 @@
+# 修复窗口模糊遮挡、NoteTag 标签不显示、按键记录窗口不可见与焦点抢占问题
+
+## Core Features
+
+- 修复 NoteTag 强制显示/隐藏的可见性逻辑（使用 Show/Hide）
+
+- 消除设置 IsVisible 导致的绑定/运行期警告
+
+- 确保标签测试按钮可立即显示/收回标签
+
+## Tech Stack
+
+{
+  "Desktop": "Avalonia .NET（.axaml/.cs）"
+}
+
+## Design
+
+仅修正 ForceShow/ForceHide 中的显示调用，不改动动画与事件逻辑，保持最小改动原则。
+
+## Plan
+
+Note: 
+
+- [ ] is holding
+- [/] is doing
+- [X] is done
+
+---
+
+[/] Step1_窗口模糊遮挡排查与修复
+
+[X] Step2_按键记录窗口显示修复
+
+[/] Step3_NoteTagComponent 绑定与模板修复
+
+[/] Step4_输入焦点抢占治理
