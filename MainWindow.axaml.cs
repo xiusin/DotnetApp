@@ -21,6 +21,10 @@ public partial class MainWindow : Window
     private bool _isListening = false;
     private KeyDisplayWindow? _keyDisplayWindow;
     private System.Threading.Timer? _hideTimer;
+    private System.Threading.Timer? _hookHealthTimer;
+    private DateTime _lastKeyEventTime = DateTime.MinValue;
+    private string _lastImmediateText = "";
+    private DateTime _lastImmediateAt = DateTime.MinValue;
     
     // 新功能组件
     private TextSelectionPopover? _textSelectionPopover;
@@ -38,6 +42,7 @@ public partial class MainWindow : Window
     
     // 当前按下的键
     private readonly HashSet<Key> _pressedKeys = new();
+    private KeyModifiers _lastModifiers = KeyModifiers.None;
     
     
     public MainWindow()
@@ -258,6 +263,9 @@ public partial class MainWindow : Window
                 ListeningToggle.IsChecked = true;
             this.Get<TextBlock>("StatusText").Text = "监听中...";
             this.Get<TextBlock>("StatusTextBlock").Text = "键盘钩子已初始化，开始监听按键";
+
+            // 启动健康检测：每5秒校正修饰键并清理卡死状态
+            _hookHealthTimer = new System.Threading.Timer(HookHealthCheck, null, 5000, 5000);
         }
         catch (Exception ex)
         {
@@ -273,6 +281,19 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.Post(() =>
         {
             _pressedKeys.Add(e.Key);
+            _lastModifiers = e.KeyModifiers;
+            _lastKeyEventTime = DateTime.Now;
+
+            // 立即显示当前按键，避免快速单击被异步清空导致不显示
+            var immediateText = FormatImmediateKey(e.Key, _keyboardHook?.GetCurrentModifiers() ?? e.KeyModifiers);
+            if (!string.IsNullOrEmpty(immediateText))
+            {
+                ShowKeyDisplay(immediateText);
+                _keyDisplayWindow?.RefreshDisplay(); // 重置自动隐藏
+                _lastImmediateText = immediateText;
+                _lastImmediateAt = DateTime.Now;
+            }
+
             UpdateKeyDisplay();
         });
     }
@@ -284,19 +305,34 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.Post(() =>
         {
             _pressedKeys.Remove(e.Key);
+            _lastModifiers = e.KeyModifiers;
+            _lastKeyEventTime = DateTime.Now;
             UpdateKeyDisplay();
         });
     }
     
     private void UpdateKeyDisplay()
     {
+        // 每次刷新前，从键盘钩子拉取最新修饰键，避免长时间后事件修饰键丢失
+        _lastModifiers = _keyboardHook?.GetCurrentModifiers() ?? _lastModifiers;
+
         if (_pressedKeys.Count == 0)
         {
+            // 若刚刚发生过即时显示（例如快速单击 D/F），在200ms内保持显示，不立即隐藏
+            if ((DateTime.Now - _lastImmediateAt).TotalMilliseconds < 200 && !string.IsNullOrEmpty(_lastImmediateText))
+            {
+                ShowKeyDisplay(_lastImmediateText);
+                _keyDisplayWindow?.RefreshDisplay();
+                return;
+            }
             HideKeyDisplay();
             return;
         }
         
-        var keyText = FormatKeyCombination(_pressedKeys);
+        // 使用快照（合并轮询结果），提升组合键稳定性
+        var snapshot = BuildCurrentKeysSnapshot();
+        var keyText = FormatKeyCombination(snapshot);
+        Console.WriteLine($"[MainWindow] Computed keyText='{keyText}' from pressed={string.Join(",", _pressedKeys)} mods={_lastModifiers}");
         if (string.IsNullOrEmpty(keyText))
         {
             HideKeyDisplay();
@@ -315,31 +351,46 @@ public partial class MainWindow : Window
     private string FormatKeyCombination(HashSet<Key> keys)
     {
         var parts = new List<string>();
-        
+
         // 只显示有实际按键的组合，避免只显示修饰键
         var normalKeys = keys.Where(k => !IsModifierKey(k)).ToList();
         if (normalKeys.Count == 0)
-        {
-            return ""; // 没有实际按键时不显示任何内容
-        }
-        
-        // 检查修饰键（只在有实际按键时显示）
-        if (keys.Contains(Key.LeftCtrl) || keys.Contains(Key.RightCtrl))
+            return "";
+
+        // 使用事件修饰键状态，确保组合键可靠显示
+        if ((_lastModifiers & KeyModifiers.Control) != 0)
             parts.Add("Ctrl");
-        if (keys.Contains(Key.LeftAlt) || keys.Contains(Key.RightAlt))
+        if ((_lastModifiers & KeyModifiers.Alt) != 0)
             parts.Add("Alt");
-        if (keys.Contains(Key.LeftShift) || keys.Contains(Key.RightShift))
+        if ((_lastModifiers & KeyModifiers.Shift) != 0)
             parts.Add("Shift");
-        if (keys.Contains(Key.LWin) || keys.Contains(Key.RWin))
+        if ((_lastModifiers & KeyModifiers.Meta) != 0)
             parts.Add("Win");
-        
+
         // 添加普通按键
         foreach (var key in normalKeys)
-        {
             parts.Add(FormatKeyName(key));
-        }
-        
+
         return string.Join(" + ", parts);
+    }
+
+    // 立即显示当前按下的键（用于快速单击的可见性保障）
+    private string FormatImmediateKey(Key key, KeyModifiers mods)
+    {
+        var parts = new List<string>();
+        if ((mods & KeyModifiers.Control) != 0) parts.Add("Ctrl");
+        if ((mods & KeyModifiers.Alt) != 0) parts.Add("Alt");
+        if ((mods & KeyModifiers.Shift) != 0) parts.Add("Shift");
+        if ((mods & KeyModifiers.Meta) != 0) parts.Add("Win");
+        parts.Add(FormatKeyName(key));
+        return string.Join(" + ", parts);
+    }
+
+    // 组合键快照：合并 _pressedKeys 与 KeyboardHook 的当前按键检测
+    private HashSet<Key> BuildCurrentKeysSnapshot()
+    {
+        // 快修：仅使用事件捕获的按键集，避免错误键码映射引入的“幽灵键”
+        return new HashSet<Key>(_pressedKeys);
     }
     
     private bool IsModifierKey(Key key)
@@ -356,7 +407,7 @@ public partial class MainWindow : Window
         {
             Key.Space => "Space",
             Key.Enter or Key.Return => "Enter",
-            Key.Escape => "Esc",
+            Key.Escape => "Escape",
             Key.Tab => "Tab",
             Key.Back => "⌫",
             Key.Delete => "Del",
@@ -806,6 +857,7 @@ public partial class MainWindow : Window
         _keyboardHook?.Dispose();
         _keyDisplayWindow?.Close();
         CancelHideTimer();
+        _hookHealthTimer?.Dispose();
         
         // 清理新功能组件
         _textSelectionPopover?.Dispose();
@@ -833,5 +885,19 @@ public partial class MainWindow : Window
     {
         Show();
         // 不主动抢占焦点
+    }
+
+    // 健康检测：若长时间无事件，重置卡死状态并校正修饰键
+    private void HookHealthCheck(object? state)
+    {
+        var idle = (DateTime.Now - _lastKeyEventTime).TotalSeconds;
+        if (idle > 5)
+        {
+            // 清理可能卡住的按键状态
+            _keyboardHook?.ClearAllKeyStates();
+            // 再次拉取修饰键，避免组合键显示缺失
+            _lastModifiers = _keyboardHook?.GetCurrentModifiers() ?? KeyModifiers.None;
+            try { this.Get<TextBlock>("StatusTextBlock").Text = "键盘状态已校正"; } catch { }
+        }
     }
 }

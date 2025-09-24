@@ -68,6 +68,7 @@ public class KeyboardHook : IDisposable
                 if (isCurrentlyPressed && !wasPreviouslyPressed)
                 {
                     // 按键按下
+                    if (key == Key.D) Console.WriteLine("[KeyboardHook] D down (polling)");
                     Dispatcher.UIThread.Post(() =>
                     {
                         var args = new KeyEventArgs { Key = key };
@@ -78,6 +79,7 @@ public class KeyboardHook : IDisposable
                 else if (!isCurrentlyPressed && wasPreviouslyPressed)
                 {
                     // 按键释放
+                    if (key == Key.D) Console.WriteLine("[KeyboardHook] D up (polling)");
                     Dispatcher.UIThread.Post(() =>
                     {
                         var args = new KeyEventArgs { Key = key };
@@ -181,29 +183,43 @@ public class KeyboardHook : IDisposable
     
     private int KeyToMacVirtualKey(Key key)
     {
+        // 纠正 macOS 键码，避免与数字行冲突（参考 Apple VK 表）
         return key switch
         {
+            // 字母
             Key.A => 0x00, Key.S => 0x01, Key.D => 0x02, Key.F => 0x03,
             Key.H => 0x04, Key.G => 0x05, Key.Z => 0x06, Key.X => 0x07,
             Key.C => 0x08, Key.V => 0x09, Key.B => 0x0B, Key.Q => 0x0C,
             Key.W => 0x0D, Key.E => 0x0E, Key.R => 0x0F, Key.Y => 0x10,
-            Key.T => 0x11, Key.O => 0x12, Key.P => 0x13, Key.U => 0x14,
-            Key.I => 0x15, Key.L => 0x16, Key.K => 0x17, Key.J => 0x18,
-            Key.M => 0x1E, Key.N => 0x1A, Key.D1 => 0x12, Key.D2 => 0x13,
-            Key.D3 => 0x14, Key.D4 => 0x15, Key.D5 => 0x17, Key.D6 => 0x16,
-            Key.D7 => 0x1A, Key.D8 => 0x1C, Key.D9 => 0x19, Key.D0 => 0x1D,
-            Key.Space => 0x31, Key.Enter => 0x24, Key.Escape => 0x35,
-            Key.Back => 0x33, Key.Tab => 0x30, Key.Delete => 0x75,
+            Key.T => 0x11,
+            Key.O => 0x1F, Key.U => 0x20, Key.I => 0x22, Key.P => 0x23,
+            Key.L => 0x25, Key.J => 0x26, Key.K => 0x28,
+            Key.N => 0x2D, Key.M => 0x2E,
+
+            // 数字行
+            Key.D1 => 0x12, Key.D2 => 0x13, Key.D3 => 0x14, Key.D4 => 0x15,
+            Key.D5 => 0x17, Key.D6 => 0x16, Key.D7 => 0x1A, Key.D8 => 0x1C,
+            Key.D9 => 0x19, Key.D0 => 0x1D,
+
+            // 常用控制键
+            Key.Space => 0x31, Key.Enter or Key.Return => 0x24,
+            Key.Escape => 0x35, Key.Back => 0x33, Key.Tab => 0x30, Key.Delete => 0x75,
+
+            // 修饰键
             Key.LeftShift => 0x38, Key.RightShift => 0x3C,
             Key.LeftCtrl => 0x3B, Key.RightCtrl => 0x3E,
             Key.LeftAlt => 0x3A, Key.RightAlt => 0x3D,
             Key.LWin => 0x37, Key.RWin => 0x36,
-            Key.F1 => 0x7A, Key.F2 => 0x78, Key.F3 => 0x63,
-            Key.F4 => 0x76, Key.F5 => 0x60, Key.F6 => 0x61,
-            Key.F7 => 0x62, Key.F8 => 0x64, Key.F9 => 0x65,
-            Key.F10 => 0x6D, Key.F11 => 0x67, Key.F12 => 0x6F,
-            Key.Up => 0x7E, Key.Down => 0x7D, Key.Left => 0x7B,
-            Key.Right => 0x7C, _ => -1
+
+            // 功能键
+            Key.F1 => 0x7A, Key.F2 => 0x78, Key.F3 => 0x63, Key.F4 => 0x76,
+            Key.F5 => 0x60, Key.F6 => 0x61, Key.F7 => 0x62, Key.F8 => 0x64,
+            Key.F9 => 0x65, Key.F10 => 0x6D, Key.F11 => 0x67, Key.F12 => 0x6F,
+
+            // 方向键
+            Key.Up => 0x7E, Key.Down => 0x7D, Key.Left => 0x7B, Key.Right => 0x7C,
+
+            _ => -1
         };
     }
     
@@ -295,6 +311,20 @@ public class KeyboardHook : IDisposable
         KeyUp?.Invoke(this, e);
     }
     
+    // 提供当前修饰键状态（基于全局键状态），用于可靠组合键显示
+    public KeyModifiers GetCurrentModifiers()
+    {
+        KeyModifiers mods = KeyModifiers.None;
+        if (IsKeyPressed(Key.LeftCtrl) || IsKeyPressed(Key.RightCtrl)) mods |= KeyModifiers.Control;
+        if (IsKeyPressed(Key.LeftAlt) || IsKeyPressed(Key.RightAlt)) mods |= KeyModifiers.Alt;
+        if (IsKeyPressed(Key.LeftShift) || IsKeyPressed(Key.RightShift)) mods |= KeyModifiers.Shift;
+        if (IsKeyPressed(Key.LWin) || IsKeyPressed(Key.RWin)) mods |= KeyModifiers.Meta;
+        return mods;
+    }
+
+    // 查询某键当前是否按下（使用全局检测）
+    public bool IsKeyCurrentlyPressed(Key key) => IsKeyPressed(key);
+
     public void Dispose()
     {
         _pollingTimer?.Dispose();

@@ -9,27 +9,29 @@
         CanResize="False"
         ShowInTaskbar="False"
         Topmost="True"
-        MinWidth="120"
-        MaxWidth="400"
-        Height="80"
+        MinWidth="100"
+        MaxWidth="99999"
+        Height="64"
         SystemDecorations="None"
         Focusable="False"
-        Background="Transparent"
-        SizeToContent="Width">
+        Background="#00000000"
+        SizeToContent="Manual"
+        Opacity="1">
     
     <!-- 半透明圆角窗体设计 -->
-    <Border Name="MainBorder" 
-            Background="Transparent"
-            CornerRadius="20"
+    <Border x:Name="MainBorder" 
+            CornerRadius="8"
             BorderThickness="1"
             BorderBrush="#33FFFFFF"
             Margin="0"
-            Padding="24,16"
-            BoxShadow="0 8 32 0 #40000000">
+            Padding="14,12"
+            BoxShadow="0 4 16 0 #30000000"
+            ClipToBounds="True"
+            Background="#000000EE">
         
-        <TextBlock Name="DisplayTextBlock" 
+        <TextBlock x:Name="DisplayTextBlock" 
                   Text=""
-                  FontSize="28"
+                  FontSize="20"
                   FontWeight="SemiBold"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"

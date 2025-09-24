@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using System;
 using System.Threading;
@@ -14,10 +15,18 @@ public partial class KeyDisplayWindow : Window
     private Timer? _autoHideTimer;
     private const int AUTO_HIDE_DELAY = 2000; // 2秒自动隐藏
     private bool _isContentVisible = false;
+    public bool ForceFullWidth = true;
 
     public KeyDisplayWindow()
     {
         InitializeComponent();
+        // 绑定到主窗口，确保子窗体显示不受其他窗口影响
+        var desktop = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+        if (desktop?.MainWindow != null)
+        {
+            this.Owner = desktop.MainWindow;
+        }
+
         this.Closing += (s, e) => 
         {
             // 阻止关闭窗口，只隐藏
@@ -31,7 +40,8 @@ public partial class KeyDisplayWindow : Window
     
     private void OnWindowLoaded(object? sender, RoutedEventArgs e)
     {
-        PositionWindowAtBottomCenter();
+        // 异步定位到底部居中，避免初次显示时尺寸尚未应用导致位置偏差
+        Dispatcher.UIThread.Post(() => PositionWindowAtBottomCenter());
     }
     
     /// <summary>
@@ -62,18 +72,31 @@ public partial class KeyDisplayWindow : Window
     /// </summary>
     private void AdjustWindowWidth(string text)
     {
+        // 全屏宽度模式：用于调试内容显示是否正确
+        if (ForceFullWidth)
+        {
+            var screens = Screens?.All;
+            if (screens != null && screens.Count > 0)
+            {
+                var primary = screens[0];
+                this.Width = primary.Bounds.Width;
+                PositionWindowAtBottomCenter();
+                return;
+            }
+        }
+
         if (DisplayTextBlock != null && !string.IsNullOrEmpty(text))
         {
             // 根据文本长度估算宽度
             var baseWidth = 120; // 最小宽度
-            var charWidth = 20; // 每个字符大约20px宽度
+            var charWidth = 20; // 每个字符约20px
             var estimatedWidth = Math.Max(baseWidth, text.Length * charWidth + 48); // 48px为padding
-            
-            // 限制在最小和最大宽度之间
-            var finalWidth = Math.Min(400, Math.Max(120, estimatedWidth));
-            
+
+            // 提高上限以适配更长文本
+            var finalWidth = Math.Min(800, Math.Max(120, estimatedWidth));
+
             this.Width = finalWidth;
-            
+
             // 重新定位到底部居中
             PositionWindowAtBottomCenter();
         }
@@ -91,9 +114,7 @@ public partial class KeyDisplayWindow : Window
         {
             if (!string.IsNullOrEmpty(text))
             {
-                // 有内容时显示半透明主题背景（移除黑底与模糊）
-                var themedBg = new Color(0xCC, backgroundColor.R, backgroundColor.G, backgroundColor.B);
-                MainBorder.Background = new SolidColorBrush(themedBg);
+                // 使用 Acrylic 背景，不在代码里覆盖背景色；仅设置边框与尺寸
                 MainBorder.BorderBrush = new SolidColorBrush(Color.Parse("#33FFFFFF"));
                 
                 // 动态调整窗口宽度
