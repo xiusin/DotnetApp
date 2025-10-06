@@ -22,12 +22,15 @@
   - 创建 `Core/Configuration/KeyboardMonitorSettings.cs` 键盘监控配置模型
   - _Requirements: 1.4, 1.5, 5.1_
 
+
+
   - _Commit: "创建配置服务基础架构"_
 
 - [ ] 2. 实现配置服务
   - 创建 `Core/Services/ConfigurationService.cs` 实现 `IConfigurationService`
   - 实现 `LoadAsync()` 方法，支持从 JSON 文件加载配置
   - 实现 `SaveAsync()` 方法，支持保存配置到 JSON 文件
+
   - 实现 `GetModuleAsync<T>()` 和 `SaveModuleAsync<T>()` 方法
   - 添加错误处理：文件不存在时创建默认配置，JSON 格式错误时备份并使用默认值
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
