@@ -12,6 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Avalonia.Markup.Xaml;
+using ConfigButtonDisplay.Core.Interfaces;
+using ConfigButtonDisplay.Core.Services;
+using ConfigButtonDisplay.Core.Configuration;
 
 namespace ConfigButtonDisplay;
 
@@ -44,10 +47,21 @@ public partial class MainWindow : Window
     private readonly HashSet<Key> _pressedKeys = new();
     private KeyModifiers _lastModifiers = KeyModifiers.None;
     
+    // 核心服务
+    private readonly IConfigurationService _configurationService;
+    private readonly IWindowPositionService _windowPositionService;
+    private AppSettings? _appSettings;
+    
     
     public MainWindow()
     {
         Console.WriteLine("MainWindow constructor starting...");
+        
+        // 初始化核心服务
+        _configurationService = new ConfigurationService();
+        _windowPositionService = new WindowPositionService();
+        Console.WriteLine("Core services initialized");
+        
         AvaloniaXamlLoader.Load(this);
         Console.WriteLine("AvaloniaXamlLoader.Load completed");
         
@@ -62,6 +76,7 @@ public partial class MainWindow : Window
         
         // 延迟初始化键盘钩子，确保控件已加载
         this.Loaded += OnWindowLoaded;
+        this.Opened += OnWindowOpened;
         Console.WriteLine("MainWindow constructor completed");
     }
 
@@ -76,6 +91,54 @@ public partial class MainWindow : Window
             InitializeKeyboardHook();
             UpdatePreview();
         }, DispatcherPriority.Render);
+    }
+    
+    /// <summary>
+    /// 窗口打开事件，应用窗口定位和配置
+    /// </summary>
+    private async void OnWindowOpened(object? sender, EventArgs e)
+    {
+        Console.WriteLine("MainWindow Opened event triggered");
+        
+        try
+        {
+            // 加载配置
+            _appSettings = await _configurationService.LoadAsync();
+            Console.WriteLine($"Configuration loaded: Position={_appSettings.Window.Position}");
+            
+            // 应用窗口定位
+            if (_appSettings.Window.Position == "RightEdge")
+            {
+                var position = _windowPositionService.CalculateRightEdgePosition(
+                    (int)this.Width, 
+                    (int)this.Height
+                );
+                this.Position = position;
+                Console.WriteLine($"Window positioned at right edge: X={position.X}, Y={position.Y}");
+            }
+            else if (_appSettings.Window.RememberPosition)
+            {
+                // 尝试加载保存的位置
+                var savedPosition = _windowPositionService.LoadSavedPosition();
+                if (savedPosition.HasValue)
+                {
+                    this.Position = savedPosition.Value;
+                    Console.WriteLine($"Window positioned at saved location: X={savedPosition.Value.X}, Y={savedPosition.Value.Y}");
+                }
+            }
+            
+            // 应用窗口透明度
+            this.Opacity = _appSettings.Window.Opacity;
+            
+            // 应用置顶设置
+            this.Topmost = _appSettings.Window.AlwaysOnTop;
+            
+            Console.WriteLine("Window configuration applied successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error applying window configuration: {ex.Message}");
+        }
     }
     
     /// <summary>

@@ -43,11 +43,14 @@
   - 创建 `Infrastructure/Helpers/ScreenHelper.cs` 屏幕辅助类
   - 创建 `Core/Services/WindowPositionService.cs` 实现窗口定位逻辑
 
+
+
   - 实现 `CalculateRightEdgePosition()` 方法计算右侧边缘位置
   - 实现 `CalculatePosition()` 方法支持多种位置（TopLeft, TopCenter, BottomCenter 等）
   - 实现 `SavePosition()` 和 `LoadSavedPosition()` 方法
   - _Requirements: 2.1, 2.3, 2.7_
   - _Commit: "创建窗口定位服务"_
+
 
 ## Phase 2: Sticky Note Window Effect
 
@@ -60,7 +63,8 @@
   - _Requirements: 2.2_
   - _Commit: "修改主窗口样式为便签贴纸效果"_
 
-- [ ] 5. 集成窗口定位服务到主窗口
+- [-] 5. 集成窗口定位服务到主窗口
+
   - 在 `MainWindow.axaml.cs` 中注入 `IWindowPositionService` 和 `IConfigurationService`
   - 在 `OnOpened()` 或 `Loaded` 事件中加载窗口配置
   - 根据配置的 `Position` 属性计算窗口位置
