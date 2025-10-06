@@ -12,13 +12,16 @@
 
 ## Phase 1: Core Services Foundation
 
-- [-] 1. 创建配置服务基础架构
+- [x] 1. 创建配置服务基础架构
+
+
 
   - 创建 `Core/Interfaces/IConfigurationService.cs` 接口
   - 创建 `Core/Configuration/AppSettings.cs` 配置模型
   - 创建 `Core/Configuration/WindowSettings.cs` 窗口配置模型
   - 创建 `Core/Configuration/KeyboardMonitorSettings.cs` 键盘监控配置模型
   - _Requirements: 1.4, 1.5, 5.1_
+
   - _Commit: "创建配置服务基础架构"_
 
 - [ ] 2. 实现配置服务
