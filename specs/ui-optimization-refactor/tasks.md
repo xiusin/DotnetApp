@@ -31,6 +31,8 @@
   - 实现 `LoadAsync()` 方法，支持从 JSON 文件加载配置
   - 实现 `SaveAsync()` 方法，支持保存配置到 JSON 文件
 
+
+
   - 实现 `GetModuleAsync<T>()` 和 `SaveModuleAsync<T>()` 方法
   - 添加错误处理：文件不存在时创建默认配置，JSON 格式错误时备份并使用默认值
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
@@ -40,6 +42,7 @@
   - 创建 `Core/Interfaces/IWindowPositionService.cs` 接口
   - 创建 `Infrastructure/Helpers/ScreenHelper.cs` 屏幕辅助类
   - 创建 `Core/Services/WindowPositionService.cs` 实现窗口定位逻辑
+
   - 实现 `CalculateRightEdgePosition()` 方法计算右侧边缘位置
   - 实现 `CalculatePosition()` 方法支持多种位置（TopLeft, TopCenter, BottomCenter 等）
   - 实现 `SavePosition()` 和 `LoadSavedPosition()` 方法

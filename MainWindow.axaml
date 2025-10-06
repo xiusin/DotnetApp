@@ -17,11 +17,13 @@
         Width="680"
         Height="580">
     
-    <!-- Fluent Design 主容器 -->
-    <Border Background="#F0FFFFFF" 
+    <!-- Fluent Design 主容器 - 便签贴纸效果 -->
+    <Border Background="#F2FFFFFF" 
             CornerRadius="16" 
             Margin="8"
-            BoxShadow="0 8 32 0 #40000000">
+            BoxShadow="0 8 32 0 #40000000"
+            BorderThickness="1"
+            BorderBrush="#33FFFFFF">
         
 
         
