@@ -115,6 +115,9 @@ public partial class MainWindow : Window
                 );
                 this.Position = position;
                 Console.WriteLine($"Window positioned at right edge: X={position.X}, Y={position.Y}");
+                
+                // 执行从右侧滑入动画
+                await Infrastructure.Helpers.AnimationHelper.SlideInFromRight(this, 300);
             }
             else if (_appSettings.Window.RememberPosition)
             {

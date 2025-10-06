@@ -63,7 +63,9 @@
   - _Requirements: 2.2_
   - _Commit: "修改主窗口样式为便签贴纸效果"_
 
-- [-] 5. 集成窗口定位服务到主窗口
+- [x] 5. 集成窗口定位服务到主窗口
+
+
 
   - 在 `MainWindow.axaml.cs` 中注入 `IWindowPositionService` 和 `IConfigurationService`
   - 在 `OnOpened()` 或 `Loaded` 事件中加载窗口配置
@@ -71,6 +73,7 @@
   - 如果 `Position` 为 "RightEdge"，调用 `CalculateRightEdgePosition()` 定位到右侧边缘
   - 设置 `Topmost = true` 保持置顶
   - _Requirements: 2.1, 2.4_
+
   - _Commit: "集成窗口定位服务到主窗口"_
 
 - [ ] 6. 实现主窗口滑入动画
