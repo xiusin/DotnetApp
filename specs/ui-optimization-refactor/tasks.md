@@ -201,6 +201,7 @@
   - _Commit: "添加显示行为配置"_
 
 
+
 - [ ] 18. 添加按键过滤配置
   - 添加"显示修饰键"复选框（Ctrl, Alt, Shift, Win）
   - 添加"显示功能键"复选框（F1-F12）
@@ -371,6 +372,8 @@
 
 ## Phase 9: Dependency Injection Setup
 
+
+
 - [ ] 36. 配置依赖注入容器
   - 在 `Program.cs` 或 `App.axaml.cs` 中配置 `ServiceCollection`
   - 注册 `IConfigurationService` 为单例
@@ -402,6 +405,7 @@
 - [ ] 39. 优化动画和过渡效果
   - 为配置窗口的 TabControl 添加切换动画
   - 为主窗口的悬停效果添加缩放动画（scale 1.02）
+
   - 优化滑入动画的缓动函数
   - 确保所有动画流畅，帧率稳定
   - _Requirements: 2.8, 3.4_
