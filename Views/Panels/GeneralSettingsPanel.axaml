@@ -1,0 +1,123 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:ConfigButtonDisplay.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+             x:Class="ConfigButtonDisplay.Views.Panels.GeneralSettingsPanel"
+             x:DataType="vm:ConfigViewModel">
+    
+    <ScrollViewer>
+        <StackPanel Spacing="24" Margin="24">
+            
+            <!-- 面板标题 -->
+            <TextBlock Text="通用设置" 
+                       FontSize="20" 
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,8"/>
+            
+            <TextBlock Text="配置主窗口的基本行为和外观" 
+                       FontSize="13" 
+                       Foreground="#99000000"
+                       Margin="0,0,0,16"/>
+            
+            <!-- 窗口位置设置 -->
+            <Border Background="#F5F5F5" 
+                    CornerRadius="8" 
+                    Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="窗口位置" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"/>
+                    
+                    <Grid ColumnDefinitions="200,*">
+                        <TextBlock Text="默认位置:" 
+                                   VerticalAlignment="Center"
+                                   Grid.Column="0"/>
+                        
+                        <ComboBox Grid.Column="1"
+                                  x:Name="PositionComboBox"
+                                  SelectedItem="{Binding AppSettings.Window.Position}"
+                                  HorizontalAlignment="Stretch">
+                            <x:String>RightEdge</x:String>
+                            <x:String>LeftEdge</x:String>
+                            <x:String>Custom</x:String>
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Border>
+            
+            <!-- 窗口透明度设置 -->
+            <Border Background="#F5F5F5" 
+                    CornerRadius="8" 
+                    Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="窗口外观" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"/>
+                    
+                    <Grid ColumnDefinitions="200,*,80">
+                        <TextBlock Text="窗口透明度:" 
+                                   VerticalAlignment="Center"
+                                   Grid.Column="0"/>
+                        
+                        <Slider Grid.Column="1"
+                                Value="{Binding AppSettings.Window.Opacity}"
+                                Minimum="0.5"
+                                Maximum="1.0"
+                                TickFrequency="0.05"
+                                IsSnapToTickEnabled="True"
+                                VerticalAlignment="Center"/>
+                        
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding AppSettings.Window.Opacity, StringFormat='{}{0:P0}'}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   Margin="8,0,0,0"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+            
+            <!-- 窗口行为设置 -->
+            <Border Background="#F5F5F5" 
+                    CornerRadius="8" 
+                    Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="窗口行为" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"/>
+                    
+                    <CheckBox Content="记住窗口位置"
+                              IsChecked="{Binding AppSettings.Window.RememberPosition}"
+                              ToolTip.Tip="启用后，窗口会记住您手动调整的位置"/>
+                    
+                    <CheckBox Content="始终置顶"
+                              IsChecked="{Binding AppSettings.Window.AlwaysOnTop}"
+                              ToolTip.Tip="窗口将始终显示在其他窗口之上"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- 提示信息 -->
+            <Border Background="#E3F2FD" 
+                    BorderBrush="#2196F3" 
+                    BorderThickness="1" 
+                    CornerRadius="8" 
+                    Padding="12">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="ℹ️" FontSize="16" VerticalAlignment="Top"/>
+                    <TextBlock TextWrapping="Wrap" 
+                               FontSize="12"
+                               Foreground="#1976D2">
+                        <Run Text="提示："/>
+                        <LineBreak/>
+                        <Run Text="• 窗口位置更改后需要重启应用才能生效"/>
+                        <LineBreak/>
+                        <Run Text="• 透明度和置顶设置会立即应用"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+            
+        </StackPanel>
+    </ScrollViewer>
+    
+</UserControl>

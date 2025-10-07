@@ -76,8 +76,8 @@
                             <TextBlock Text="通用设置" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
-                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
-                        <TextBlock Text="通用设置面板" FontSize="14" Foreground="#FF718096"/>
+                    <Border Background="#FAFBFC" CornerRadius="12">
+                        <panels:GeneralSettingsPanel/>
                     </Border>
                 </TabItem>
                 
