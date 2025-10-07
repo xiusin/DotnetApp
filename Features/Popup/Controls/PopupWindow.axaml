@@ -16,239 +16,310 @@
         SystemDecorations="None"
         Background="Transparent">
 
-    <!-- 主容器 - Fluent Design风格 -->
-    <Border Background="#F0FFFFFF" 
-            CornerRadius="16" 
+    <!-- Fluent Design Container with Acrylic -->
+    <Border Background="#F5FFFFFF" 
+            CornerRadius="12" 
             BorderThickness="1" 
-            BorderBrush="#20000000"
-            BoxShadow="0 8 32 0 #40000000">
+            BorderBrush="#15323130"
+            BoxShadow="0 4 16 0 #30000000">
         
         <Grid RowDefinitions="Auto,*,Auto" Margin="0">
             
-            <!-- 标题栏 -->
+            <!-- Header Bar -->
             <Grid Grid.Row="0" 
-                  Background="#10000000" 
-                  Height="50"
+                  Background="Transparent" 
+                  Height="44"
                   ColumnDefinitions="*,Auto">
                 
                 <StackPanel Grid.Column="0" 
                            Orientation="Horizontal" 
-                           Spacing="12" 
+                           Spacing="10" 
                            VerticalAlignment="Center"
-                           Margin="20,0">
-                    <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Apps}" 
-                                      FontSize="18" 
-                                      Foreground="#FF3182CE"/>
-                    <TextBlock Text="状态栏菜单" 
-                              FontSize="16" 
-                              FontWeight="SemiBold"
-                              Foreground="#FF2D3748"
-                              VerticalAlignment="Center"/>
+                           Margin="16,0">
+                    <Border Background="#0A0078D4"
+                            CornerRadius="8"
+                            Padding="6">
+                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Apps}" 
+                                          FontSize="14" 
+                                          Foreground="#FF0078D4"/>
+                    </Border>
+                    <StackPanel Spacing="1" VerticalAlignment="Center">
+                        <TextBlock Text="状态栏菜单" 
+                                  FontSize="13" 
+                                  FontWeight="SemiBold"
+                                  Foreground="#FF323130"/>
+                        <TextBlock Text="快速访问" 
+                                  FontSize="9" 
+                                  Foreground="#FF605E5C"/>
+                    </StackPanel>
                 </StackPanel>
                 
                 <Button Name="CloseButton" 
                        Grid.Column="1"
-                       Width="32" 
-                       Height="32" 
-                       Margin="0,0,12,0"
+                       Width="28" 
+                       Height="28" 
+                       Margin="0,0,10,0"
                        Background="Transparent"
-                       Foreground="#FF718096"
+                       Foreground="#FF605E5C"
                        BorderThickness="0"
-                       CornerRadius="16"
+                       CornerRadius="14"
                        VerticalAlignment="Center"
                        Click="CloseButton_Click">
-                    <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Dismiss}" FontSize="14"/>
+                    <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Dismiss}" FontSize="12"/>
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#FFE53E3E"/>
+                            <Setter Property="Background" Value="#FFE81123"/>
                             <Setter Property="Foreground" Value="White"/>
                         </Style>
                     </Button.Styles>
                 </Button>
             </Grid>
             
-            <!-- 内容区域 - 可动态填充 -->
+            <!-- Content Area -->
             <ScrollViewer Grid.Row="1" 
-                         Padding="20"
+                         Padding="16,12"
                          VerticalScrollBarVisibility="Auto">
-                <StackPanel Name="ContentContainer" Spacing="16">
+                <StackPanel Name="ContentContainer" Spacing="12">
                     
-                    <!-- 快速操作区域 -->
-                    <Border Background="#F7FAFC" 
-                           CornerRadius="12" 
-                           Padding="16">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="快速操作" 
-                                      FontSize="14" 
-                                      FontWeight="SemiBold"
-                                      Foreground="#FF2D3748"/>
+                    <!-- Quick Actions Card -->
+                    <Border Background="#05FFFFFF" 
+                           CornerRadius="8" 
+                           Padding="14,12"
+                           BorderBrush="#0F323130"
+                           BorderThickness="1">
+                        <StackPanel Spacing="10">
+                            <Grid>
+                                <TextBlock Text="快速操作" 
+                                          FontSize="12" 
+                                          FontWeight="SemiBold"
+                                          Foreground="#FF323130"/>
+                                <Border Background="#0A000000"
+                                        CornerRadius="6"
+                                        Padding="5,2"
+                                        HorizontalAlignment="Right">
+                                    <TextBlock Text="4 项" 
+                                              FontSize="8" 
+                                              Foreground="#FF605E5C"/>
+                                </Border>
+                            </Grid>
                             
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                            <Grid ColumnDefinitions="*,8,*" RowDefinitions="Auto,8,Auto">
                                 
                                 <Button Grid.Column="0" Grid.Row="0"
-                                       Background="#FF3182CE"
+                                       Background="#FF0078D4"
                                        Foreground="White"
                                        BorderThickness="0"
-                                       CornerRadius="8"
-                                       Padding="12,8"
+                                       CornerRadius="6"
+                                       Height="32"
                                        Click="QuickAction1_Click">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Play}" FontSize="12"/>
-                                        <TextBlock Text="开始监听" FontSize="12"/>
+                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Play}" FontSize="11"/>
+                                        <TextBlock Text="开始监听" FontSize="11" FontWeight="Medium"/>
                                     </StackPanel>
+                                    <Button.Styles>
+                                        <Style Selector="Button:pointerover">
+                                            <Setter Property="Background" Value="#FF106EBE"/>
+                                        </Style>
+                                    </Button.Styles>
                                 </Button>
                                 
-                                <Button Grid.Column="1" Grid.Row="0" Margin="12,0,0,8"
-                                       Background="#F7FAFC"
-                                       Foreground="#FF4A5568"
+                                <Button Grid.Column="2" Grid.Row="0"
+                                       Background="Transparent"
+                                       Foreground="#FF323130"
                                        BorderThickness="1"
-                                       BorderBrush="#E2E8F0"
-                                       CornerRadius="8"
-                                       Padding="12,8"
+                                       BorderBrush="#FF8A8886"
+                                       CornerRadius="6"
+                                       Height="32"
                                        Click="QuickAction2_Click">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Settings}" FontSize="12"/>
-                                        <TextBlock Text="设置" FontSize="12"/>
+                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Settings}" FontSize="11"/>
+                                        <TextBlock Text="设置" FontSize="11" FontWeight="Medium"/>
                                     </StackPanel>
+                                    <Button.Styles>
+                                        <Style Selector="Button:pointerover">
+                                            <Setter Property="Background" Value="#0A000000"/>
+                                        </Style>
+                                    </Button.Styles>
                                 </Button>
                                 
-                                <Button Grid.Column="0" Grid.Row="1" Margin="0,8,0,0"
-                                       Background="#F7FAFC"
-                                       Foreground="#FF4A5568"
+                                <Button Grid.Column="0" Grid.Row="2"
+                                       Background="Transparent"
+                                       Foreground="#FF323130"
                                        BorderThickness="1"
-                                       BorderBrush="#E2E8F0"
-                                       CornerRadius="8"
-                                       Padding="12,8"
+                                       BorderBrush="#FF8A8886"
+                                       CornerRadius="6"
+                                       Height="32"
                                        Click="QuickAction3_Click">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Beaker}" FontSize="12"/>
-                                        <TextBlock Text="测试" FontSize="12"/>
+                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Beaker}" FontSize="11"/>
+                                        <TextBlock Text="测试" FontSize="11" FontWeight="Medium"/>
                                     </StackPanel>
+                                    <Button.Styles>
+                                        <Style Selector="Button:pointerover">
+                                            <Setter Property="Background" Value="#0A000000"/>
+                                        </Style>
+                                    </Button.Styles>
                                 </Button>
                                 
-                                <Button Grid.Column="1" Grid.Row="1" Margin="12,8,0,0"
-                                       Background="#F7FAFC"
-                                       Foreground="#FF4A5568"
+                                <Button Grid.Column="2" Grid.Row="2"
+                                       Background="Transparent"
+                                       Foreground="#FF323130"
                                        BorderThickness="1"
-                                       BorderBrush="#E2E8F0"
-                                       CornerRadius="8"
-                                       Padding="12,8"
+                                       BorderBrush="#FF8A8886"
+                                       CornerRadius="6"
+                                       Height="32"
                                        Click="QuickAction4_Click">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Info}" FontSize="12"/>
-                                        <TextBlock Text="关于" FontSize="12"/>
+                                        <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Info}" FontSize="11"/>
+                                        <TextBlock Text="关于" FontSize="11" FontWeight="Medium"/>
                                     </StackPanel>
+                                    <Button.Styles>
+                                        <Style Selector="Button:pointerover">
+                                            <Setter Property="Background" Value="#0A000000"/>
+                                        </Style>
+                                    </Button.Styles>
                                 </Button>
                             </Grid>
                         </StackPanel>
                     </Border>
                     
-                    <!-- 状态信息区域 -->
-                    <Border Background="#F7FAFC" 
-                           CornerRadius="12" 
-                           Padding="16">
-                        <StackPanel Spacing="12">
+                    <!-- System Status Card -->
+                    <Border Background="#05FFFFFF" 
+                           CornerRadius="8" 
+                           Padding="14,12"
+                           BorderBrush="#0F323130"
+                           BorderThickness="1">
+                        <StackPanel Spacing="10">
                             <TextBlock Text="系统状态" 
-                                      FontSize="14" 
+                                      FontSize="12" 
                                       FontWeight="SemiBold"
-                                      Foreground="#FF2D3748"/>
+                                      Foreground="#FF323130"/>
                             
                             <StackPanel Spacing="8">
-                                <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <fluent:SymbolIcon Grid.Column="0" 
-                                                      Symbol="{x:Static fluentCommon:Symbol.Circle}" 
-                                                      FontSize="12" 
-                                                      Foreground="#FF48BB78"/>
-                                    <TextBlock Grid.Column="1" 
-                                              Text="键盘监听" 
-                                              FontSize="13"
-                                              Foreground="#FF4A5568"
-                                              Margin="12,0"/>
-                                    <TextBlock Grid.Column="2" 
-                                              Name="KeyboardStatusText"
-                                              Text="已启用" 
-                                              FontSize="13"
-                                              FontWeight="Medium"
-                                              Foreground="#FF48BB78"/>
-                                </Grid>
+                                <Border Background="#0A000000" 
+                                        CornerRadius="4" 
+                                        Padding="10,6">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Border Grid.Column="0"
+                                                Background="#FF107C10"
+                                                Width="6" Height="6"
+                                                CornerRadius="3"
+                                                VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" 
+                                                  Text="键盘监听" 
+                                                  FontSize="11"
+                                                  Foreground="#FF323130"
+                                                  Margin="8,0"/>
+                                        <Border Grid.Column="2"
+                                                Background="#FF107C10"
+                                                CornerRadius="6"
+                                                Padding="6,2">
+                                            <TextBlock Name="KeyboardStatusText"
+                                                      Text="已启用" 
+                                                      FontSize="9"
+                                                      FontWeight="Medium"
+                                                      Foreground="White"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
                                 
-                                <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <fluent:SymbolIcon Grid.Column="0" 
-                                                      Symbol="Circle" 
-                                                      FontSize="12" 
-                                                      Foreground="#FF3182CE"/>
-                                    <TextBlock Grid.Column="1" 
-                                              Text="显示窗口" 
-                                              FontSize="13"
-                                              Foreground="#FF4A5568"
-                                              Margin="12,0"/>
-                                    <TextBlock Grid.Column="2" 
-                                              Name="DisplayStatusText"
-                                              Text="就绪" 
-                                              FontSize="13"
-                                              FontWeight="Medium"
-                                              Foreground="#FF3182CE"/>
-                                </Grid>
+                                <Border Background="#0A000000" 
+                                        CornerRadius="4" 
+                                        Padding="10,6">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Border Grid.Column="0"
+                                                Background="#FF0078D4"
+                                                Width="6" Height="6"
+                                                CornerRadius="3"
+                                                VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" 
+                                                  Text="显示窗口" 
+                                                  FontSize="11"
+                                                  Foreground="#FF323130"
+                                                  Margin="8,0"/>
+                                        <Border Grid.Column="2"
+                                                Background="#FF0078D4"
+                                                CornerRadius="6"
+                                                Padding="6,2">
+                                            <TextBlock Name="DisplayStatusText"
+                                                      Text="就绪" 
+                                                      FontSize="9"
+                                                      FontWeight="Medium"
+                                                      Foreground="White"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
                             </StackPanel>
                         </StackPanel>
                     </Border>
                     
-                    <!-- 动态内容区域 - 预留扩展 -->
+                    <!-- Dynamic Content Area -->
                     <Border Name="DynamicContentArea"
-                           Background="#F7FAFC" 
-                           CornerRadius="12" 
-                           Padding="16"
+                           Background="#05FFFFFF" 
+                           CornerRadius="8" 
+                           Padding="14,12"
+                           BorderBrush="#0F323130"
+                           BorderThickness="1"
                            IsVisible="False">
                         <StackPanel Name="DynamicContentContainer" Spacing="8">
-                            <!-- 动态内容将在这里填充 -->
+                            <!-- Dynamic content will be populated here -->
                         </StackPanel>
                     </Border>
                     
                 </StackPanel>
             </ScrollViewer>
             
-            <!-- 底部操作栏 -->
+            <!-- Footer Action Bar -->
             <Border Grid.Row="2" 
-                   Background="#10000000" 
-                   Height="50"
-                   CornerRadius="0,0,16,16">
-                <Grid ColumnDefinitions="*,Auto" Margin="20,0">
+                   Background="Transparent" 
+                   Height="42"
+                   BorderBrush="#0F323130"
+                   BorderThickness="0,1,0,0"
+                   CornerRadius="0,0,12,12">
+                <Grid ColumnDefinitions="*,Auto" Margin="16,0">
                     
-                    <TextBlock Grid.Column="0"
-                              Name="FooterStatusText"
-                              Text="准备就绪"
-                              FontSize="12"
-                              Foreground="#FF718096"
-                              VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="0"
+                               Orientation="Horizontal"
+                               Spacing="6"
+                               VerticalAlignment="Center">
+                        <Border Background="#FF107C10"
+                                Width="5" Height="5"
+                                CornerRadius="2.5"/>
+                        <TextBlock Name="FooterStatusText"
+                                  Text="准备就绪"
+                                  FontSize="10"
+                                  Foreground="#FF605E5C"
+                                  VerticalAlignment="Center"/>
+                    </StackPanel>
                     
                     <StackPanel Grid.Column="1" 
                                Orientation="Horizontal" 
-                               Spacing="8"
+                               Spacing="6"
                                VerticalAlignment="Center">
                         <Button Background="Transparent"
-                               Foreground="#FF718096"
+                               Foreground="#FF605E5C"
                                BorderThickness="0"
-                               Padding="8"
-                               CornerRadius="6"
+                               Width="26" Height="26"
+                               CornerRadius="13"
                                Click="RefreshButton_Click">
-                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.ArrowClockwise}" FontSize="14"/>
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.ArrowClockwise}" FontSize="12"/>
                             <Button.Styles>
                                 <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#20000000"/>
+                                    <Setter Property="Background" Value="#0A000000"/>
                                 </Style>
                             </Button.Styles>
                         </Button>
                         
                         <Button Background="Transparent"
-                               Foreground="#FF718096"
+                               Foreground="#FF605E5C"
                                BorderThickness="0"
-                               Padding="8"
-                               CornerRadius="6"
+                               Width="26" Height="26"
+                               CornerRadius="13"
                                Click="SettingsButton_Click">
-                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Settings}" FontSize="14"/>
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Settings}" FontSize="12"/>
                             <Button.Styles>
                                 <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#20000000"/>
+                                    <Setter Property="Background" Value="#0A000000"/>
                                 </Style>
                             </Button.Styles>
                         </Button>

@@ -6,49 +6,138 @@
              x:Class="ConfigButtonDisplay.Views.Panels.EdgeComponentPanel">
     
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="24" Margin="24">
-            <StackPanel Spacing="8">
-                <TextBlock Text="边缘组件" FontSize="20" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <TextBlock Text="配置屏幕边缘工具栏的行为" FontSize="14" Foreground="#FF718096"/>
-            </StackPanel>
+        <StackPanel Spacing="16" Margin="0">
+            <!-- Header Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="边缘组件" 
+                                  FontSize="14" 
+                                  FontWeight="SemiBold" 
+                                  Foreground="#FF323130"/>
+                        <TextBlock Text="配置屏幕边缘工具栏的行为" 
+                                  FontSize="10" 
+                                  Foreground="#FF605E5C"/>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                 Name="EnabledToggle" 
+                                 OnContent="启用" 
+                                 OffContent="禁用" 
+                                 IsChecked="True"
+                                 VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
             
-            <StackPanel Spacing="12">
-                <TextBlock Text="基本设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <ToggleSwitch Name="EnabledToggle" OnContent="已启用" OffContent="已禁用" IsChecked="True"/>
-            </StackPanel>
-            
-            <StackPanel Spacing="12">
-                <TextBlock Text="触发设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,16,Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="触发区域" VerticalAlignment="Center" Foreground="#FF4A5568"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1" Name="TriggerAreaComboBox" SelectedIndex="0">
-                        <ComboBoxItem Content="屏幕左边缘"/>
-                        <ComboBoxItem Content="屏幕右边缘"/>
-                    </ComboBox>
-                    
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="触发宽度" VerticalAlignment="Center" Foreground="#FF4A5568"/>
-                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                        <Slider Name="TriggerWidthSlider" Minimum="1" Maximum="10" Value="5" Width="200"/>
-                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
-                            <TextBlock Text="{Binding #TriggerWidthSlider.Value, StringFormat='{}{0:F0}px'}" FontSize="14" Foreground="#FF4A5568"/>
+            <!-- Trigger Settings Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="触发设置" 
+                              FontSize="12" 
+                              FontWeight="SemiBold" 
+                              Foreground="#FF323130"/>
+                    <StackPanel Spacing="8">
+                        <!-- Trigger Area -->
+                        <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                            <Grid ColumnDefinitions="80,*">
+                                <TextBlock Grid.Column="0" 
+                                          Text="触发区域" 
+                                          VerticalAlignment="Center" 
+                                          FontSize="10"
+                                          Foreground="#FF323130"/>
+                                <ComboBox Grid.Column="1" 
+                                         Name="TriggerAreaComboBox" 
+                                         SelectedIndex="0"
+                                         FontSize="10"
+                                         Background="Transparent"
+                                         BorderThickness="0">
+                                    <ComboBoxItem Content="屏幕左边缘"/>
+                                    <ComboBoxItem Content="屏幕右边缘"/>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Trigger Width -->
+                        <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                            <Grid ColumnDefinitions="80,*,50">
+                                <TextBlock Grid.Column="0" 
+                                          Text="触发宽度" 
+                                          VerticalAlignment="Center" 
+                                          FontSize="10"
+                                          Foreground="#FF323130"/>
+                                <Slider Grid.Column="1" 
+                                       Name="TriggerWidthSlider" 
+                                       Minimum="1" Maximum="10" Value="5"
+                                       Margin="8,0"/>
+                                <Border Grid.Column="2"
+                                        Background="#FF0078D4" 
+                                        CornerRadius="6" 
+                                        Padding="6,2">
+                                    <TextBlock Text="{Binding #TriggerWidthSlider.Value, StringFormat='{}{0:F0}'}" 
+                                              FontSize="9" 
+                                              FontWeight="Medium"
+                                              Foreground="White"
+                                              HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
                         </Border>
                     </StackPanel>
-                </Grid>
-            </StackPanel>
+                </StackPanel>
+            </Border>
             
-            <StackPanel Spacing="12">
-                <TextBlock Text="自动显示" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <CheckBox Name="AutoShowCheckBox" Content="启用自动显示" IsChecked="False"/>
-                <Grid ColumnDefinitions="150,*">
-                    <TextBlock Grid.Column="0" Text="显示间隔" VerticalAlignment="Center" Foreground="#FF4A5568"/>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                        <Slider Name="IntervalSlider" Minimum="10" Maximum="60" Value="30" Width="200" IsEnabled="{Binding #AutoShowCheckBox.IsChecked}"/>
-                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
-                            <TextBlock Text="{Binding #IntervalSlider.Value, StringFormat='{}{0:F0}秒'}" FontSize="14" Foreground="#FF4A5568"/>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
+            <!-- Auto Show Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="自动显示" 
+                              FontSize="12" 
+                              FontWeight="SemiBold" 
+                              Foreground="#FF323130"/>
+                    <CheckBox Name="AutoShowCheckBox" 
+                             Content="启用自动显示" 
+                             IsChecked="False"
+                             FontSize="10"
+                             Foreground="#FF323130"/>
+                    <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                        <Grid ColumnDefinitions="80,*,50">
+                            <TextBlock Grid.Column="0" 
+                                      Text="显示间隔" 
+                                      VerticalAlignment="Center" 
+                                      FontSize="10"
+                                      Foreground="#FF323130"/>
+                            <Slider Grid.Column="1" 
+                                   Name="IntervalSlider" 
+                                   Minimum="10" Maximum="60" Value="30"
+                                   IsEnabled="{Binding #AutoShowCheckBox.IsChecked}"
+                                   Margin="8,0"/>
+                            <Border Grid.Column="2"
+                                    Background="#FF0078D4" 
+                                    CornerRadius="6" 
+                                    Padding="6,2">
+                                <TextBlock Text="{Binding #IntervalSlider.Value, StringFormat='{}{0:F0}s'}" 
+                                          FontSize="9" 
+                                          FontWeight="Medium"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

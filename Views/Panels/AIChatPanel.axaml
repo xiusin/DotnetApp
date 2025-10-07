@@ -6,140 +6,215 @@
              x:Class="ConfigButtonDisplay.Views.Panels.AIChatPanel">
     
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="24" Margin="24">
+        <StackPanel Spacing="16" Margin="0">
             
-            <!-- 标题和描述 -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="AI 聊天设置" 
-                          FontSize="20" 
-                          FontWeight="SemiBold"
-                          Foreground="#FF2D3748"/>
-                <TextBlock Text="配置 AI 聊天窗口的行为和快捷键"
-                          FontSize="14"
-                          Foreground="#FF718096"/>
-            </StackPanel>
-            
-            <!-- 启用开关 -->
-            <StackPanel Spacing="12">
-                <TextBlock Text="基本设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <ToggleSwitch Name="EnabledToggle"
-                             OnContent="已启用"
-                             OffContent="已禁用"
-                             IsChecked="True"/>
-            </StackPanel>
-            
-            <!-- 快捷键设置 -->
-            <StackPanel Spacing="12">
-                <TextBlock Text="快捷键" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <TextBlock Text="用于打开/关闭 AI 聊天窗口的快捷键"
-                          FontSize="13"
-                          Foreground="#FF718096"
-                          Margin="0,0,0,8"/>
-                
-                <Grid ColumnDefinitions="150,*">
-                    <TextBlock Grid.Column="0" 
-                              Text="快捷键" 
-                              VerticalAlignment="Center"
-                              Foreground="#FF4A5568"/>
-                    <ComboBox Grid.Column="1"
-                             Name="HotkeyComboBox"
-                             SelectedIndex="0">
-                        <ComboBoxItem Content="双击 Shift"/>
-                        <ComboBoxItem Content="Ctrl + Space"/>
-                        <ComboBoxItem Content="Alt + C"/>
-                        <ComboBoxItem Content="Ctrl + Alt + C"/>
-                    </ComboBox>
+            <!-- Header Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="AI 聊天设置" 
+                                  FontSize="14" 
+                                  FontWeight="SemiBold"
+                                  Foreground="#FF323130"/>
+                        <TextBlock Text="配置 AI 聊天窗口的行为和快捷键"
+                                  FontSize="10"
+                                  Foreground="#FF605E5C"/>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                 Name="EnabledToggle"
+                                 OnContent="启用"
+                                 OffContent="禁用"
+                                 IsChecked="True"
+                                 VerticalAlignment="Center"/>
                 </Grid>
-            </StackPanel>
+            </Border>
             
-            <!-- 窗口设置 -->
-            <StackPanel Spacing="12">
-                <TextBlock Text="窗口设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                
-                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,16,Auto,16,Auto">
-                    
-                    <!-- 窗口位置 -->
-                    <TextBlock Grid.Row="0" Grid.Column="0"
-                              Text="窗口位置"
-                              VerticalAlignment="Center"
-                              Foreground="#FF4A5568"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1"
-                             Name="PositionComboBox"
-                             SelectedIndex="1">
-                        <ComboBoxItem Content="屏幕中心"/>
-                        <ComboBoxItem Content="屏幕右侧"/>
-                        <ComboBoxItem Content="屏幕左侧"/>
-                    </ComboBox>
-                    
-                    <!-- 窗口宽度 -->
-                    <TextBlock Grid.Row="2" Grid.Column="0"
-                              Text="窗口宽度"
-                              VerticalAlignment="Center"
-                              Foreground="#FF4A5568"/>
-                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                        <Slider Name="WidthSlider"
-                               Minimum="400" Maximum="800" Value="600"
-                               Width="200"
-                               TickFrequency="50"
-                               IsSnapToTickEnabled="True"/>
-                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
-                            <TextBlock Text="{Binding #WidthSlider.Value, StringFormat='{}{0:F0}px'}"
-                                      FontSize="14"
-                                      Foreground="#FF4A5568"/>
-                        </Border>
+            <!-- Hotkey Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="快捷键" 
+                                  FontSize="12" 
+                                  FontWeight="SemiBold" 
+                                  Foreground="#FF323130"/>
+                        <TextBlock Text="用于打开/关闭 AI 聊天窗口的快捷键"
+                                  FontSize="9"
+                                  Foreground="#FF605E5C"/>
                     </StackPanel>
                     
-                    <!-- 窗口高度 -->
-                    <TextBlock Grid.Row="4" Grid.Column="0"
-                              Text="窗口高度"
-                              VerticalAlignment="Center"
-                              Foreground="#FF4A5568"/>
-                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                        <Slider Name="HeightSlider"
-                               Minimum="300" Maximum="700" Value="500"
-                               Width="200"
-                               TickFrequency="50"
-                               IsSnapToTickEnabled="True"/>
-                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
-                            <TextBlock Text="{Binding #HeightSlider.Value, StringFormat='{}{0:F0}px'}"
-                                      FontSize="14"
-                                      Foreground="#FF4A5568"/>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
-            
-            <!-- 行为设置 -->
-            <StackPanel Spacing="12">
-                <TextBlock Text="行为设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                
-                <StackPanel Spacing="8">
-                    <CheckBox Name="AutoFocusCheckBox" 
-                             Content="打开时自动聚焦输入框" 
-                             IsChecked="True"/>
-                    <CheckBox Name="RememberHistoryCheckBox" 
-                             Content="记住聊天历史" 
-                             IsChecked="True"/>
-                    <CheckBox Name="ShowTimestampCheckBox" 
-                             Content="显示消息时间戳" 
-                             IsChecked="False"/>
+                    <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                        <Grid ColumnDefinitions="80,*">
+                            <TextBlock Grid.Column="0" 
+                                      Text="快捷键" 
+                                      VerticalAlignment="Center"
+                                      FontSize="10"
+                                      Foreground="#FF323130"/>
+                            <ComboBox Grid.Column="1"
+                                     Name="HotkeyComboBox"
+                                     SelectedIndex="0"
+                                     FontSize="10"
+                                     Background="Transparent"
+                                     BorderThickness="0">
+                                <ComboBoxItem Content="双击 Shift"/>
+                                <ComboBoxItem Content="Ctrl + Space"/>
+                                <ComboBoxItem Content="Alt + C"/>
+                                <ComboBoxItem Content="Ctrl + Alt + C"/>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
                 </StackPanel>
-            </StackPanel>
+            </Border>
             
-            <!-- 提示信息 -->
-            <Border Background="#EBF8FF" 
-                   BorderBrush="#90CDF4" 
+            <!-- Window Settings Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="窗口设置" 
+                              FontSize="12" 
+                              FontWeight="SemiBold" 
+                              Foreground="#FF323130"/>
+                    
+                    <StackPanel Spacing="8">
+                        <!-- Window Position -->
+                        <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                            <Grid ColumnDefinitions="80,*">
+                                <TextBlock Grid.Column="0"
+                                          Text="窗口位置"
+                                          VerticalAlignment="Center"
+                                          FontSize="10"
+                                          Foreground="#FF323130"/>
+                                <ComboBox Grid.Column="1"
+                                         Name="PositionComboBox"
+                                         SelectedIndex="1"
+                                         FontSize="10"
+                                         Background="Transparent"
+                                         BorderThickness="0">
+                                    <ComboBoxItem Content="屏幕中心"/>
+                                    <ComboBoxItem Content="屏幕右侧"/>
+                                    <ComboBoxItem Content="屏幕左侧"/>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Window Width -->
+                        <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                            <Grid ColumnDefinitions="80,*,60">
+                                <TextBlock Grid.Column="0"
+                                          Text="窗口宽度"
+                                          VerticalAlignment="Center"
+                                          FontSize="10"
+                                          Foreground="#FF323130"/>
+                                <Slider Grid.Column="1"
+                                       Name="WidthSlider"
+                                       Minimum="400" Maximum="800" Value="600"
+                                       TickFrequency="50"
+                                       IsSnapToTickEnabled="True"
+                                       Margin="8,0"/>
+                                <Border Grid.Column="2"
+                                        Background="#FF0078D4" 
+                                        CornerRadius="6" 
+                                        Padding="6,2">
+                                    <TextBlock Text="{Binding #WidthSlider.Value, StringFormat='{}{0:F0}'}"
+                                              FontSize="9"
+                                              FontWeight="Medium"
+                                              Foreground="White"
+                                              HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Window Height -->
+                        <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                            <Grid ColumnDefinitions="80,*,60">
+                                <TextBlock Grid.Column="0"
+                                          Text="窗口高度"
+                                          VerticalAlignment="Center"
+                                          FontSize="10"
+                                          Foreground="#FF323130"/>
+                                <Slider Grid.Column="1"
+                                       Name="HeightSlider"
+                                       Minimum="300" Maximum="700" Value="500"
+                                       TickFrequency="50"
+                                       IsSnapToTickEnabled="True"
+                                       Margin="8,0"/>
+                                <Border Grid.Column="2"
+                                        Background="#FF0078D4" 
+                                        CornerRadius="6" 
+                                        Padding="6,2">
+                                    <TextBlock Text="{Binding #HeightSlider.Value, StringFormat='{}{0:F0}'}"
+                                              FontSize="9"
+                                              FontWeight="Medium"
+                                              Foreground="White"
+                                              HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <!-- Behavior Settings Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="行为设置" 
+                              FontSize="12" 
+                              FontWeight="SemiBold" 
+                              Foreground="#FF323130"/>
+                    
+                    <StackPanel Spacing="6">
+                        <CheckBox Name="AutoFocusCheckBox" 
+                                 Content="打开时自动聚焦输入框" 
+                                 IsChecked="True"
+                                 FontSize="10"
+                                 Foreground="#FF323130"/>
+                        <CheckBox Name="RememberHistoryCheckBox" 
+                                 Content="记住聊天历史" 
+                                 IsChecked="True"
+                                 FontSize="10"
+                                 Foreground="#FF323130"/>
+                        <CheckBox Name="ShowTimestampCheckBox" 
+                                 Content="显示消息时间戳" 
+                                 IsChecked="False"
+                                 FontSize="10"
+                                 Foreground="#FF323130"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <!-- Tips Card -->
+            <Border Background="#0A0078D4" 
+                   BorderBrush="#200078D4" 
                    BorderThickness="1"
-                   CornerRadius="8" 
-                   Padding="16">
-                <StackPanel Spacing="8">
+                   CornerRadius="6" 
+                   Padding="14,10">
+                <StackPanel Spacing="6">
                     <TextBlock Text="💡 使用提示" 
-                              FontSize="14" 
+                              FontSize="11" 
                               FontWeight="SemiBold"
-                              Foreground="#2C5282"/>
+                              Foreground="#FF0078D4"/>
                     <TextBlock TextWrapping="Wrap"
-                              FontSize="13"
-                              Foreground="#2C5282">
+                              FontSize="10"
+                              Foreground="#FF323130"
+                              LineHeight="16">
                         <Run Text="• 双击 Shift 键可快速打开/关闭 AI 聊天窗口"/>
                         <LineBreak/>
                         <Run Text="• 聊天窗口会记住你的对话历史"/>

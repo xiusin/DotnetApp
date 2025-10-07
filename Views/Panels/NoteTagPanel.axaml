@@ -6,37 +6,114 @@
              x:Class="ConfigButtonDisplay.Views.Panels.NoteTagPanel">
     
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="24" Margin="24">
-            <StackPanel Spacing="8">
-                <TextBlock Text="标签管理" FontSize="20" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <TextBlock Text="配置便签标签的显示和行为" FontSize="14" Foreground="#FF718096"/>
-            </StackPanel>
-            
-            <StackPanel Spacing="12">
-                <TextBlock Text="基本设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <ToggleSwitch Name="EnabledToggle" OnContent="已启用" OffContent="已禁用" IsChecked="True"/>
-            </StackPanel>
-            
-            <StackPanel Spacing="12">
-                <TextBlock Text="标签位置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <Grid ColumnDefinitions="150,*">
-                    <TextBlock Grid.Column="0" Text="显示位置" VerticalAlignment="Center" Foreground="#FF4A5568"/>
-                    <ComboBox Grid.Column="1" Name="PositionComboBox" SelectedIndex="0">
-                        <ComboBoxItem Content="屏幕左侧"/>
-                        <ComboBoxItem Content="屏幕右侧"/>
-                    </ComboBox>
+        <StackPanel Spacing="16" Margin="0">
+            <!-- Header Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="标签管理" 
+                                  FontSize="14" 
+                                  FontWeight="SemiBold" 
+                                  Foreground="#FF323130"/>
+                        <TextBlock Text="配置便签标签的显示和行为" 
+                                  FontSize="10" 
+                                  Foreground="#FF605E5C"/>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                 Name="EnabledToggle" 
+                                 OnContent="启用" 
+                                 OffContent="禁用" 
+                                 IsChecked="True"
+                                 VerticalAlignment="Center"/>
                 </Grid>
-            </StackPanel>
+            </Border>
             
-            <StackPanel Spacing="12">
-                <TextBlock Text="标签列表" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
-                <TextBlock Text="最多支持 3 个标签" FontSize="13" Foreground="#FF718096"/>
-                <StackPanel Spacing="8">
-                    <TextBox Name="Tag1TextBox" Watermark="标签 1 文本" Text="功能标签 1"/>
-                    <TextBox Name="Tag2TextBox" Watermark="标签 2 文本" Text="功能标签 2"/>
-                    <TextBox Name="Tag3TextBox" Watermark="标签 3 文本" Text="功能标签 3"/>
+            <!-- Position Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="标签位置" 
+                              FontSize="12" 
+                              FontWeight="SemiBold" 
+                              Foreground="#FF323130"/>
+                    <Border Background="#0A000000" CornerRadius="4" Padding="10,6">
+                        <Grid ColumnDefinitions="80,*">
+                            <TextBlock Grid.Column="0" 
+                                      Text="显示位置" 
+                                      VerticalAlignment="Center" 
+                                      FontSize="10"
+                                      Foreground="#FF323130"/>
+                            <ComboBox Grid.Column="1" 
+                                     Name="PositionComboBox" 
+                                     SelectedIndex="0"
+                                     FontSize="10"
+                                     Background="Transparent"
+                                     BorderThickness="0">
+                                <ComboBoxItem Content="屏幕左侧"/>
+                                <ComboBoxItem Content="屏幕右侧"/>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
                 </StackPanel>
-            </StackPanel>
+            </Border>
+            
+            <!-- Tags List Card -->
+            <Border Background="#05FFFFFF" 
+                    CornerRadius="6" 
+                    Padding="16,12"
+                    BorderBrush="#0F323130" 
+                    BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <Grid>
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="标签列表" 
+                                      FontSize="12" 
+                                      FontWeight="SemiBold" 
+                                      Foreground="#FF323130"/>
+                            <TextBlock Text="最多支持 3 个标签" 
+                                      FontSize="9" 
+                                      Foreground="#FF605E5C"/>
+                        </StackPanel>
+                        <Border Background="#0A000000"
+                                CornerRadius="6"
+                                Padding="5,2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                            <TextBlock Text="3 项" 
+                                      FontSize="8" 
+                                      Foreground="#FF605E5C"/>
+                        </Border>
+                    </Grid>
+                    <StackPanel Spacing="8">
+                        <TextBox Name="Tag1TextBox" 
+                                Watermark="标签 1 文本" 
+                                Text="功能标签 1"
+                                FontSize="10"
+                                Height="28"/>
+                        <TextBox Name="Tag2TextBox" 
+                                Watermark="标签 2 文本" 
+                                Text="功能标签 2"
+                                FontSize="10"
+                                Height="28"/>
+                        <TextBox Name="Tag3TextBox" 
+                                Watermark="标签 3 文本" 
+                                Text="功能标签 3"
+                                FontSize="10"
+                                Height="28"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

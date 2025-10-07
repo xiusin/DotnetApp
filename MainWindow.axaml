@@ -6,16 +6,17 @@
         xmlns:fluentCommon="clr-namespace:FluentIcons.Common;assembly=FluentIcons.Common"
         mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="580"
         x:Class="ConfigButtonDisplay.MainWindow"
-        Title="键盘按键显示器 - Fluent Design"
+        Title="键盘按键显示器"
         WindowStartupLocation="CenterScreen"
         ShowInTaskbar="True"
         SystemDecorations="None"
         Background="Transparent"
         CanResize="True"
-        MinWidth="600"
-        MinHeight="500"
-        Width="680"
-        Height="580">
+        Focusable="False"
+        MinWidth="520"
+        MinHeight="420"
+        Width="560"
+        Height="480">
     
     <Window.Styles>
         <!-- 按钮悬停缩放动画 -->
@@ -42,13 +43,13 @@
         </Style>
     </Window.Styles>
     
-    <!-- Fluent Design 主容器 - 便签贴纸效果 -->
-    <Border Background="#F2FFFFFF" 
-            CornerRadius="16" 
-            Margin="8"
-            BoxShadow="0 8 32 0 #40000000"
+    <!-- Fluent Design 主容器 - 紧凑便签效果 -->
+    <Border Background="#F8FAFCF5" 
+            CornerRadius="12" 
+            Margin="6"
+            BoxShadow="0 4 20 0 #30000000"
             BorderThickness="1"
-            BorderBrush="#33FFFFFF">
+            BorderBrush="#20000000">
         
 
         
@@ -56,54 +57,57 @@
             <!-- 标签容器 -->
             <Panel Name="NoteTagContainer" Grid.Row="0" Grid.RowSpan="3" />
             
-            <!-- 自定义标题栏 - Fluent Design风格 -->
+            <!-- 自定义标题栏 - 紧凑 Fluent Design -->
             <Border Grid.Row="0" 
                     Background="Transparent" 
-                    Padding="24,16" 
-                    Margin="0,0,0,16">
+                    Padding="16,12" 
+                    Margin="0,0,0,8">
                 <Grid ColumnDefinitions="*,Auto">
-                    <!-- 标题区域 -->
+                    <!-- 标题区域 - 紧凑 -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
                         <TextBlock Text="键盘按键显示器" 
-                                  FontSize="32" 
-                                  FontWeight="Light" 
+                                  FontSize="20" 
+                                  FontWeight="SemiBold" 
                                   Foreground="#FF2D3748"
-                                  Margin="0,0,0,4"/>
-                        <TextBlock Text="实时显示按键组合，支持自定义样式和位置" 
-                                  FontSize="14" 
+                                  Margin="0,0,0,2"/>
+                        <TextBlock Text="实时显示按键组合" 
+                                  FontSize="12" 
                                   Foreground="#FF718096"
-                                  Opacity="0.8"/>
+                                  Opacity="0.7"/>
                     </StackPanel>
                     
-                    <!-- 窗口控制按钮 - 使用FluentIcons -->
+                    <!-- 窗口控制按钮 - 紧凑不抢焦点 -->
                     <StackPanel Grid.Column="1" 
                                Orientation="Horizontal" 
-                               Spacing="8"
+                               Spacing="4"
                                VerticalAlignment="Top">
                         <Button Name="MinimizeButton" 
-                               Width="32" 
-                               Height="32"
+                               Width="28" 
+                               Height="28"
                                Background="Transparent"
-                               Foreground="#FF718096"
+                               Foreground="#99718096"
                                BorderThickness="0"
-                               CornerRadius="16"
+                               CornerRadius="6"
+                               Focusable="False"
                                Click="MinimizeButton_Click">
-                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Subtract}" FontSize="16"/>
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Subtract}" FontSize="12"/>
                             <Button.Styles>
                                 <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#20000000"/>
+                                    <Setter Property="Background" Value="#15000000"/>
+                                    <Setter Property="Foreground" Value="#FF718096"/>
                                 </Style>
                             </Button.Styles>
                         </Button>
                         <Button Name="CloseButton" 
-                               Width="32" 
-                               Height="32"
+                               Width="28" 
+                               Height="28"
                                Background="Transparent"
-                               Foreground="#FF718096"
+                               Foreground="#99718096"
                                BorderThickness="0"
-                               CornerRadius="16"
+                               CornerRadius="6"
+                               Focusable="False"
                                Click="CloseButton_Click">
-                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Dismiss}" FontSize="14"/>
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Dismiss}" FontSize="12"/>
                             <Button.Styles>
                                 <Style Selector="Button:pointerover">
                                     <Setter Property="Background" Value="#FFE53E3E"/>
@@ -115,15 +119,15 @@
                 </Grid>
             </Border>
         
-            <!-- 主要内容 - Fluent Design卡片 -->
+            <!-- 主要内容 - 紧凑 Fluent Design -->
             <Border Grid.Row="1" 
-                    Background="#FAFBFC" 
-                    CornerRadius="12" 
-                    Padding="32" 
-                    Margin="16,0,16,16"
-                    BoxShadow="0 4 16 0 #10000000">
+                    Background="#FCFCFC" 
+                    CornerRadius="8" 
+                    Padding="20" 
+                    Margin="12,0,12,8"
+                    BoxShadow="0 2 8 0 #08000000">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="32">
+                    <StackPanel Spacing="20">
                         <!-- 状态显示 - Fluent Design -->
                         <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
                             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16">
