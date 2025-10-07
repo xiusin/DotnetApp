@@ -157,6 +157,12 @@ public partial class MainWindow : Window
             // 应用置顶设置
             this.Topmost = _appSettings.Window.AlwaysOnTop;
             
+            // 应用键盘监控配置到 KeyDisplayWindow
+            if (_keyDisplayWindow != null && _appSettings.KeyboardMonitor != null)
+            {
+                _keyDisplayWindow.UpdateSettings(_appSettings.KeyboardMonitor);
+            }
+            
             Console.WriteLine("Window configuration applied successfully");
         }
         catch (Exception ex)
@@ -675,6 +681,12 @@ public partial class MainWindow : Window
             // 配置窗口关闭后，重新加载配置
             _appSettings = await _configurationService.LoadAsync();
             Console.WriteLine("Configuration reloaded after config window closed");
+            
+            // 应用新配置到 KeyDisplayWindow
+            if (_keyDisplayWindow != null && _appSettings.KeyboardMonitor != null)
+            {
+                _keyDisplayWindow.UpdateSettings(_appSettings.KeyboardMonitor);
+            }
             
             this.Get<TextBlock>("StatusTextBlock").Text = "配置已更新";
         }

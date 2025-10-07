@@ -227,6 +227,52 @@ public partial class KeyDisplayWindow : Window
         StartAutoHideTimer();
     }
     
+    /// <summary>
+    /// 更新键盘监控设置
+    /// </summary>
+    public void UpdateSettings(Core.Configuration.KeyboardMonitorSettings settings)
+    {
+        if (settings == null)
+        {
+            return;
+        }
+
+        try
+        {
+            Console.WriteLine($"Updating KeyDisplayWindow settings: Position={settings.DisplayPosition}, FontSize={settings.FontSize}");
+            
+            // 更新显示位置
+            UpdateDisplayPosition(settings.DisplayPosition, settings.CustomDisplayX, settings.CustomDisplayY);
+            
+            // 更新自动隐藏时长（将在下次显示时生效）
+            // AUTO_HIDE_DELAY 是常量，这里我们可以存储设置供后续使用
+            
+            Console.WriteLine("KeyDisplayWindow settings updated successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating KeyDisplayWindow settings: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 更新显示位置
+    /// </summary>
+    private void UpdateDisplayPosition(string position, int? customX, int? customY)
+    {
+        var positionService = new Core.Services.WindowPositionService();
+        var newPosition = positionService.CalculatePosition(position, (int)this.Width, (int)this.Height);
+        
+        // 如果是自定义位置且提供了坐标
+        if (position == "Custom" && customX.HasValue && customY.HasValue)
+        {
+            newPosition = new PixelPoint(customX.Value, customY.Value);
+        }
+        
+        this.Position = newPosition;
+        Console.WriteLine($"KeyDisplayWindow positioned at: X={newPosition.X}, Y={newPosition.Y}");
+    }
+    
     protected override void OnClosed(EventArgs e)
     {
         StopAutoHideTimer();

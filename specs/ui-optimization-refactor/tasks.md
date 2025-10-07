@@ -120,6 +120,8 @@
   - 在配置窗口的 Content 区域添加 `TabControl`
   - 创建 6 个 TabItem：通用设置、键盘监控、AI 聊天、标签管理、边缘组件、调试选项
 
+
+
   - 为每个 TabItem 添加 Header（使用 FluentIcon + 文本）
   - 设置 TabControl 样式符合 Fluent Design（圆角、过渡动画）
   - _Requirements: 3.2, 3.3, 3.4, 3.8_
@@ -197,6 +199,7 @@
   - 添加"自动隐藏"复选框
   - _Requirements: 4.3_
   - _Commit: "添加显示行为配置"_
+
 
 - [ ] 18. 添加按键过滤配置
   - 添加"显示修饰键"复选框（Ctrl, Alt, Shift, Win）
