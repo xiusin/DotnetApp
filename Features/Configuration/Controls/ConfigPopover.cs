@@ -11,7 +11,7 @@ namespace ConfigButtonDisplay.Features.Configuration.Controls;
 
 public class ConfigPopover : IDisposable
 {
-    private Popup? _configPopup;
+    private Avalonia.Controls.Primitives.Popup? _configPopup;
     private Window? _parentWindow;
     
     // 配置项
@@ -32,7 +32,7 @@ public class ConfigPopover : IDisposable
     
     private void InitializePopup()
     {
-        _configPopup = new Popup
+        _configPopup = new Avalonia.Controls.Primitives.Popup
         {
             IsLightDismissEnabled = true,
             HorizontalOffset = -10,

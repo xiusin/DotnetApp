@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -25,7 +25,7 @@ public partial class PopupWindow : Window
     
     private void InitializeWindow()
     {
-        // 设置窗口初始状�?
+        // 设置窗口初始状态
         Opacity = 0;
         IsVisible = false;
         
@@ -36,14 +36,14 @@ public partial class PopupWindow : Window
         };
         _autoHideTimer.Tick += AutoHideTimer_Tick;
         
-        // 更新状态显�?
+        // 更新状态显示
         UpdateStatusDisplay();
     }
     
     /// <summary>
     /// 显示弹窗，带淡入动画
     /// </summary>
-    /// <param name="anchorControl">锚点控件，用于计算显示位�?/param>
+    /// <param name="anchorControl">锚点控件，用于计算显示位置</param>
     public async Task ShowPopupAsync(Control? anchorControl = null)
     {
         if (_isAnimating) return;
@@ -62,11 +62,11 @@ public partial class PopupWindow : Window
             // 淡入动画
             await AnimateOpacityAsync(0, 1, TimeSpan.FromMilliseconds(200));
             
-            // 启动自动隐藏计时�?
+            // 启动自动隐藏计时器
             _autoHideTimer?.Start();
             
-            // 更新状�?
-            UpdateFooterStatus("弹窗已显�?);
+            // 更新状态
+            UpdateFooterStatus("弹窗已显示");
         }
         finally
         {
@@ -85,7 +85,7 @@ public partial class PopupWindow : Window
         {
             _isAnimating = true;
             
-            // 停止自动隐藏计时�?
+            // 停止自动隐藏计时器
             _autoHideTimer?.Stop();
             
             // 淡出动画
@@ -95,7 +95,7 @@ public partial class PopupWindow : Window
             Hide();
             IsVisible = false;
             
-            // 更新状�?
+            // 更新状态
             UpdateFooterStatus("准备就绪");
         }
         finally
@@ -118,11 +118,11 @@ public partial class PopupWindow : Window
         
         if (anchorControl != null)
         {
-            // 相对于锚点控件定�?
+            // 相对于锚点控件定位
             var anchorBounds = anchorControl.Bounds;
             var anchorPosition = anchorControl.PointToScreen(new Point(0, 0));
             
-            // 计算最佳显示位置（避免超出屏幕边界�?
+            // 计算最佳显示位置（避免超出屏幕边界）
             var x = anchorPosition.X;
             var y = anchorPosition.Y + anchorBounds.Height + 8; // 锚点下方8px
             
@@ -133,7 +133,7 @@ public partial class PopupWindow : Window
                 x = (int)(workingArea.X + 16);
             
             if (y + windowHeight > workingArea.Y + workingArea.Height)
-                y = (int)(anchorPosition.Y - windowHeight - 8); // 显示在锚点上�?
+                y = (int)(anchorPosition.Y - windowHeight - 8); // 显示在锚点上方
             
             Position = new PixelPoint((int)x, (int)y);
         }
@@ -147,7 +147,7 @@ public partial class PopupWindow : Window
     }
     
     /// <summary>
-    /// 透明度动�?
+    /// 透明度动画
     /// </summary>
     private async Task AnimateOpacityAsync(double from, double to, TimeSpan duration)
     {
@@ -173,11 +173,11 @@ public partial class PopupWindow : Window
     }
     
     /// <summary>
-    /// 更新状态显�?
+    /// 更新状态显示
     /// </summary>
     private void UpdateStatusDisplay()
     {
-        KeyboardStatusText.Text = "已启�?;
+        KeyboardStatusText.Text = "已启用";
         KeyboardStatusText.Foreground = new SolidColorBrush(Color.Parse("#FF48BB78"));
         
         DisplayStatusText.Text = "就绪";
@@ -185,7 +185,7 @@ public partial class PopupWindow : Window
     }
     
     /// <summary>
-    /// 更新底部状态文�?
+    /// 更新底部状态文本
     /// </summary>
     private void UpdateFooterStatus(string status)
     {
@@ -202,7 +202,7 @@ public partial class PopupWindow : Window
     }
     
     /// <summary>
-    /// 清空动态内�?
+    /// 清空动态内容
     /// </summary>
     public void ClearDynamicContent()
     {
@@ -210,7 +210,7 @@ public partial class PopupWindow : Window
         DynamicContentArea.IsVisible = false;
     }
     
-    // 事件处理�?
+    // 事件处理器
     private async void CloseButton_Click(object? sender, RoutedEventArgs e)
     {
         await HidePopupAsync();
@@ -227,10 +227,10 @@ public partial class PopupWindow : Window
         });
     }
     
-    // 快速操作按钮事�?
+    // 快速操作按钮事件
     private void QuickAction1_Click(object? sender, RoutedEventArgs e)
     {
-        UpdateFooterStatus("开始监听键盘输�?..");
+        UpdateFooterStatus("开始监听键盘输入...");
         // TODO: 实现开始监听逻辑
     }
     
@@ -269,7 +269,7 @@ public partial class PopupWindow : Window
     {
         base.OnPointerPressed(e);
         
-        // 重置自动隐藏计时�?
+        // 重置自动隐藏计时器
         _autoHideTimer?.Stop();
         _autoHideTimer?.Start();
     }
@@ -278,7 +278,7 @@ public partial class PopupWindow : Window
     {
         base.OnLostFocus(e);
         
-        // 失去焦点时启动快速隐�?
+        // 失去焦点时启动快速隐藏
         _autoHideTimer?.Stop();
         _autoHideTimer = new DispatcherTimer
         {

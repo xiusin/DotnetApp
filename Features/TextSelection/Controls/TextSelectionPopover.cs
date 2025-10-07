@@ -14,7 +14,7 @@ namespace ConfigButtonDisplay.Features.TextSelection.Controls;
 
 public class TextSelectionPopover : IDisposable
 {
-    private Popup? _popup;
+    private Avalonia.Controls.Primitives.Popup? _popup;
     private string _selectedText = string.Empty;
     private Timer? _selectionCheckTimer;
     private readonly DebugOverlay? _debugOverlay;
@@ -35,7 +35,7 @@ public class TextSelectionPopover : IDisposable
     
     private void InitializePopup()
     {
-        _popup = new Popup
+        _popup = new Avalonia.Controls.Primitives.Popup
         {
             IsLightDismissEnabled = true,
             HorizontalOffset = 10,

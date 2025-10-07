@@ -16,7 +16,11 @@ using ConfigButtonDisplay.Core.Interfaces;
 using ConfigButtonDisplay.Core.Services;
 using ConfigButtonDisplay.Core.Configuration;
 using ConfigButtonDisplay.Features.Debug.Controls;
+using ConfigButtonDisplay.Features.KeyboardMonitoring.Controls;
+using ConfigButtonDisplay.Features.Configuration.Controls;
+using ConfigButtonDisplay.Features.Popup.Controls;
 using ConfigButtonDisplay.Infrastructure.Helpers;
+using ConfigButtonDisplay.Infrastructure.Hooks;
 
 namespace ConfigButtonDisplay;
 

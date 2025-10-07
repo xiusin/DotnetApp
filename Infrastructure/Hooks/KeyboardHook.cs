@@ -120,7 +120,7 @@ public class KeyboardHook : IDisposable
     
     private bool IsKeyPressed(Key key)
     {
-        // 跨平台按键状态检�?- 真正的全局检�?
+        // 跨平台按键状态检测 - 真正的全局检测
         try
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -145,17 +145,17 @@ public class KeyboardHook : IDisposable
     // 添加对macOS的IOHIDManager支持，实现真正的全局键盘监听
     private bool IsMacKeyPressedWithIOHID(Key key)
     {
-        // 这里应该使用IOHIDManager来获取全局键盘状�?
+        // 这里应该使用IOHIDManager来获取全局键盘状态
         // 由于实现复杂，暂时使用简化的检测，但确保不依赖窗口焦点
         return false;
     }
     
     private bool IsMacKeyPressed(Key key)
     {
-        // macOS下的全局按键检�?- 使用CGEventSourceKeyState
+        // macOS下的全局按键检测 - 使用CGEventSourceKeyState
         try
         {
-            // 使用Core Graphics API检测按键状态，不依赖窗口焦�?
+            // 使用Core Graphics API检测按键状态，不依赖窗口焦点
             return IsMacGlobalKeyPressed(key);
         }
         catch
@@ -172,7 +172,7 @@ public class KeyboardHook : IDisposable
         
         try
         {
-            // 使用CGEventSourceKeyState检测全局按键状�?
+            // 使用CGEventSourceKeyState检测全局按键状态
             return CGEventSourceKeyState(0, (CGKeyCode)vkCode) != 0;
         }
         catch
@@ -183,7 +183,7 @@ public class KeyboardHook : IDisposable
     
     private int KeyToMacVirtualKey(Key key)
     {
-        // 纠正 macOS 键码，避免与数字行冲突（参�?Apple VK 表）
+        // 纠正 macOS 键码，避免与数字行冲突（参考 Apple VK 表）
         return key switch
         {
             // 字母
@@ -196,27 +196,27 @@ public class KeyboardHook : IDisposable
             Key.L => 0x25, Key.J => 0x26, Key.K => 0x28,
             Key.N => 0x2D, Key.M => 0x2E,
 
-            // 数字�?
+            // 数字行
             Key.D1 => 0x12, Key.D2 => 0x13, Key.D3 => 0x14, Key.D4 => 0x15,
             Key.D5 => 0x17, Key.D6 => 0x16, Key.D7 => 0x1A, Key.D8 => 0x1C,
             Key.D9 => 0x19, Key.D0 => 0x1D,
 
-            // 常用控制�?
+            // 常用控制键
             Key.Space => 0x31, Key.Enter or Key.Return => 0x24,
             Key.Escape => 0x35, Key.Back => 0x33, Key.Tab => 0x30, Key.Delete => 0x75,
 
-            // 修饰�?
+            // 修饰键
             Key.LeftShift => 0x38, Key.RightShift => 0x3C,
             Key.LeftCtrl => 0x3B, Key.RightCtrl => 0x3E,
             Key.LeftAlt => 0x3A, Key.RightAlt => 0x3D,
             Key.LWin => 0x37, Key.RWin => 0x36,
 
-            // 功能�?
+            // 功能键
             Key.F1 => 0x7A, Key.F2 => 0x78, Key.F3 => 0x63, Key.F4 => 0x76,
             Key.F5 => 0x60, Key.F6 => 0x61, Key.F7 => 0x62, Key.F8 => 0x64,
             Key.F9 => 0x65, Key.F10 => 0x6D, Key.F11 => 0x67, Key.F12 => 0x6F,
 
-            // 方向�?
+            // 方向键
             Key.Up => 0x7E, Key.Down => 0x7D, Key.Left => 0x7B, Key.Right => 0x7C,
 
             _ => -1
@@ -234,7 +234,7 @@ public class KeyboardHook : IDisposable
     
     private bool IsWindowsKeyPressed(Key key)
     {
-        // Windows下的按键状态检�?
+        // Windows下的按键状态检测
         try
         {
             int vkCode = KeyToVirtualKey(key);
