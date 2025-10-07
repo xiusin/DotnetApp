@@ -422,6 +422,8 @@
   - 验证编译通过
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
 
+
+
   - _Commit: "移动调试组件到 Features 目录"_
 
 ## Phase 9: Dependency Injection Setup
@@ -437,7 +439,8 @@
   - _Requirements: 1.5_
   - _Commit: "配置依赖注入容器"_
 
-- [ ] 37. 重构主窗口使用依赖注入
+- [-] 37. 重构主窗口使用依赖注入
+
   - 修改 `MainWindow` 构造函数接受 `IConfigurationService` 和 `IWindowPositionService`
   - 移除手动创建服务实例的代码
   - 使用注入的服务实例

@@ -14,6 +14,37 @@
         Background="Transparent"
         CanResize="False">
     
+    <Window.Styles>
+        <!-- TabItem 悬停效果 -->
+        <Style Selector="TabItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#10000000"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <!-- TabItem 选中效果 -->
+        <Style Selector="TabItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#203182CE"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <!-- TabControl 内容区域淡入淡出效果 -->
+        <Style Selector="TabControl > ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.3"/>
+                </Transitions>
+            </Setter>
+        </Style>
+    </Window.Styles>
+    
     <!-- Fluent Design 主容器 -->
     <Border Background="#F2FFFFFF"
             CornerRadius="16"

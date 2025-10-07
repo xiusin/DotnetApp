@@ -17,6 +17,31 @@
         Width="680"
         Height="580">
     
+    <Window.Styles>
+        <!-- 按钮悬停缩放动画 -->
+        <Style Selector="Button:pointerover">
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <!-- 按钮按下效果 -->
+        <Style Selector="Button:pressed">
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Styles>
+    
     <!-- Fluent Design 主容器 - 便签贴纸效果 -->
     <Border Background="#F2FFFFFF" 
             CornerRadius="16" 

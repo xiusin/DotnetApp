@@ -79,11 +79,29 @@ public static class AnimationHelper
     }
     
     /// <summary>
-    /// Ease-out 缓动函数
+    /// Ease-out 缓动函数（Cubic）- 更平滑的减速效果
     /// </summary>
     private static double EaseOut(double t)
     {
         return 1 - Math.Pow(1 - t, 3);
+    }
+    
+    /// <summary>
+    /// Ease-out 缓动函数（Quart）- 更强的减速效果
+    /// </summary>
+    private static double EaseOutQuart(double t)
+    {
+        return 1 - Math.Pow(1 - t, 4);
+    }
+    
+    /// <summary>
+    /// Ease-out 缓动函数（Back）- 带回弹效果
+    /// </summary>
+    private static double EaseOutBack(double t)
+    {
+        const double c1 = 1.70158;
+        const double c3 = c1 + 1;
+        return 1 + c3 * Math.Pow(t - 1, 3) + c1 * Math.Pow(t - 1, 2);
     }
     
     /// <summary>
