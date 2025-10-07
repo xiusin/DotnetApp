@@ -1,13 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ConfigButtonDisplay.Features.Debug.Controls;
@@ -19,7 +17,7 @@ public class TextSelectionPopover : IDisposable
     private Popup? _popup;
     private string _selectedText = string.Empty;
     private Timer? _selectionCheckTimer;
-    private DebugOverlay? _debugOverlay;
+    private readonly DebugOverlay? _debugOverlay;
     private const int SELECTION_CHECK_INTERVAL = 1000; // 1秒检查一次
     private int _selectionDetectCount = 0; // 选择检测计数
     private int _popupShowCount = 0; // 弹出框显示计数
@@ -135,6 +133,18 @@ public class TextSelectionPopover : IDisposable
         }
     }
     
+    private static readonly string[] TestTexts = 
+    {
+        "Hello World! This is a test.",
+        "测试文本选择功能",
+        "Avalonia UI is awesome!",
+        "ConfigButtonDisplay working well",
+        "Semi Design looks great",
+        "Double shift detection active",
+        "Edge swipe component ready",
+        "Text selection popup working"
+    };
+
     private async Task<string> GetSelectedTextAsync()
     {
         return await Task.Run(async () =>
@@ -142,7 +152,7 @@ public class TextSelectionPopover : IDisposable
             try
             {
                 // 方法1: 尝试从剪贴板获取文本
-                var topLevel = Avalonia.Application.Current?.ApplicationLifetime 
+                var topLevel = Application.Current?.ApplicationLifetime 
                     is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                     ? desktop.MainWindow : null;
                 
@@ -155,31 +165,22 @@ public class TextSelectionPopover : IDisposable
                         // 如果剪贴板有文本且长度合理，认为是有选中文本
                         if (!string.IsNullOrEmpty(clipboardText) && clipboardText.Length > 0 && clipboardText.Length < 500)
                         {
+                            _debugOverlay?.LogEvent($"📋 从剪贴板获取文本: {clipboardText[..Math.Min(clipboardText.Length, 30)]}...");
                             return clipboardText;
                         }
                     }
                     catch (Exception ex)
                     {
-                        _debugOverlay?.LogEvent($"剪贴板访问错误: {ex.Message}");
+                        _debugOverlay?.LogEvent($"❌ 剪贴板访问错误: {ex.Message}");
                     }
                 }
                 
                 // 方法2: 模拟文本选择（用于测试）
+                // 注意：这只是用于演示，实际应用中应该使用真实的文本选择检测
                 var random = new Random();
-                if (random.Next(100) < 30) // 30%概率模拟选中文本
+                if (random.Next(100) < 5) // 降低到5%概率，避免过于频繁
                 {
-                    var testTexts = new[]
-                    {
-                        "Hello World! This is a test.",
-                        "测试文本选择功能",
-                        "Avalonia UI is awesome!",
-                        "ConfigButtonDisplay working well",
-                        "Semi Design looks great",
-                        "Double shift detection active",
-                        "Edge swipe component ready",
-                        "Text selection popup working"
-                    };
-                    var selectedText = testTexts[random.Next(testTexts.Length)];
+                    var selectedText = TestTexts[random.Next(TestTexts.Length)];
                     _debugOverlay?.LogEvent($"🎯 模拟文本选择: {selectedText}");
                     return selectedText;
                 }
@@ -188,7 +189,7 @@ public class TextSelectionPopover : IDisposable
             }
             catch (Exception ex)
             {
-                _debugOverlay?.LogEvent($"文本获取错误: {ex.Message}");
+                _debugOverlay?.LogEvent($"❌ 文本获取错误: {ex.Message}");
                 return string.Empty;
             }
         });
@@ -198,42 +199,58 @@ public class TextSelectionPopover : IDisposable
     {
         try
         {
-            if (_popup != null)
+            if (_popup == null)
             {
-                // 获取当前窗口
-                var window = Avalonia.Application.Current?.ApplicationLifetime 
-                    is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
-                    ? desktop.MainWindow : null;
-                
-                if (window == null) 
-                {
-                    _debugOverlay?.LogEvent("❌ 无法获取主窗口");
-                    return;
-                }
-                
-                // 设置弹出框位置
-                _popup.PlacementTarget = window;
-                _popup.Placement = PlacementMode.Pointer;
-                
-                // 显示弹出框
+                _debugOverlay?.LogEvent("❌ Popup 对象为 null");
+                return;
+            }
+
+            // 获取当前窗口
+            var window = Application.Current?.ApplicationLifetime 
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow : null;
+            
+            if (window == null) 
+            {
+                _debugOverlay?.LogEvent("❌ 无法获取主窗口");
+                return;
+            }
+            
+            // 确保窗口已加载
+            if (!window.IsLoaded)
+            {
+                _debugOverlay?.LogEvent("⚠️ 主窗口尚未加载");
+                return;
+            }
+            
+            // 设置弹出框位置 - 使用屏幕中心
+            _popup.PlacementTarget = window;
+            _popup.Placement = PlacementMode.Center;
+            _popup.HorizontalOffset = 0;
+            _popup.VerticalOffset = -100; // 稍微向上偏移
+            
+            // 显示弹出框
+            if (!_popup.IsOpen)
+            {
                 _popup.IsOpen = true;
                 _popupShowCount++;
                 
-                _debugOverlay?.LogEvent($"🎉 文本选择弹出框已显示 (第{_popupShowCount}次)");
+                _debugOverlay?.LogEvent($"🎉 文本选择弹出框已显示 (第{_popupShowCount}次) - 文本: {_selectedText[..Math.Min(_selectedText.Length, 30)]}");
                 
-                // 3秒后自动隐藏
-                Task.Delay(3000).ContinueWith(_ =>
+                // 5秒后自动隐藏
+                Task.Delay(5000).ContinueWith(_ =>
                 {
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        HidePopup();
-                    });
+                    Dispatcher.UIThread.Post(HidePopup);
                 });
+            }
+            else
+            {
+                _debugOverlay?.LogEvent("⚠️ Popup 已经是打开状态");
             }
         }
         catch (Exception ex)
         {
-            _debugOverlay?.LogEvent($"❌ 弹出框显示错误: {ex.Message}");
+            _debugOverlay?.LogEvent($"❌ 弹出框显示错误: {ex.Message}\n堆栈: {ex.StackTrace}");
         }
     }
     
@@ -297,5 +314,7 @@ public class TextSelectionPopover : IDisposable
             _popup.IsOpen = false;
             _popup = null;
         }
+        
+        GC.SuppressFinalize(this);
     }
 }

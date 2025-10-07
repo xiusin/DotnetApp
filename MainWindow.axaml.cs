@@ -1111,35 +1111,41 @@ public partial class MainWindow : Window
     {
         try
         {
+            // 首先初始化调试覆盖层（其他组件需要它）
+            _debugOverlay = new EnhancedDebugOverlay();
+            _debugOverlay.ShowDebug();
+            _debugOverlay?.LogEvent("🔧 开始初始化附加功能...");
+            
             // 初始化文本选择弹出框
             _textSelectionPopover = new Features.TextSelection.Controls.TextSelectionPopover(_debugOverlay);
             _textSelectionPopover.CopyRequested += OnTextCopyRequested;
             _textSelectionPopover.TranslateRequested += OnTextTranslateRequested;
+            _debugOverlay?.LogEvent("✅ 文本选择弹出框已初始化");
             
             // 初始化边缘滑动组件
             _edgeSwipeComponent = new Features.EdgeComponents.Controls.SimpleEdgeComponent(_debugOverlay);
             _edgeSwipeComponent.WindowOpened += OnEdgeWindowOpened;
             _edgeSwipeComponent.WindowClosed += OnEdgeWindowClosed;
+            _debugOverlay?.LogEvent("✅ 边缘滑动组件已初始化");
             
             // 启动边缘组件自动显示（可选）
             StartEdgeAutoShow();
             
             // 初始化AI聊天窗口
             _aiChatWindow = new Features.AIChat.Controls.AIChatWindow();
+            _debugOverlay?.LogEvent("✅ AI聊天窗口已初始化");
             
             // 初始化双击 Shift 检测器
             _doubleShiftDetector = new DoubleShiftDetector();
             _doubleShiftDetector.Interval = 500;  // 默认 500ms
+            _debugOverlay?.LogEvent("✅ 双击Shift检测器已初始化");
             
             // 初始化配置弹出框
             _configPopover = new ConfigPopover(this);
             _configPopover.AutoStartChanged += OnAutoStartConfigChanged;
             _configPopover.MinimizeToTrayChanged += OnMinimizeToTrayConfigChanged;
             _configPopover.ShowNotificationsChanged += OnShowNotificationsConfigChanged;
-            
-            // 初始化调试覆盖层
-            _debugOverlay = new EnhancedDebugOverlay();
-            _debugOverlay.ShowDebug();
+            _debugOverlay?.LogEvent("✅ 配置弹出框已初始化");
             
             // 初始化状态栏弹窗
             _popupWindow = new PopupWindow();
