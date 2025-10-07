@@ -933,8 +933,13 @@ public partial class MainWindow : Window
         }
         else
         {
-            _debugOverlay?.LogEvent("❌ 标签管理器未初始化");
-            this.Get<TextBlock>("StatusTextBlock").Text = "标签管理器未初始化";
+            var errorMsg = "标签管理器未初始化 - 请检查控制台日志查看初始化错误";
+            _debugOverlay?.LogEvent($"❌ {errorMsg}");
+            this.Get<TextBlock>("StatusTextBlock").Text = errorMsg;
+            System.Console.WriteLine($"[MainWindow] {errorMsg}");
+            
+            // 显示错误通知
+            _ = NotificationHelper.ShowError(this, "标签管理器初始化失败，请查看控制台日志了解详情", "初始化错误");
         }
     }
     
@@ -1027,15 +1032,24 @@ public partial class MainWindow : Window
             _debugOverlay?.LogEvent("✅ 状态栏弹窗已初始化");
             
             // 初始化创可贴标签组件
-            System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
-            _noteTagManager = new Features.NoteTags.Controls.NoteTagManager(this);
-            System.Console.WriteLine($"[MainWindow] 标签管理器创建完成，设置文本...");
-            _noteTagManager.SetTagText(0, "功能标签 1");
-            _noteTagManager.SetTagText(1, "功能标签 2");
-            _noteTagManager.SetTagText(2, "功能标签 3");
-            System.Console.WriteLine($"[MainWindow] 文本设置完成，调用ShowTags...");
-            _noteTagManager.ShowTags();
-            System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
+            try
+            {
+                System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
+                _noteTagManager = new Features.NoteTags.Controls.NoteTagManager(this);
+                System.Console.WriteLine($"[MainWindow] 标签管理器创建完成，设置文本...");
+                _noteTagManager.SetTagText(0, "功能标签 1");
+                _noteTagManager.SetTagText(1, "功能标签 2");
+                _noteTagManager.SetTagText(2, "功能标签 3");
+                System.Console.WriteLine($"[MainWindow] 文本设置完成，调用ShowTags...");
+                _noteTagManager.ShowTags();
+                System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"[MainWindow] 标签管理器初始化失败: {ex.Message}");
+                System.Console.WriteLine($"[MainWindow] 堆栈跟踪: {ex.StackTrace}");
+                _noteTagManager = null;
+            }
             
             // 延迟500ms后验证便签初始状态
             Task.Delay(500).ContinueWith(_ =>
