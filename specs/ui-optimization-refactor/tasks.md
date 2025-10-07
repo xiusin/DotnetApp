@@ -149,6 +149,7 @@
 
 - [ ] 12. 创建通用设置面板
   - 创建 `Views/Panels/GeneralSettingsPanel.axaml` UserControl
+
   - 添加窗口位置设置：ComboBox 选择 RightEdge/LeftEdge/Custom
   - 添加窗口透明度设置：Slider (0.5 - 1.0)
   - 添加"记住窗口位置"复选框
@@ -300,6 +301,7 @@
   - 触发 UI 更新
   - _Requirements: 4.9_
   - _Commit: "实现配置重置功能"_
+
 
 
 

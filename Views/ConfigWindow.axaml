@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fluent="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
         xmlns:fluentCommon="clr-namespace:FluentIcons.Common;assembly=FluentIcons.Common"
+        xmlns:panels="clr-namespace:ConfigButtonDisplay.Views.Panels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ConfigButtonDisplay.Views.ConfigWindow"
         Title="应用设置"
@@ -88,8 +89,8 @@
                             <TextBlock Text="键盘监控" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
-                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
-                        <TextBlock Text="键盘监控面板" FontSize="14" Foreground="#FF718096"/>
+                    <Border Background="#FAFBFC" CornerRadius="12">
+                        <panels:KeyboardMonitorPanel x:Name="KeyboardMonitorPanel"/>
                     </Border>
                 </TabItem>
                 

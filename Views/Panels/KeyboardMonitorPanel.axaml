@@ -1,0 +1,236 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+             x:Class="ConfigButtonDisplay.Views.Panels.KeyboardMonitorPanel">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" Margin="24">
+            
+            <!-- 标题和描述 -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="键盘监控设置" 
+                          FontSize="20" 
+                          FontWeight="SemiBold"
+                          Foreground="#FF2D3748"/>
+                <TextBlock Text="配置按键显示的位置、样式和行为"
+                          FontSize="14"
+                          Foreground="#FF718096"/>
+            </StackPanel>
+            
+            <!-- 启用开关 -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="基本设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <ToggleSwitch Name="EnabledToggle"
+                             OnContent="已启用"
+                             OffContent="已禁用"
+                             IsChecked="True"/>
+            </StackPanel>
+            
+            <!-- 显示位置 -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="显示位置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <ComboBox Name="PositionComboBox"
+                         SelectedIndex="4"
+                         HorizontalAlignment="Stretch">
+                    <ComboBoxItem Content="左上角"/>
+                    <ComboBoxItem Content="顶部居中"/>
+                    <ComboBoxItem Content="右上角"/>
+                    <ComboBoxItem Content="左下角"/>
+                    <ComboBoxItem Content="底部居中"/>
+                    <ComboBoxItem Content="右下角"/>
+                </ComboBox>
+            </StackPanel>
+            
+            <!-- 显示样式 -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="显示样式" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                
+                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,16,Auto,16,Auto,16,Auto">
+                    
+                    <!-- 背景颜色 -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" 
+                              Text="背景颜色" 
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1"
+                             Name="BackgroundColorComboBox"
+                             SelectedIndex="0">
+                        <ComboBoxItem Content="蓝色 (#3182CE)"/>
+                        <ComboBoxItem Content="绿色 (#38A169)"/>
+                        <ComboBoxItem Content="红色 (#E53E3E)"/>
+                        <ComboBoxItem Content="紫色 (#805AD5)"/>
+                        <ComboBoxItem Content="橙色 (#DD6B20)"/>
+                    </ComboBox>
+                    
+                    <!-- 透明度 -->
+                    <TextBlock Grid.Row="2" Grid.Column="0"
+                              Text="透明度"
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Name="OpacitySlider"
+                               Minimum="0.1" Maximum="1.0" Value="0.9"
+                               Width="200"
+                               TickFrequency="0.1"
+                               IsSnapToTickEnabled="True"/>
+                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
+                            <TextBlock Text="{Binding #OpacitySlider.Value, StringFormat='{}{0:P0}'}"
+                                      FontSize="14"
+                                      Foreground="#FF4A5568"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- 字体大小 -->
+                    <TextBlock Grid.Row="4" Grid.Column="0"
+                              Text="字体大小"
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Name="FontSizeSlider"
+                               Minimum="12" Maximum="48" Value="28"
+                               Width="200"
+                               TickFrequency="2"
+                               IsSnapToTickEnabled="True"/>
+                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
+                            <TextBlock Text="{Binding #FontSizeSlider.Value, StringFormat='{}{0:F0}px'}"
+                                      FontSize="14"
+                                      Foreground="#FF4A5568"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- 字体颜色 -->
+                    <TextBlock Grid.Row="6" Grid.Column="0"
+                              Text="字体颜色"
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <ComboBox Grid.Row="6" Grid.Column="1"
+                             Name="FontColorComboBox"
+                             SelectedIndex="0">
+                        <ComboBoxItem Content="白色 (#FFFFFF)"/>
+                        <ComboBoxItem Content="黑色 (#000000)"/>
+                        <ComboBoxItem Content="灰色 (#718096)"/>
+                    </ComboBox>
+                </Grid>
+            </StackPanel>
+            
+            <!-- 显示行为 -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="显示行为" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                
+                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,16,Auto,16,Auto">
+                    
+                    <!-- 显示时长 -->
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                              Text="显示时长"
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Name="DisplayDurationSlider"
+                               Minimum="1" Maximum="10" Value="2"
+                               Width="200"
+                               TickFrequency="0.5"
+                               IsSnapToTickEnabled="True"/>
+                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
+                            <TextBlock Text="{Binding #DisplayDurationSlider.Value, StringFormat='{}{0:F1}秒'}"
+                                      FontSize="14"
+                                      Foreground="#FF4A5568"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- 淡入时长 -->
+                    <TextBlock Grid.Row="2" Grid.Column="0"
+                              Text="淡入时长"
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Name="FadeInSlider"
+                               Minimum="0.1" Maximum="1.0" Value="0.2"
+                               Width="200"
+                               TickFrequency="0.1"
+                               IsSnapToTickEnabled="True"/>
+                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
+                            <TextBlock Text="{Binding #FadeInSlider.Value, StringFormat='{}{0:F1}秒'}"
+                                      FontSize="14"
+                                      Foreground="#FF4A5568"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- 淡出时长 -->
+                    <TextBlock Grid.Row="4" Grid.Column="0"
+                              Text="淡出时长"
+                              VerticalAlignment="Center"
+                              Foreground="#FF4A5568"/>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Slider Name="FadeOutSlider"
+                               Minimum="0.1" Maximum="1.0" Value="0.3"
+                               Width="200"
+                               TickFrequency="0.1"
+                               IsSnapToTickEnabled="True"/>
+                        <Border Background="#EDF2F7" CornerRadius="6" Padding="8,4">
+                            <TextBlock Text="{Binding #FadeOutSlider.Value, StringFormat='{}{0:F1}秒'}"
+                                      FontSize="14"
+                                      Foreground="#FF4A5568"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            
+            <!-- 按键过滤 -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="按键过滤" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <TextBlock Text="选择要显示的按键类型"
+                          FontSize="13"
+                          Foreground="#FF718096"
+                          Margin="0,0,0,8"/>
+                
+                <StackPanel Spacing="8">
+                    <CheckBox Name="ShowModifiersCheckBox" Content="显示修饰键 (Ctrl, Alt, Shift, Win)" IsChecked="True"/>
+                    <CheckBox Name="ShowFunctionKeysCheckBox" Content="显示功能键 (F1-F12)" IsChecked="True"/>
+                    <CheckBox Name="ShowAlphaNumericCheckBox" Content="显示字母数字键 (A-Z, 0-9)" IsChecked="True"/>
+                    <CheckBox Name="ShowNavigationCheckBox" Content="显示导航键 (方向键, Home, End 等)" IsChecked="True"/>
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- 实时预览 -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="实时预览" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                
+                <Border Name="PreviewBorder"
+                       Background="#FF3182CE"
+                       CornerRadius="12"
+                       Padding="24,16"
+                       HorizontalAlignment="Center"
+                       MinWidth="200">
+                    <TextBlock Name="PreviewText"
+                              Text="Ctrl + Shift + A"
+                              FontSize="28"
+                              FontWeight="SemiBold"
+                              Foreground="White"
+                              HorizontalAlignment="Center"/>
+                </Border>
+                
+                <Button Name="TestDisplayButton"
+                       Content="测试显示"
+                       HorizontalAlignment="Center"
+                       Background="#FF3182CE"
+                       Foreground="White"
+                       BorderThickness="0"
+                       CornerRadius="8"
+                       Padding="24,10"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Click="TestDisplayButton_Click">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#FF2C5AA0"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </StackPanel>
+            
+        </StackPanel>
+    </ScrollViewer>
+    
+</UserControl>
