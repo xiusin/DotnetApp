@@ -41,7 +41,7 @@ public partial class MainWindow : Window
     private PopupWindow? _popupWindow;
     
     // 创可贴标签组件
-    private NoteTagComponent.NoteTagManager? _noteTagManager;
+    private Features.NoteTags.Controls.NoteTagManager? _noteTagManager;
     
     // 当前按下的键
     private readonly HashSet<Key> _pressedKeys = new();
@@ -1018,7 +1018,7 @@ public partial class MainWindow : Window
             
             // 初始化创可贴标签组件
             System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
-            _noteTagManager = new NoteTagComponent.NoteTagManager(this);
+            _noteTagManager = new Features.NoteTags.Controls.NoteTagManager(this);
             System.Console.WriteLine($"[MainWindow] 标签管理器创建完成，设置文本...");
             _noteTagManager.SetTagText(0, "功能标签 1");
             _noteTagManager.SetTagText(1, "功能标签 2");

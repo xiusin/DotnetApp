@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using Avalonia.Animation;
 
-namespace ConfigButtonDisplay.NoteTagComponent;
+namespace ConfigButtonDisplay.Features.NoteTags.Controls;
 
 public class NoteTagManager
 {

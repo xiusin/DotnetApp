@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:fluent="using:FluentIcons.Avalonia"
-             x:Class="ConfigButtonDisplay.NoteTagComponent.NoteTagControl"
+             x:Class="ConfigButtonDisplay.Features.NoteTags.Controls.NoteTagControl"
              Width="160" Height="80">
     <!-- 便签样式设计 -->
     <Border Name="TagBorder" 

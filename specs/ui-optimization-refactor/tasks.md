@@ -325,6 +325,7 @@
   - _Commit: "实现配置保存逻辑"_
 
 
+
 - [x] 27. 实现配置重置功能
   - 在 `ConfigViewModel` 中实现 `ResetCommand`
   - 显示确认对话框："确定要重置所有设置到默认值吗？"
@@ -366,7 +367,8 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
   - _Commit: "移动键盘监控组件到 Features 目录"_
 
-- [ ] 31. 移动便签标签组件到 Features 目录
+- [-] 31. 移动便签标签组件到 Features 目录
+
   - 将 `NoteTagComponent` 相关文件移动到 `Features/NoteTags/Controls/`
   - 更新命名空间为 `ConfigButtonDisplay.Features.NoteTags.Controls`
   - 更新 `MainWindow.axaml.cs` 中的引用

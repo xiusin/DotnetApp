@@ -5,7 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using System;
 
-namespace ConfigButtonDisplay.NoteTagComponent;
+namespace ConfigButtonDisplay.Features.NoteTags.Controls;
 
 public partial class NoteTagControl : UserControl
 {
