@@ -30,7 +30,7 @@ public partial class MainWindow : Window
     private DateTime _lastImmediateAt = DateTime.MinValue;
     
     // 新功能组件
-    private TextSelectionPopover? _textSelectionPopover;
+    private Features.TextSelection.Controls.TextSelectionPopover? _textSelectionPopover;
     private Features.EdgeComponents.Controls.SimpleEdgeComponent? _edgeSwipeComponent;  // 改为SimpleEdgeComponent
     private Features.AIChat.Controls.AIChatWindow? _aiChatWindow;
     private ConfigPopover? _configPopover;
@@ -987,7 +987,7 @@ public partial class MainWindow : Window
         try
         {
             // 初始化文本选择弹出框
-            _textSelectionPopover = new TextSelectionPopover(_debugOverlay);
+            _textSelectionPopover = new Features.TextSelection.Controls.TextSelectionPopover(_debugOverlay);
             _textSelectionPopover.CopyRequested += OnTextCopyRequested;
             _textSelectionPopover.TranslateRequested += OnTextTranslateRequested;
             

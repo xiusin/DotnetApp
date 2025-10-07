@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConfigButtonDisplay;
+namespace ConfigButtonDisplay.Features.TextSelection.Controls;
 
 public class TextSelectionPopover : IDisposable
 {
