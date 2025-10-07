@@ -166,6 +166,9 @@ public partial class MainWindow : Window
             if (_keyDisplayWindow != null && _appSettings.KeyboardMonitor != null)
             {
                 _keyDisplayWindow.UpdateSettings(_appSettings.KeyboardMonitor);
+                
+                // 显示欢迎消息
+                _ = _keyDisplayWindow.ShowWelcomeMessageAsync();
             }
             
             // 启动配置文件监听
