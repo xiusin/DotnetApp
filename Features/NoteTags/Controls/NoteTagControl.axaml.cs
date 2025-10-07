@@ -82,36 +82,31 @@ public partial class NoteTagControl : UserControl
         {
             if (isHovered)
             {
-                // 悬停时的效果 - 增强圆角和视觉效果
-                border.Background = new SolidColorBrush(Color.Parse("#FFFEF7")); // 更亮的背景色
-                border.BorderBrush = new SolidColorBrush(Color.Parse("#FFC107"));
-                border.BorderThickness = new Thickness(2); // 增加边框厚度
-                border.CornerRadius = new CornerRadius(15); // 增大圆角半径
+                // 悬停时的效果 - 撕裂便签的悬停效果
+                border.Background = new SolidColorBrush(Color.Parse("#FFFFF0")); // 更亮的米黄色
                 
-                // 添加缩放效果
-                var scaleTransform = new ScaleTransform(1.03, 1.03); // 稍微缩放，更自然
-                border.RenderTransform = scaleTransform;
-                border.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
-                
-                // 添加阴影效果
-                border.BoxShadow = new BoxShadows(new BoxShadow
+                // 增强阴影效果，让便签看起来"浮起来"
+                border.Effect = new Avalonia.Media.DropShadowEffect
                 {
-                    OffsetX = 0,
-                    OffsetY = 4,
-                    Blur = 12, // 增加模糊半径
-                    Color = Color.FromUInt32(0x40000000),
-                    Spread = 2 // 添加扩散效果
-                });
+                    Color = Color.FromArgb(80, 0, 0, 0),
+                    OffsetX = 3,
+                    OffsetY = 5,
+                    BlurRadius = 12
+                };
             }
             else
             {
-                // 恢复原始便签状态
-                border.Background = new SolidColorBrush(Color.Parse("White")); // 改为白色背景
-                border.BorderBrush = new SolidColorBrush(Color.Parse("#FFD54F"));
-                border.BorderThickness = new Thickness(1); // 恢复原始边框厚度
-                border.CornerRadius = new CornerRadius(12); // 恢复原始圆角
-                border.RenderTransform = null;
-                border.BoxShadow = new BoxShadows(); // 移除阴影
+                // 恢复原始撕裂便签状态
+                border.Background = new SolidColorBrush(Color.Parse("#FFFEF5")); // 米黄色便签纸
+                
+                // 恢复原始阴影
+                border.Effect = new Avalonia.Media.DropShadowEffect
+                {
+                    Color = Color.FromArgb(64, 0, 0, 0),
+                    OffsetX = 2,
+                    OffsetY = 3,
+                    BlurRadius = 8
+                };
             }
         }
     }

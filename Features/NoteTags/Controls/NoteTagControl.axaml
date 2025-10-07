@@ -2,63 +2,154 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:fluent="using:FluentIcons.Avalonia"
              x:Class="ConfigButtonDisplay.Features.NoteTags.Controls.NoteTagControl"
-             Width="160" Height="80">
-    <!-- 便签样式设计 -->
-    <Border Name="TagBorder" 
-            Background="White" 
-            CornerRadius="12" 
-            Padding="12" 
-            BorderBrush="#FFD54F" 
-            BorderThickness="1"
-            Cursor="Hand"
-            ClipToBounds="True">
-        <Border.Styles>
-            <Style Selector="Border:pointerover">
-                <Setter Property="BorderBrush" Value="#FFC107"/>
-                <Setter Property="BorderThickness" Value="2"/>
-                <Setter Property="CornerRadius" Value="15"/>
-                <Setter Property="BoxShadow" Value="0 4 8 0 #20000000"/>
-                <Setter Property="Background" Value="#FFFEF7"/>
-            </Style>
-        </Border.Styles>
-        <!-- 便签阴影效果 - 暂时移除，因为Avalonia可能不支持 -->
+             Width="160" Height="90">
+    <!-- 便签撕裂效果设计 -->
+    <Grid>
+        <!-- 阴影层 -->
+        <Border Background="#30000000" 
+                CornerRadius="0,0,8,8"
+                Margin="2,8,0,0"
+                Opacity="0.3"/>
         
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- 主便签层 -->
+        <Grid Margin="0,0,2,2">
+            <!-- 撕裂效果背景 -->
+            <Border Name="TagBorder" 
+                    Background="#FFFEF5" 
+                    CornerRadius="0,0,8,8" 
+                    Padding="12,16,12,12" 
+                    BorderBrush="#E0E0E0" 
+                    BorderThickness="0,0,1,1"
+                    Cursor="Hand">
+                <Border.Effect>
+                    <DropShadowEffect Color="#40000000" 
+                                    OffsetX="2" 
+                                    OffsetY="3" 
+                                    BlurRadius="8"/>
+                </Border.Effect>
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- 便签内容区域 -->
+                    <TextBlock Name="TagText" 
+                              Grid.Row="1"
+                              Text="便签内容" 
+                              VerticalAlignment="Center" 
+                              HorizontalAlignment="Center"
+                              Foreground="#5D4037" 
+                              FontWeight="Medium"
+                              FontSize="13"
+                              TextAlignment="Center"
+                              TextWrapping="Wrap"
+                              MaxLines="3"
+                              Margin="0,4,0,4"/>
+                    
+                    <!-- 便签底部图标 -->
+                    <fluent:SymbolIcon Grid.Row="2"
+                                      Symbol="Note"
+                                      FontSize="12"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Bottom"
+                                      Foreground="#FFB74D"
+                                      Opacity="0.5"
+                                      Margin="0,4,0,0"/>
+                </Grid>
+            </Border>
             
-            <!-- 便签顶部装饰线 -->
-            <Border Grid.Row="0" 
-                    Height="2" 
-                    Background="#FFB74D" 
-                    CornerRadius="1"
-                    Margin="0,0,0,8"/>
+            <!-- 撕裂边缘效果 - 顶部不规则边缘 -->
+            <Canvas Height="12" VerticalAlignment="Top">
+                <!-- 撕裂纹理 -->
+                <Path Fill="#FFFEF5" Stroke="#D0D0D0" StrokeThickness="0.5">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure StartPoint="0,8">
+                                <LineSegment Point="8,10"/>
+                                <LineSegment Point="15,6"/>
+                                <LineSegment Point="22,9"/>
+                                <LineSegment Point="30,7"/>
+                                <LineSegment Point="38,11"/>
+                                <LineSegment Point="45,8"/>
+                                <LineSegment Point="52,10"/>
+                                <LineSegment Point="60,6"/>
+                                <LineSegment Point="68,9"/>
+                                <LineSegment Point="75,7"/>
+                                <LineSegment Point="83,10"/>
+                                <LineSegment Point="90,8"/>
+                                <LineSegment Point="98,11"/>
+                                <LineSegment Point="105,7"/>
+                                <LineSegment Point="113,9"/>
+                                <LineSegment Point="120,6"/>
+                                <LineSegment Point="128,10"/>
+                                <LineSegment Point="135,8"/>
+                                <LineSegment Point="143,11"/>
+                                <LineSegment Point="150,7"/>
+                                <LineSegment Point="158,9"/>
+                                <LineSegment Point="160,8"/>
+                                <LineSegment Point="160,12"/>
+                                <LineSegment Point="0,12"/>
+                                <LineSegment Point="0,8"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+                
+                <!-- 撕裂阴影 -->
+                <Path Fill="#20000000" Opacity="0.3">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure StartPoint="0,9">
+                                <LineSegment Point="8,11"/>
+                                <LineSegment Point="15,7"/>
+                                <LineSegment Point="22,10"/>
+                                <LineSegment Point="30,8"/>
+                                <LineSegment Point="38,12"/>
+                                <LineSegment Point="45,9"/>
+                                <LineSegment Point="52,11"/>
+                                <LineSegment Point="60,7"/>
+                                <LineSegment Point="68,10"/>
+                                <LineSegment Point="75,8"/>
+                                <LineSegment Point="83,11"/>
+                                <LineSegment Point="90,9"/>
+                                <LineSegment Point="98,12"/>
+                                <LineSegment Point="105,8"/>
+                                <LineSegment Point="113,10"/>
+                                <LineSegment Point="120,7"/>
+                                <LineSegment Point="128,11"/>
+                                <LineSegment Point="135,9"/>
+                                <LineSegment Point="143,12"/>
+                                <LineSegment Point="150,8"/>
+                                <LineSegment Point="158,10"/>
+                                <LineSegment Point="160,9"/>
+                                <LineSegment Point="160,10"/>
+                                <LineSegment Point="0,10"/>
+                                <LineSegment Point="0,9"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+            </Canvas>
             
-            <!-- 便签内容区域 -->
-            <TextBlock Name="TagText" 
-                      Grid.Row="1"
-                      Text="便签内容" 
-                      VerticalAlignment="Center" 
-                      HorizontalAlignment="Center"
-                      Foreground="#5D4037" 
-                      FontWeight="Medium"
-                      FontSize="12"
-                      TextAlignment="Center"
-                      TextWrapping="Wrap"
-                      MaxLines="3"/>
-            
-            <!-- 便签底部FluentIcon图标 -->
-            <fluent:SymbolIcon Grid.Row="2"
-                              Symbol="Note"
-                              FontSize="12"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Bottom"
-                              Foreground="#FFB74D"
-                              Opacity="0.7"
-                              Margin="0,4,0,0"/>
+            <!-- 胶带效果（可选） -->
+            <Border Background="#F0F0E0" 
+                    Height="16" 
+                    Width="40"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center"
+                    Margin="0,-2,0,0"
+                    CornerRadius="2"
+                    Opacity="0.6">
+                <Border.Effect>
+                    <DropShadowEffect Color="#20000000" 
+                                    OffsetX="0" 
+                                    OffsetY="1" 
+                                    BlurRadius="2"/>
+                </Border.Effect>
+            </Border>
         </Grid>
-    </Border>
+    </Grid>
 </UserControl>
