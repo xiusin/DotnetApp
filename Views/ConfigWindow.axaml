@@ -62,18 +62,90 @@
                 </Grid>
             </Border>
             
-            <!-- Content - TabControl 占位 -->
-            <Border Grid.Row="1"
-                    Background="#FAFBFC"
-                    CornerRadius="12"
-                    Padding="16"
-                    Margin="16,0,16,16">
-                <TextBlock Text="配置内容将在此处显示"
-                          FontSize="16"
-                          Foreground="#FF718096"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"/>
-            </Border>
+            <!-- Content - TabControl -->
+            <TabControl Grid.Row="1"
+                       Margin="16,0,16,16"
+                       Background="Transparent">
+                
+                <!-- 通用设置 -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Settings}" FontSize="16"/>
+                            <TextBlock Text="通用设置" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
+                        <TextBlock Text="通用设置面板" FontSize="14" Foreground="#FF718096"/>
+                    </Border>
+                </TabItem>
+                
+                <!-- 键盘监控 -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Keyboard}" FontSize="16"/>
+                            <TextBlock Text="键盘监控" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
+                        <TextBlock Text="键盘监控面板" FontSize="14" Foreground="#FF718096"/>
+                    </Border>
+                </TabItem>
+                
+                <!-- AI 聊天 -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Chat}" FontSize="16"/>
+                            <TextBlock Text="AI 聊天" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
+                        <TextBlock Text="AI 聊天面板" FontSize="14" Foreground="#FF718096"/>
+                    </Border>
+                </TabItem>
+                
+                <!-- 标签管理 -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Tag}" FontSize="16"/>
+                            <TextBlock Text="标签管理" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
+                        <TextBlock Text="标签管理面板" FontSize="14" Foreground="#FF718096"/>
+                    </Border>
+                </TabItem>
+                
+                <!-- 边缘组件 -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Apps}" FontSize="16"/>
+                            <TextBlock Text="边缘组件" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
+                        <TextBlock Text="边缘组件面板" FontSize="14" Foreground="#FF718096"/>
+                    </Border>
+                </TabItem>
+                
+                <!-- 调试选项 -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                            <fluent:SymbolIcon Symbol="{x:Static fluentCommon:Symbol.Bug}" FontSize="16"/>
+                            <TextBlock Text="调试选项" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
+                        <TextBlock Text="调试选项面板" FontSize="14" Foreground="#FF718096"/>
+                    </Border>
+                </TabItem>
+                
+            </TabControl>
             
             <!-- Footer - 按钮栏 -->
             <Border Grid.Row="2"

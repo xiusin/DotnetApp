@@ -92,6 +92,7 @@
 - [ ] 7. 实现窗口位置保存和恢复
   - 在主窗口的 `PositionChanged` 事件中调用 `SavePosition()`
 
+
   - 使用防抖动机制避免频繁保存（500ms 延迟）
   - 在窗口启动时，如果 `RememberPosition` 为 true，加载保存的位置
   - 验证保存的位置在屏幕范围内，超出则使用默认位置
@@ -99,6 +100,7 @@
   - _Commit: "实现窗口位置保存和恢复"_
 
 ## Phase 3: Configuration Window Foundation
+
 
 - [ ] 8. 创建配置窗口基础结构
   - 创建 `Views/ConfigWindow.axaml` 和 `Views/ConfigWindow.axaml.cs`
