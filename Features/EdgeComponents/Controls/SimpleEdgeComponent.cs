@@ -9,7 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConfigButtonDisplay;
+namespace ConfigButtonDisplay.Features.EdgeComponents.Controls;
 
 public class SimpleEdgeComponent : IDisposable
 {

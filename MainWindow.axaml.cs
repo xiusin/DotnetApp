@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     
     // 新功能组件
     private TextSelectionPopover? _textSelectionPopover;
-    private SimpleEdgeComponent? _edgeSwipeComponent;  // 改为SimpleEdgeComponent
+    private Features.EdgeComponents.Controls.SimpleEdgeComponent? _edgeSwipeComponent;  // 改为SimpleEdgeComponent
     private Features.AIChat.Controls.AIChatWindow? _aiChatWindow;
     private ConfigPopover? _configPopover;
     private DebugOverlay? _debugOverlay;  // 使用基类类型
@@ -992,7 +992,7 @@ public partial class MainWindow : Window
             _textSelectionPopover.TranslateRequested += OnTextTranslateRequested;
             
             // 初始化边缘滑动组件
-            _edgeSwipeComponent = new SimpleEdgeComponent(_debugOverlay);
+            _edgeSwipeComponent = new Features.EdgeComponents.Controls.SimpleEdgeComponent(_debugOverlay);
             _edgeSwipeComponent.WindowOpened += OnEdgeWindowOpened;
             _edgeSwipeComponent.WindowClosed += OnEdgeWindowClosed;
             
