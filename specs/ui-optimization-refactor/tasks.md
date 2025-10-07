@@ -74,11 +74,14 @@
   - 设置 `Topmost = true` 保持置顶
   - _Requirements: 2.1, 2.4_
 
+
+
   - _Commit: "集成窗口定位服务到主窗口"_
 
 - [ ] 6. 实现主窗口滑入动画
   - 创建 `Infrastructure/Helpers/AnimationHelper.cs` 动画辅助类
   - 实现 `SlideInFromRight()` 方法，从右侧滑入动画（300ms ease-out）
+
   - 在主窗口启动时调用滑入动画
   - 确保动画流畅，不阻塞 UI 线程
   - _Requirements: 2.8_

@@ -119,6 +119,27 @@ public partial class MainWindow : Window
                 // 执行从右侧滑入动画
                 await Infrastructure.Helpers.AnimationHelper.SlideInFromRight(this, 300);
             }
+            else if (_appSettings.Window.Position == "Custom" && _appSettings.Window.RememberPosition)
+            {
+                // 加载自定义位置
+                if (_appSettings.Window.CustomX.HasValue && _appSettings.Window.CustomY.HasValue)
+                {
+                    var customPosition = new PixelPoint(
+                        _appSettings.Window.CustomX.Value,
+                        _appSettings.Window.CustomY.Value
+                    );
+                    
+                    // 确保位置在屏幕范围内
+                    var validPosition = Infrastructure.Helpers.ScreenHelper.EnsureOnScreen(
+                        customPosition,
+                        (int)this.Width,
+                        (int)this.Height
+                    );
+                    
+                    this.Position = validPosition;
+                    Console.WriteLine($"Window positioned at custom location: X={validPosition.X}, Y={validPosition.Y}");
+                }
+            }
             else if (_appSettings.Window.RememberPosition)
             {
                 // 尝试加载保存的位置
@@ -157,6 +178,7 @@ public partial class MainWindow : Window
     
     private bool _isDragging = false;
     private Point _dragStartPoint;
+    private System.Threading.Timer? _positionSaveTimer;
     
     private void OnWindowPointerPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -189,6 +211,58 @@ public partial class MainWindow : Window
         {
             _isDragging = false;
             e.Pointer.Capture(null);
+            
+            // 使用防抖动机制保存位置（500ms 延迟）
+            SchedulePositionSave();
+        }
+    }
+    
+    /// <summary>
+    /// 安排位置保存（防抖动）
+    /// </summary>
+    private void SchedulePositionSave()
+    {
+        // 取消之前的计时器
+        _positionSaveTimer?.Dispose();
+        
+        // 创建新的计时器，500ms 后保存位置
+        _positionSaveTimer = new System.Threading.Timer(_ =>
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                SaveWindowPosition();
+            });
+        }, null, 500, Timeout.Infinite);
+    }
+    
+    /// <summary>
+    /// 保存窗口位置
+    /// </summary>
+    private async void SaveWindowPosition()
+    {
+        try
+        {
+            if (_appSettings == null || !_appSettings.Window.RememberPosition)
+            {
+                return;
+            }
+            
+            // 保存到服务
+            _windowPositionService.SavePosition(this);
+            
+            // 更新配置中的自定义位置
+            _appSettings.Window.Position = "Custom";
+            _appSettings.Window.CustomX = this.Position.X;
+            _appSettings.Window.CustomY = this.Position.Y;
+            
+            // 保存配置到文件
+            await _configurationService.SaveAsync(_appSettings);
+            
+            Console.WriteLine($"Window position saved: X={this.Position.X}, Y={this.Position.Y}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving window position: {ex.Message}");
         }
     }
     
