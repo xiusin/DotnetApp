@@ -503,21 +503,101 @@ public partial class MainWindow : Window
         if (normalKeys.Count == 0)
             return "";
 
-        // 使用事件修饰键状态，确保组合键可靠显示
-        if ((_lastModifiers & KeyModifiers.Control) != 0)
-            parts.Add("Ctrl");
-        if ((_lastModifiers & KeyModifiers.Alt) != 0)
-            parts.Add("Alt");
-        if ((_lastModifiers & KeyModifiers.Shift) != 0)
-            parts.Add("Shift");
-        if ((_lastModifiers & KeyModifiers.Meta) != 0)
-            parts.Add("Win");
+        // 应用按键过滤
+        var filteredKeys = ApplyKeyFilter(normalKeys);
+        if (filteredKeys.Count == 0)
+            return "";
 
-        // 添加普通按键
-        foreach (var key in normalKeys)
+        // 使用事件修饰键状态，确保组合键可靠显示
+        // 根据配置决定是否显示修饰键
+        var showModifiers = _appSettings?.KeyboardMonitor?.ShowModifiers ?? true;
+        if (showModifiers)
+        {
+            if ((_lastModifiers & KeyModifiers.Control) != 0)
+                parts.Add("Ctrl");
+            if ((_lastModifiers & KeyModifiers.Alt) != 0)
+                parts.Add("Alt");
+            if ((_lastModifiers & KeyModifiers.Shift) != 0)
+                parts.Add("Shift");
+            if ((_lastModifiers & KeyModifiers.Meta) != 0)
+                parts.Add("Win");
+        }
+
+        // 添加过滤后的普通按键
+        foreach (var key in filteredKeys)
             parts.Add(FormatKeyName(key));
 
         return string.Join(" + ", parts);
+    }
+    
+    /// <summary>
+    /// 应用按键过滤规则
+    /// </summary>
+    private List<Key> ApplyKeyFilter(List<Key> keys)
+    {
+        if (_appSettings?.KeyboardMonitor == null)
+        {
+            return keys;
+        }
+        
+        var settings = _appSettings.KeyboardMonitor;
+        var filtered = new List<Key>();
+        
+        foreach (var key in keys)
+        {
+            // 功能键过滤 (F1-F12)
+            if (key >= Key.F1 && key <= Key.F12)
+            {
+                if (settings.ShowFunctionKeys)
+                {
+                    filtered.Add(key);
+                }
+                continue;
+            }
+            
+            // 导航键过滤
+            if (IsNavigationKey(key))
+            {
+                if (settings.ShowNavigation)
+                {
+                    filtered.Add(key);
+                }
+                continue;
+            }
+            
+            // 字母数字键过滤
+            if (IsAlphaNumericKey(key))
+            {
+                if (settings.ShowAlphaNumeric)
+                {
+                    filtered.Add(key);
+                }
+                continue;
+            }
+            
+            // 其他按键默认显示
+            filtered.Add(key);
+        }
+        
+        return filtered;
+    }
+    
+    /// <summary>
+    /// 判断是否为导航键
+    /// </summary>
+    private bool IsNavigationKey(Key key)
+    {
+        return key is Key.Up or Key.Down or Key.Left or Key.Right or
+               Key.Home or Key.End or Key.PageUp or Key.PageDown or
+               Key.Insert or Key.Delete;
+    }
+    
+    /// <summary>
+    /// 判断是否为字母数字键
+    /// </summary>
+    private bool IsAlphaNumericKey(Key key)
+    {
+        return (key >= Key.A && key <= Key.Z) || (key >= Key.D0 && key <= Key.D9);
     }
 
     // 立即显示当前按下的键（用于快速单击的可见性保障）

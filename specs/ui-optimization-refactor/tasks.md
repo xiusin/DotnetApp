@@ -150,6 +150,7 @@
 - [ ] 12. 创建通用设置面板
   - 创建 `Views/Panels/GeneralSettingsPanel.axaml` UserControl
 
+
   - 添加窗口位置设置：ComboBox 选择 RightEdge/LeftEdge/Custom
   - 添加窗口透明度设置：Slider (0.5 - 1.0)
   - 添加"记住窗口位置"复选框
@@ -158,11 +159,13 @@
   - _Requirements: 2.1, 2.4, 2.7_
   - _Commit: "创建通用设置面板"_
 
+
 - [ ] 13. 绑定通用设置到 ViewModel
   - 在 `ConfigViewModel` 中添加 `WindowSettings` 属性
   - 在 `GeneralSettingsPanel.axaml` 中绑定控件到 `WindowSettings` 属性
   - 实现属性更改通知，确保 UI 实时更新
   - 添加输入验证（透明度范围、位置有效性）
+
   - _Requirements: 3.5, 3.7_
   - _Commit: "绑定通用设置到 ViewModel"_
 
@@ -171,13 +174,15 @@
 - [ ] 14. 创建键盘监控设置面板基础
   - 创建 `Views/Panels/KeyboardMonitorPanel.axaml` UserControl
   - 创建 `ViewModels/KeyboardMonitorViewModel.cs`
+
   - 添加面板标题和描述
   - 创建 ScrollViewer 容器支持滚动
   - 创建 StackPanel 布局，Spacing="24"
   - _Requirements: 4.1_
   - _Commit: "创建键盘监控设置面板基础"_
 
-- [ ] 15. 添加显示位置配置
+- [x] 15. 添加显示位置配置
+
   - 添加"显示位置"ComboBox，包含 6 个选项：左上、顶部居中、右上、左下、底部居中、右下
   - 绑定到 `KeyboardMonitorViewModel.DisplayPosition` 属性
   - 添加自定义位置输入框（X, Y 坐标），当选择"自定义"时启用
@@ -186,6 +191,8 @@
 
 - [ ] 16. 添加显示样式配置
   - 添加背景颜色选择器（使用 ColorPicker 或预设颜色 ComboBox）
+
+
   - 添加透明度 Slider (0.1 - 1.0)，显示当前值
   - 添加字体大小 Slider (12 - 48)，显示当前值
   - 添加字体颜色选择器
@@ -200,6 +207,7 @@
   - 添加"自动隐藏"复选框
   - _Requirements: 4.3_
   - _Commit: "添加显示行为配置"_
+
 
 
 
