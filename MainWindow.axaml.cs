@@ -657,10 +657,32 @@ public partial class MainWindow : Window
         HideToBackground();
     }
     
-    private void ConfigButton_Click(object? sender, RoutedEventArgs e)
+    private async void ConfigButton_Click(object? sender, RoutedEventArgs e)
     {
-        // 显示状态栏弹窗菜单
-        ShowStatusBarPopup(sender as Button);
+        // 打开配置窗口
+        try
+        {
+            var configWindow = new Views.ConfigWindow();
+            var viewModel = new ViewModels.ConfigViewModel(_configurationService);
+            
+            // 加载配置
+            await viewModel.LoadAsync();
+            configWindow.DataContext = viewModel;
+            
+            // 以模态方式显示
+            await configWindow.ShowDialog(this);
+            
+            // 配置窗口关闭后，重新加载配置
+            _appSettings = await _configurationService.LoadAsync();
+            Console.WriteLine("Configuration reloaded after config window closed");
+            
+            this.Get<TextBlock>("StatusTextBlock").Text = "配置已更新";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error opening config window: {ex.Message}");
+            this.Get<TextBlock>("StatusTextBlock").Text = $"打开配置窗口失败: {ex.Message}";
+        }
     }
     
     /// <summary>

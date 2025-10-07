@@ -110,6 +110,7 @@
   - 创建 Fluent Design 风格的 Border 容器（圆角、阴影）
   - 创建 Grid 布局：Header (Auto), Content (*), Footer (Auto)
 
+
   - 添加标题栏（包含标题文本和关闭按钮）
   - 添加底部按钮栏（保存、取消按钮）
   - _Requirements: 3.1, 3.8_
@@ -118,6 +119,7 @@
 - [ ] 9. 创建 TabControl 结构
   - 在配置窗口的 Content 区域添加 `TabControl`
   - 创建 6 个 TabItem：通用设置、键盘监控、AI 聊天、标签管理、边缘组件、调试选项
+
   - 为每个 TabItem 添加 Header（使用 FluentIcon + 文本）
   - 设置 TabControl 样式符合 Fluent Design（圆角、过渡动画）
   - _Requirements: 3.2, 3.3, 3.4, 3.8_
