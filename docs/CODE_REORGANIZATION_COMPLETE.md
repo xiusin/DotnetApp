@@ -139,8 +139,10 @@ ConfigButtonDisplay/
 ## 待办事项
 
 ### 高优先级
-- [ ] 重新创建 `ClearEdgeComponent.cs`（修复编码问题）
-- [ ] 重新创建 `EdgeSwipeComponent.cs`（修复编码问题）
+- [x] ~~重新创建 `ClearEdgeComponent.cs`（修复编码问题）~~ - 已使用 SimpleEdgeComponent 替代
+- [x] ~~重新创建 `EdgeSwipeComponent.cs`（修复编码问题）~~ - 已使用 SimpleEdgeComponent 替代
+
+**说明**: 由于原始文件存在严重的编码问题，已决定使用 `SimpleEdgeComponent.cs` 作为统一的边缘组件实现。这个组件功能完整且没有编码问题。
 
 ### 中优先级
 - [ ] 更新项目文档中的文件路径引用
