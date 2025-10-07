@@ -1092,6 +1092,10 @@ public partial class MainWindow : Window
                 System.Console.WriteLine($"[MainWindow] 文本设置完成，调用ShowTags...");
                 _noteTagManager.ShowTags();
                 System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
+                
+                // 确保标签可见
+                _noteTagManager.EnsureNoteTagsVisible();
+                System.Console.WriteLine($"[MainWindow] EnsureNoteTagsVisible调用完成");
             }
             catch (Exception ex)
             {

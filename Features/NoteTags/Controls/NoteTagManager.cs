@@ -737,6 +737,41 @@ public class NoteTagManager
         }
     }
 
+    /// <summary>
+    /// 确保所有 NoteTag 可见并设置正确的属性
+    /// </summary>
+    public void EnsureNoteTagsVisible()
+    {
+        System.Console.WriteLine($"[NoteTagManager] EnsureNoteTagsVisible() 被调用");
+        
+        for (int i = 0; i < _tagWindows.Length; i++)
+        {
+            if (_tagWindows[i] != null && _tags[i] != null)
+            {
+                var window = _tagWindows[i];
+                var tag = _tags[i];
+                
+                // 确保窗口可见
+                window.IsVisible = true;
+                window.Opacity = 1.0;
+                
+                // 设置高 ZIndex（通过 Topmost 实现）
+                window.Topmost = true;
+                
+                // 确保标签控件可见
+                tag.IsVisible = true;
+                tag.Opacity = 1.0;
+                
+                // 强制刷新布局
+                tag.InvalidateVisual();
+                tag.InvalidateMeasure();
+                tag.InvalidateArrange();
+                
+                System.Console.WriteLine($"[NoteTagManager] 标签 {i + 1} 可见性已确保: IsVisible={window.IsVisible}, Opacity={window.Opacity}, Topmost={window.Topmost}");
+            }
+        }
+    }
+    
     public void Dispose()
     {
         // 移除事件监听
