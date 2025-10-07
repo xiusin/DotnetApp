@@ -16,24 +16,23 @@ namespace ConfigButtonDisplay.Features.NoteTags.Controls;
 public class NoteTagManager
 {
     private readonly Window _hostWindow;
-    private NoteTagControl[] _tags = new NoteTagControl[3];
-    private Window[] _tagWindows = new Window[3];
-    private PixelPoint[] _positions = new PixelPoint[3];  // 显示位置
-    private PixelPoint[] _hiddenPositions = new PixelPoint[3]; // 隐藏位置
+    private readonly NoteTagControl[] _tags = new NoteTagControl[3];
+    private readonly Window[] _tagWindows = new Window[3];
+    private readonly PixelPoint[] _positions = new PixelPoint[3];
+    private readonly PixelPoint[] _hiddenPositions = new PixelPoint[3];
     private bool _isAnimating = false;
     private DispatcherTimer? _hoverTimer;
-    private const int SLIDE_DISTANCE = 100; // 滑出距离
-    private const int ANIMATION_DURATION = 300; // 动画持续时间（毫秒）
-    private const int HOVER_DELAY = 200; // 悬停延迟（毫秒）
-    private int _debugCounter = 0; // 调试计数器
-    private bool[] _tagHovered = new bool[3]; // 记录每个标签的悬停状态
-    private bool[] _tagSlidOut = new bool[3]; // 记录每个标签是否已滑出
-    private DispatcherTimer? _stateCheckTimer; // 状态检查计时器
+    private const int SLIDE_DISTANCE = 100;
+    private const int ANIMATION_DURATION = 300;
+    private const int HOVER_DELAY = 200;
+    private int _debugCounter = 0;
+    private readonly bool[] _tagHovered = new bool[3];
+    private readonly bool[] _tagSlidOut = new bool[3];
+    private DispatcherTimer? _stateCheckTimer;
     
-    // 新增：动画队列管理
     private readonly Queue<(int tagIndex, bool slideOut)>[] _animationQueues = new Queue<(int, bool)>[3];
-    private readonly bool[] _tagAnimating = new bool[3]; // 每个标签的动画状态
-    private readonly DispatcherTimer?[] _pendingAnimationTimers = new DispatcherTimer?[3]; // 延迟动画计时器
+    private readonly bool[] _tagAnimating = new bool[3];
+    private readonly DispatcherTimer?[] _pendingAnimationTimers = new DispatcherTimer?[3];
 
     public NoteTagManager(Window hostWindow)
     {

@@ -3,15 +3,18 @@ using Avalonia.Input;
 
 namespace ConfigButtonDisplay.Infrastructure.Helpers;
 
+/// <summary>
+/// 优化的双击 Shift 检测器 - 使用 UtcNow 减少性能开销
+/// </summary>
 public class DoubleShiftDetector
 {
-    private DateTime _lastShiftPress = DateTime.MinValue;
-    private int _interval = 500;  // ms
+    private long _lastShiftPressTicks = 0;
+    private int _intervalMs = 500;
 
     public int Interval
     {
-        get => _interval;
-        set => _interval = Math.Max(100, Math.Min(2000, value));  // Clamp between 100-2000ms
+        get => _intervalMs;
+        set => _intervalMs = Math.Max(100, Math.Min(2000, value));
     }
 
     public bool OnKeyDown(Key key)
@@ -19,21 +22,21 @@ public class DoubleShiftDetector
         if (key != Key.LeftShift && key != Key.RightShift)
             return false;
 
-        var now = DateTime.Now;
-        var elapsed = (now - _lastShiftPress).TotalMilliseconds;
+        var nowTicks = DateTime.UtcNow.Ticks;
+        var elapsedMs = (nowTicks - _lastShiftPressTicks) / TimeSpan.TicksPerMillisecond;
 
-        if (elapsed < _interval && elapsed > 0)
+        if (elapsedMs < _intervalMs && elapsedMs > 0)
         {
-            _lastShiftPress = DateTime.MinValue;  // Reset
-            return true;  // Double-shift detected
+            _lastShiftPressTicks = 0;
+            return true;
         }
 
-        _lastShiftPress = now;
+        _lastShiftPressTicks = nowTicks;
         return false;
     }
 
     public void Reset()
     {
-        _lastShiftPress = DateTime.MinValue;
+        _lastShiftPressTicks = 0;
     }
 }
