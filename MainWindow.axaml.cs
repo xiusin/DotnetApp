@@ -54,14 +54,14 @@ public partial class MainWindow : Window
     private AppSettings? _appSettings;
     
     
-    public MainWindow()
+    public MainWindow(IConfigurationService configurationService, IWindowPositionService windowPositionService)
     {
         Console.WriteLine("MainWindow constructor starting...");
         
-        // 初始化核心服务
-        _configurationService = new ConfigurationService();
-        _windowPositionService = new WindowPositionService();
-        Console.WriteLine("Core services initialized");
+        // 使用依赖注入的服务
+        _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
+        _windowPositionService = windowPositionService ?? throw new ArgumentNullException(nameof(windowPositionService));
+        Console.WriteLine("Core services injected");
         
         AvaloniaXamlLoader.Load(this);
         Console.WriteLine("AvaloniaXamlLoader.Load completed");
@@ -790,8 +790,14 @@ public partial class MainWindow : Window
         // 打开配置窗口
         try
         {
-            var configWindow = new Views.ConfigWindow();
-            var viewModel = new ViewModels.ConfigViewModel(_configurationService);
+            // 从依赖注入容器获取 ConfigWindow 和 ConfigViewModel
+            var configWindow = App.Current?.GetService<Views.ConfigWindow>();
+            var viewModel = App.Current?.GetService<ViewModels.ConfigViewModel>();
+            
+            if (configWindow == null || viewModel == null)
+            {
+                throw new InvalidOperationException("无法从依赖注入容器获取 ConfigWindow 或 ConfigViewModel");
+            }
             
             // 加载配置
             await viewModel.LoadAsync();

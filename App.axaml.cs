@@ -15,6 +15,11 @@ namespace ConfigButtonDisplay;
 public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
+    
+    /// <summary>
+    /// 获取当前应用实例
+    /// </summary>
+    public static new App? Current => Application.Current as App;
 
     public override void Initialize()
     {

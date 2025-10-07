@@ -413,12 +413,15 @@
   - _Commit: "移动文本选择组件到 Features 目录"_
 
 
+
+
 - [ ] 35. 移动调试组件到 Features 目录
   - 将 `DebugOverlay` 和 `EnhancedDebugOverlay` 移动到 `Features/Debug/Controls/`
   - 更新命名空间为 `ConfigButtonDisplay.Features.Debug.Controls`
   - 更新 `MainWindow.axaml.cs` 中的引用
   - 验证编译通过
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
+
   - _Commit: "移动调试组件到 Features 目录"_
 
 ## Phase 9: Dependency Injection Setup
