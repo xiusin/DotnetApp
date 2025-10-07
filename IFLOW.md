@@ -1,5 +1,7 @@
 # ConfigButtonDisplay - 键盘按键显示器
 
+> 📚 **项目文档**: 查看 [docs/](docs/) 目录获取完整的项目文档，包括功能说明、Bug 修复记录、使用指南等。
+
 ## 项目概述
 
 ConfigButtonDisplay 是一个基于 Avalonia UI 框架开发的跨平台桌面应用程序，用于实时显示用户按下的键盘按键组合。该应用程序采用 C# 和 .NET 6.0 开发，支持 Windows、macOS 和 Linux 系统。
