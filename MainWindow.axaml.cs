@@ -177,11 +177,76 @@ public partial class MainWindow : Window
             // 订阅配置更改事件
             _configurationService.ConfigurationChanged += OnConfigurationChanged;
             
+            // 初始化标签管理器（延迟到窗口完全加载后）
+            await InitializeNoteTagManagerAsync();
+            
             Console.WriteLine("Window configuration applied successfully");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error applying window configuration: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 初始化标签管理器
+    /// </summary>
+    private async Task InitializeNoteTagManagerAsync()
+    {
+        try
+        {
+            // 延迟一小段时间确保窗口完全加载
+            await Task.Delay(100);
+            
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                try
+                {
+                    System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
+                    _noteTagManager = new Features.NoteTags.Controls.NoteTagManager(this);
+                    System.Console.WriteLine($"[MainWindow] 标签管理器创建完成，设置文本...");
+                    
+                    _noteTagManager.SetTagText(0, "功能标签 1");
+                    _noteTagManager.SetTagText(1, "功能标签 2");
+                    _noteTagManager.SetTagText(2, "功能标签 3");
+                    System.Console.WriteLine($"[MainWindow] 文本设置完成，调用ShowTags...");
+                    
+                    _noteTagManager.ShowTags();
+                    System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
+                    
+                    // 确保标签可见
+                    _noteTagManager.EnsureNoteTagsVisible();
+                    System.Console.WriteLine($"[MainWindow] EnsureNoteTagsVisible调用完成");
+                    
+                    _debugOverlay?.LogEvent("✅ 标签管理器已初始化");
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine($"[MainWindow] 标签管理器初始化失败: {ex.Message}");
+                    System.Console.WriteLine($"[MainWindow] 堆栈跟踪: {ex.StackTrace}");
+                    _noteTagManager = null;
+                    _debugOverlay?.LogEvent($"❌ 标签管理器初始化失败: {ex.Message}");
+                }
+            });
+            
+            // 再延迟一段时间后验证状态
+            await Task.Delay(500);
+            
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (_noteTagManager != null)
+                {
+                    System.Console.WriteLine($"[MainWindow] 验证便签初始状态...");
+                    _noteTagManager.ValidateInitialState();
+                    var status = _noteTagManager.GetTagStatus();
+                    System.Console.WriteLine($"[MainWindow] 便签状态:\n{status}");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"[MainWindow] InitializeNoteTagManagerAsync 失败: {ex.Message}");
+            _debugOverlay?.LogEvent($"❌ 标签管理器异步初始化失败: {ex.Message}");
         }
     }
     
@@ -1080,44 +1145,8 @@ public partial class MainWindow : Window
             _popupWindow = new PopupWindow();
             _debugOverlay?.LogEvent("✅ 状态栏弹窗已初始化");
             
-            // 初始化创可贴标签组件
-            try
-            {
-                System.Console.WriteLine($"[MainWindow] 开始初始化标签管理器...");
-                _noteTagManager = new Features.NoteTags.Controls.NoteTagManager(this);
-                System.Console.WriteLine($"[MainWindow] 标签管理器创建完成，设置文本...");
-                _noteTagManager.SetTagText(0, "功能标签 1");
-                _noteTagManager.SetTagText(1, "功能标签 2");
-                _noteTagManager.SetTagText(2, "功能标签 3");
-                System.Console.WriteLine($"[MainWindow] 文本设置完成，调用ShowTags...");
-                _noteTagManager.ShowTags();
-                System.Console.WriteLine($"[MainWindow] ShowTags调用完成");
-                
-                // 确保标签可见
-                _noteTagManager.EnsureNoteTagsVisible();
-                System.Console.WriteLine($"[MainWindow] EnsureNoteTagsVisible调用完成");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"[MainWindow] 标签管理器初始化失败: {ex.Message}");
-                System.Console.WriteLine($"[MainWindow] 堆栈跟踪: {ex.StackTrace}");
-                _noteTagManager = null;
-            }
-            
-            // 延迟500ms后验证便签初始状态
-            Task.Delay(500).ContinueWith(_ =>
-            {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    System.Console.WriteLine($"[MainWindow] 验证便签初始状态...");
-                    _noteTagManager?.ValidateInitialState();
-                    var status = _noteTagManager?.GetTagStatus();
-                    if (status != null)
-                    {
-                        System.Console.WriteLine($"[MainWindow] 便签状态:\n{status}");
-                    }
-                });
-            });
+            // 初始化创可贴标签组件 - 延迟到窗口完全加载后
+            // 注意：不在这里初始化，而是在 OnWindowOpened 中初始化
             
             if (this.Get<TextBlock>("StatusTextBlock") != null)
                 this.Get<TextBlock>("StatusTextBlock").Text = "所有功能已初始化 (Fluent Design)";
