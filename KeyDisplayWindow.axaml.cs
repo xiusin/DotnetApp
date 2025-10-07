@@ -16,6 +16,10 @@ public partial class KeyDisplayWindow : Window
     private const int AUTO_HIDE_DELAY = 2000; // 2秒自动隐藏
     private bool _isContentVisible = false;
     public bool ForceFullWidth = true;
+    
+    // 欢迎消息相关
+    private bool _hasShownWelcome = false;
+    private Core.Configuration.KeyboardMonitorSettings? _settings;
 
     public KeyDisplayWindow()
     {
@@ -217,6 +221,62 @@ public partial class KeyDisplayWindow : Window
     }
     
     /// <summary>
+    /// 显示欢迎消息
+    /// </summary>
+    public async System.Threading.Tasks.Task ShowWelcomeMessageAsync()
+    {
+        if (_settings == null || !_settings.ShowWelcomeMessage || _hasShownWelcome)
+            return;
+            
+        _hasShownWelcome = true;
+        
+        try
+        {
+            // 显示欢迎消息
+            if (DisplayTextBlock != null)
+            {
+                DisplayTextBlock.Text = _settings.WelcomeMessage ?? "欢迎使用按键监控";
+            }
+            
+            // 显示窗口
+            ShowWindow();
+            _isContentVisible = true;
+            
+            // 淡入动画
+            await Infrastructure.Helpers.AnimationHelper.FadeIn(this, 300);
+            
+            // 等待显示时长
+            var duration = (int)(_settings.WelcomeMessageDuration * 1000);
+            await System.Threading.Tasks.Task.Delay(duration);
+            
+            // 淡出动画
+            await Infrastructure.Helpers.AnimationHelper.FadeOut(this, 300);
+            
+            // 隐藏窗口
+            HideWindow();
+            _isContentVisible = false;
+            
+            // 清空文本
+            if (DisplayTextBlock != null)
+            {
+                DisplayTextBlock.Text = "";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[KeyDisplayWindow] ShowWelcomeMessageAsync error: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 重置欢迎消息标志
+    /// </summary>
+    public void ResetWelcomeMessage()
+    {
+        _hasShownWelcome = false;
+    }
+    
+    /// <summary>
     /// 兜底：确保窗口可见并计时隐藏（用于按钮强制显示）
     /// </summary>
     public void EnsureShowVisible()
@@ -236,6 +296,9 @@ public partial class KeyDisplayWindow : Window
         {
             return;
         }
+
+        // 保存设置以供欢迎消息使用
+        _settings = settings;
 
         try
         {

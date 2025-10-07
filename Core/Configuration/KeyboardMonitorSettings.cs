@@ -24,6 +24,9 @@ public class KeyboardMonitorSettings : INotifyPropertyChanged
     private bool _showFunctionKeys = true;
     private bool _showAlphaNumeric = true;
     private bool _showNavigation = true;
+    private bool _showWelcomeMessage = true;
+    private string _welcomeMessage = "欢迎使用按键监控";
+    private double _welcomeMessageDuration = 3.0;
 
     /// <summary>
     /// 是否启用键盘监控
@@ -270,6 +273,56 @@ public class KeyboardMonitorSettings : INotifyPropertyChanged
             if (_showNavigation != value)
             {
                 _showNavigation = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 是否在启动时显示欢迎语
+    /// </summary>
+    public bool ShowWelcomeMessage
+    {
+        get => _showWelcomeMessage;
+        set
+        {
+            if (_showWelcomeMessage != value)
+            {
+                _showWelcomeMessage = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 欢迎语内容
+    /// </summary>
+    public string WelcomeMessage
+    {
+        get => _welcomeMessage;
+        set
+        {
+            if (_welcomeMessage != value)
+            {
+                _welcomeMessage = value ?? "欢迎使用按键监控";
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 欢迎语显示时长（秒，1.0 - 10.0）
+    /// </summary>
+    public double WelcomeMessageDuration
+    {
+        get => _welcomeMessageDuration;
+        set
+        {
+            // 限制范围在 1.0 到 10.0 之间
+            var clampedValue = Math.Max(1.0, Math.Min(10.0, value));
+            if (Math.Abs(_welcomeMessageDuration - clampedValue) > 0.001)
+            {
+                _welcomeMessageDuration = clampedValue;
                 OnPropertyChanged();
             }
         }
