@@ -252,29 +252,48 @@ public static class AnimationHelper
     /// <summary>
     /// NoteTag 从右侧滑入动画
     /// </summary>
+    /// <param name="control">控件对象</param>
+    /// <param name="duration">动画时长（毫秒），默认 300ms</param>
     public static async Task SlideInFromRightForControl(Control control, int duration = 300)
     {
-        if (control == null) return;
+        if (control == null)
+        {
+            return;
+        }
+
         try
         {
+            // 保存原始位置
             var originalMargin = control.Margin;
+            
+            // 设置起始位置（向右偏移 100px）
             control.Margin = new Thickness(originalMargin.Left + 100, originalMargin.Top, originalMargin.Right, originalMargin.Bottom);
             control.Opacity = 0;
+            
             var startTime = DateTime.Now;
             var totalDuration = TimeSpan.FromMilliseconds(duration);
+            
             while (DateTime.Now - startTime < totalDuration)
             {
                 var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
                 var progress = Math.Min(1.0, elapsed / duration);
+                
+                // 使用 ease-out 缓动函数
                 var easedProgress = EaseOut(progress);
+                
+                // 计算当前位置和透明度
                 var currentOffset = 100 * (1 - easedProgress);
+                
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     control.Margin = new Thickness(originalMargin.Left + currentOffset, originalMargin.Top, originalMargin.Right, originalMargin.Bottom);
                     control.Opacity = easedProgress;
                 });
-                await Task.Delay(16);
+                
+                await Task.Delay(16);  // 约 60 FPS
             }
+            
+            // 确保最终位置和透明度准确
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 control.Margin = originalMargin;
@@ -290,27 +309,43 @@ public static class AnimationHelper
     /// <summary>
     /// NoteTag 向右侧滑出动画
     /// </summary>
+    /// <param name="control">控件对象</param>
+    /// <param name="duration">动画时长（毫秒），默认 300ms</param>
     public static async Task SlideOutToRight(Control control, int duration = 300)
     {
-        if (control == null) return;
+        if (control == null)
+        {
+            return;
+        }
+
         try
         {
             var originalMargin = control.Margin;
+            
             var startTime = DateTime.Now;
             var totalDuration = TimeSpan.FromMilliseconds(duration);
+            
             while (DateTime.Now - startTime < totalDuration)
             {
                 var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
                 var progress = Math.Min(1.0, elapsed / duration);
+                
+                // 使用 ease-in 缓动函数
                 var easedProgress = progress * progress;
+                
+                // 计算当前位置和透明度
                 var currentOffset = 100 * easedProgress;
+                
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     control.Margin = new Thickness(originalMargin.Left + currentOffset, originalMargin.Top, originalMargin.Right, originalMargin.Bottom);
                     control.Opacity = 1 - easedProgress;
                 });
-                await Task.Delay(16);
+                
+                await Task.Delay(16);  // 约 60 FPS
             }
+            
+            // 确保最终位置和透明度
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 control.Margin = new Thickness(originalMargin.Left + 100, originalMargin.Top, originalMargin.Right, originalMargin.Bottom);
@@ -324,30 +359,48 @@ public static class AnimationHelper
     }
     
     /// <summary>
-    /// 悬停缩放动画
+    /// 悬停缩放动画（用于 NoteTag）
     /// </summary>
+    /// <param name="control">控件对象</param>
+    /// <param name="targetScale">目标缩放比例，默认 1.05</param>
+    /// <param name="duration">动画时长（毫秒），默认 200ms</param>
     public static async Task ScaleToTarget(Control control, double targetScale = 1.05, int duration = 200)
     {
-        if (control == null) return;
+        if (control == null)
+        {
+            return;
+        }
+
         try
         {
+            // 获取当前缩放
             var currentTransform = control.RenderTransform as ScaleTransform;
             var startScale = currentTransform?.ScaleX ?? 1.0;
+            
             var startTime = DateTime.Now;
             var totalDuration = TimeSpan.FromMilliseconds(duration);
+            
             while (DateTime.Now - startTime < totalDuration)
             {
                 var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
                 var progress = Math.Min(1.0, elapsed / duration);
+                
+                // 使用 ease-in-out 缓动函数
                 var easedProgress = EaseInOut(progress);
+                
+                // 计算当前缩放值
                 var currentScale = startScale + (targetScale - startScale) * easedProgress;
+                
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     control.RenderTransform = new ScaleTransform(currentScale, currentScale);
                     control.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
                 });
-                await Task.Delay(16);
+                
+                await Task.Delay(16);  // 约 60 FPS
             }
+            
+            // 确保最终缩放值准确
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 control.RenderTransform = new ScaleTransform(targetScale, targetScale);
@@ -361,29 +414,46 @@ public static class AnimationHelper
     }
     
     /// <summary>
-    /// 平滑移动动画
+    /// 平滑移动动画（用于标签拖动）
     /// </summary>
+    /// <param name="control">控件对象</param>
+    /// <param name="targetMargin">目标 Margin</param>
+    /// <param name="duration">动画时长（毫秒），默认 200ms</param>
     public static async Task SmoothMove(Control control, Thickness targetMargin, int duration = 200)
     {
-        if (control == null) return;
+        if (control == null)
+        {
+            return;
+        }
+
         try
         {
             var startMargin = control.Margin;
+            
             var startTime = DateTime.Now;
             var totalDuration = TimeSpan.FromMilliseconds(duration);
+            
             while (DateTime.Now - startTime < totalDuration)
             {
                 var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
                 var progress = Math.Min(1.0, elapsed / duration);
+                
+                // 使用 ease-in-out 缓动函数
                 var easedProgress = EaseInOut(progress);
+                
+                // 计算当前位置
                 var currentLeft = startMargin.Left + (targetMargin.Left - startMargin.Left) * easedProgress;
                 var currentTop = startMargin.Top + (targetMargin.Top - startMargin.Top) * easedProgress;
+                
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     control.Margin = new Thickness(currentLeft, currentTop, startMargin.Right, startMargin.Bottom);
                 });
-                await Task.Delay(16);
+                
+                await Task.Delay(16);  // 约 60 FPS
             }
+            
+            // 确保最终位置准确
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 control.Margin = targetMargin;
