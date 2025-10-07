@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using ConfigButtonDisplay.Core.Configuration;
 using ConfigButtonDisplay.Core.Interfaces;
@@ -10,11 +11,20 @@ namespace ConfigButtonDisplay.Core.Services;
 /// <summary>
 /// 配置服务实现，负责配置的加载、保存和管理
 /// </summary>
-public class ConfigurationService : IConfigurationService
+public class ConfigurationService : IConfigurationService, IDisposable
 {
     private readonly string _configDirectory;
     private readonly string _configFilePath;
     private AppSettings? _cachedSettings;
+    private FileSystemWatcher? _fileWatcher;
+    private Timer? _debounceTimer;
+    private bool _isInternalChange = false;
+    private const int DebounceDelayMs = 500;
+
+    /// <summary>
+    /// 配置文件更改事件
+    /// </summary>
+    public event EventHandler<AppSettings>? ConfigurationChanged;
 
     public ConfigurationService()
     {
@@ -102,6 +112,9 @@ public class ConfigurationService : IConfigurationService
     {
         try
         {
+            // 标记为内部更改，避免触发文件监听事件
+            _isInternalChange = true;
+
             // 确保配置目录存在
             if (!Directory.Exists(_configDirectory))
             {
@@ -128,6 +141,7 @@ public class ConfigurationService : IConfigurationService
         catch (Exception ex)
         {
             Console.WriteLine($"保存配置文件时出错: {ex.Message}");
+            _isInternalChange = false;
             throw;
         }
     }
@@ -179,5 +193,110 @@ public class ConfigurationService : IConfigurationService
             Console.WriteLine($"保存模块配置时出错 ({moduleName}): {ex.Message}");
             throw;
         }
+    }
+
+    /// <summary>
+    /// 启动配置文件监听
+    /// </summary>
+    public void StartWatching()
+    {
+        if (_fileWatcher != null)
+        {
+            Console.WriteLine("配置文件监听已经启动");
+            return;
+        }
+
+        try
+        {
+            // 确保配置目录存在
+            if (!Directory.Exists(_configDirectory))
+            {
+                Directory.CreateDirectory(_configDirectory);
+            }
+
+            // 创建文件监听器
+            _fileWatcher = new FileSystemWatcher(_configDirectory)
+            {
+                Filter = "appsettings.json",
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
+                EnableRaisingEvents = true
+            };
+
+            // 订阅文件更改事件
+            _fileWatcher.Changed += OnConfigFileChanged;
+
+            Console.WriteLine($"开始监听配置文件: {_configFilePath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"启动配置文件监听时出错: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 停止配置文件监听
+    /// </summary>
+    public void StopWatching()
+    {
+        if (_fileWatcher != null)
+        {
+            _fileWatcher.Changed -= OnConfigFileChanged;
+            _fileWatcher.Dispose();
+            _fileWatcher = null;
+            Console.WriteLine("已停止监听配置文件");
+        }
+
+        if (_debounceTimer != null)
+        {
+            _debounceTimer.Dispose();
+            _debounceTimer = null;
+        }
+    }
+
+    /// <summary>
+    /// 配置文件更改事件处理
+    /// </summary>
+    private void OnConfigFileChanged(object sender, FileSystemEventArgs e)
+    {
+        // 如果是内部保存触发的更改，忽略
+        if (_isInternalChange)
+        {
+            _isInternalChange = false;
+            return;
+        }
+
+        Console.WriteLine($"检测到配置文件更改: {e.FullPath}");
+
+        // 使用防抖动机制，避免频繁重新加载
+        _debounceTimer?.Dispose();
+        _debounceTimer = new Timer(async _ =>
+        {
+            try
+            {
+                // 等待文件写入完成
+                await Task.Delay(100);
+
+                // 重新加载配置
+                _cachedSettings = null;
+                var newSettings = await LoadAsync();
+
+                // 触发配置更改事件
+                ConfigurationChanged?.Invoke(this, newSettings);
+
+                Console.WriteLine("配置已重新加载");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"重新加载配置时出错: {ex.Message}");
+            }
+        }, null, DebounceDelayMs, Timeout.Infinite);
+    }
+
+    /// <summary>
+    /// 释放资源
+    /// </summary>
+    public void Dispose()
+    {
+        StopWatching();
     }
 }

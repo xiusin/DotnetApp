@@ -163,11 +163,52 @@ public partial class MainWindow : Window
                 _keyDisplayWindow.UpdateSettings(_appSettings.KeyboardMonitor);
             }
             
+            // 启动配置文件监听
+            _configurationService.StartWatching();
+            
+            // 订阅配置更改事件
+            _configurationService.ConfigurationChanged += OnConfigurationChanged;
+            
             Console.WriteLine("Window configuration applied successfully");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error applying window configuration: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 配置更改事件处理
+    /// </summary>
+    private async void OnConfigurationChanged(object? sender, AppSettings newSettings)
+    {
+        try
+        {
+            Console.WriteLine("Configuration changed, reloading settings...");
+            
+            // 在 UI 线程上应用新配置
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _appSettings = newSettings;
+                
+                // 应用窗口透明度
+                this.Opacity = newSettings.Window.Opacity;
+                
+                // 应用置顶设置
+                this.Topmost = newSettings.Window.AlwaysOnTop;
+                
+                // 应用键盘监控配置
+                if (_keyDisplayWindow != null && newSettings.KeyboardMonitor != null)
+                {
+                    _keyDisplayWindow.UpdateSettings(newSettings.KeyboardMonitor);
+                }
+                
+                Console.WriteLine("Configuration reloaded successfully");
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error reloading configuration: {ex.Message}");
         }
     }
     
@@ -1153,5 +1194,28 @@ public partial class MainWindow : Window
             _lastModifiers = _keyboardHook?.GetCurrentModifiers() ?? KeyModifiers.None;
             try { this.Get<TextBlock>("StatusTextBlock").Text = "键盘状态已校正"; } catch { }
         }
+    }
+    
+    /// <summary>
+    /// 窗口关闭时清理资源
+    /// </summary>
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        try
+        {
+            // 取消订阅配置更改事件
+            _configurationService.ConfigurationChanged -= OnConfigurationChanged;
+            
+            // 停止配置文件监听
+            _configurationService.StopWatching();
+            
+            Console.WriteLine("Configuration watching stopped");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during cleanup: {ex.Message}");
+        }
+        
+        base.OnClosing(e);
     }
 }

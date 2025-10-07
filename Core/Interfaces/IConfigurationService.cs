@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ConfigButtonDisplay.Core.Configuration;
 
@@ -8,6 +9,11 @@ namespace ConfigButtonDisplay.Core.Interfaces;
 /// </summary>
 public interface IConfigurationService
 {
+    /// <summary>
+    /// 配置文件更改事件
+    /// </summary>
+    event EventHandler<AppSettings>? ConfigurationChanged;
+    
     /// <summary>
     /// 异步加载应用配置
     /// </summary>
@@ -35,4 +41,14 @@ public interface IConfigurationService
     /// <param name="moduleName">模块名称</param>
     /// <param name="settings">模块配置对象</param>
     Task SaveModuleAsync<T>(string moduleName, T settings) where T : class;
+    
+    /// <summary>
+    /// 启动配置文件监听
+    /// </summary>
+    void StartWatching();
+    
+    /// <summary>
+    /// 停止配置文件监听
+    /// </summary>
+    void StopWatching();
 }
