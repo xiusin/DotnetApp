@@ -134,6 +134,61 @@
                 </Path>
             </Canvas>
             
+            <!-- 撕裂边缘效果 - 右侧不规则边缘 -->
+            <Canvas Width="12" HorizontalAlignment="Right">
+                <!-- 右侧撕裂纹理 -->
+                <Path Fill="#FFFEF5" Stroke="#D0D0D0" StrokeThickness="0.5">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure StartPoint="4,12">
+                                <LineSegment Point="6,18"/>
+                                <LineSegment Point="2,24"/>
+                                <LineSegment Point="5,30"/>
+                                <LineSegment Point="3,36"/>
+                                <LineSegment Point="7,42"/>
+                                <LineSegment Point="4,48"/>
+                                <LineSegment Point="6,54"/>
+                                <LineSegment Point="2,60"/>
+                                <LineSegment Point="5,66"/>
+                                <LineSegment Point="3,72"/>
+                                <LineSegment Point="7,78"/>
+                                <LineSegment Point="4,84"/>
+                                <LineSegment Point="6,90"/>
+                                <LineSegment Point="0,90"/>
+                                <LineSegment Point="0,12"/>
+                                <LineSegment Point="4,12"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+                
+                <!-- 右侧撕裂阴影 -->
+                <Path Fill="#20000000" Opacity="0.3">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure StartPoint="5,12">
+                                <LineSegment Point="7,18"/>
+                                <LineSegment Point="3,24"/>
+                                <LineSegment Point="6,30"/>
+                                <LineSegment Point="4,36"/>
+                                <LineSegment Point="8,42"/>
+                                <LineSegment Point="5,48"/>
+                                <LineSegment Point="7,54"/>
+                                <LineSegment Point="3,60"/>
+                                <LineSegment Point="6,66"/>
+                                <LineSegment Point="4,72"/>
+                                <LineSegment Point="8,78"/>
+                                <LineSegment Point="5,84"/>
+                                <LineSegment Point="7,90"/>
+                                <LineSegment Point="1,90"/>
+                                <LineSegment Point="1,12"/>
+                                <LineSegment Point="5,12"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+            
             <!-- 胶带效果（可选） -->
             <Border Background="#F0F0E0" 
                     Height="16" 

@@ -340,6 +340,8 @@
 - [x] 27. 实现配置重置功能
   - 在 `ConfigViewModel` 中实现 `ResetCommand`
 
+
+
   - 显示确认对话框："确定要重置所有设置到默认值吗？"
   - 用户确认后，创建新的 `AppSettings` 实例（默认值）
   - 更新 ViewModel 的所有属性

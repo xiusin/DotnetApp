@@ -29,10 +29,15 @@ public partial class NoteTagControl : UserControl
     public event EventHandler<PointerEventArgs>? TagPointerLeave;
     public event EventHandler<PointerPressedEventArgs>? TagClicked;
 
+    private const double HiddenOffsetX = 130; // 缩进距离（像素）
+    private const double SlideAnimationDuration = 250; // 滑动动画时长（毫秒）
+    private bool _isExpanded = false;
+
     public NoteTagControl()
     {
         InitializeComponent();
         SetupEvents();
+        InitializeHiddenState();
     }
 
     private void InitializeComponent()
@@ -48,26 +53,85 @@ public partial class NoteTagControl : UserControl
         this.PointerPressed += OnPointerPressed;
     }
 
+    /// <summary>
+    /// 初始化为缩进状态
+    /// </summary>
+    private void InitializeHiddenState()
+    {
+        // 设置初始位置为缩进状态（向右偏移）
+        this.RenderTransform = new TranslateTransform(HiddenOffsetX, 0);
+    }
+
     private async void OnPointerEntered(object? sender, PointerEventArgs e)
     {
+        if (_isExpanded) return;
+        
+        _isExpanded = true;
+        
         // 触发悬停进入效果
         ApplyHoverEffect(true);
         
-        // 添加悬停缩放动画
-        await Infrastructure.Helpers.AnimationHelper.ScaleToTarget(this, 1.05, 200);
+        // 滑出动画：从缩进位置滑到完整显示
+        await SlideToPosition(0, SlideAnimationDuration);
+        
+        // 轻微缩放效果
+        await Infrastructure.Helpers.AnimationHelper.ScaleToTarget(this, 1.02, 150);
         
         TagPointerEnter?.Invoke(this, e);
     }
 
     private async void OnPointerExited(object? sender, PointerEventArgs e)
     {
+        if (!_isExpanded) return;
+        
+        _isExpanded = false;
+        
         // 触发悬停离开效果
         ApplyHoverEffect(false);
         
         // 恢复原始大小
-        await Infrastructure.Helpers.AnimationHelper.ScaleToTarget(this, 1.0, 200);
+        await Infrastructure.Helpers.AnimationHelper.ScaleToTarget(this, 1.0, 150);
+        
+        // 滑回动画：从完整显示滑回缩进位置
+        await SlideToPosition(HiddenOffsetX, SlideAnimationDuration);
         
         TagPointerLeave?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// 滑动到指定位置
+    /// </summary>
+    private async System.Threading.Tasks.Task SlideToPosition(double targetX, double duration)
+    {
+        var transform = this.RenderTransform as TranslateTransform;
+        if (transform == null)
+        {
+            transform = new TranslateTransform(HiddenOffsetX, 0);
+            this.RenderTransform = transform;
+        }
+
+        var startX = transform.X;
+        var distance = targetX - startX;
+        var startTime = DateTime.Now;
+        var durationMs = duration;
+
+        while (true)
+        {
+            var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
+            var progress = Math.Min(elapsed / durationMs, 1.0);
+            
+            // 使用 ease-out 缓动函数
+            var easedProgress = 1 - Math.Pow(1 - progress, 3);
+            
+            transform.X = startX + distance * easedProgress;
+
+            if (progress >= 1.0)
+                break;
+
+            await System.Threading.Tasks.Task.Delay(16); // ~60 FPS
+        }
+
+        transform.X = targetX;
     }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -164,7 +228,17 @@ public partial class NoteTagControl : UserControl
     public async System.Threading.Tasks.Task ShowAsync()
     {
         this.IsVisible = true;
-        await Infrastructure.Helpers.AnimationHelper.SlideInFromRightForControl(this, 300);
+        this.Opacity = 0;
+        
+        // 从更远的位置滑入到缩进位置
+        var transform = new TranslateTransform(200, 0);
+        this.RenderTransform = transform;
+        
+        // 淡入
+        await Infrastructure.Helpers.AnimationHelperOptimized.FadeInOptimized(this, 200);
+        
+        // 滑动到缩进位置
+        await SlideToPosition(HiddenOffsetX, 300);
     }
     
     /// <summary>
@@ -172,8 +246,24 @@ public partial class NoteTagControl : UserControl
     /// </summary>
     public async System.Threading.Tasks.Task HideAsync()
     {
-        await Infrastructure.Helpers.AnimationHelper.SlideOutToRight(this, 300);
+        // 如果当前是展开状态，先滑回缩进位置
+        if (_isExpanded)
+        {
+            await SlideToPosition(HiddenOffsetX, 200);
+        }
+        
+        // 滑出到屏幕外并淡出
+        var slideTask = SlideToPosition(200, 300);
+        var fadeTask = Infrastructure.Helpers.AnimationHelperOptimized.FadeOutOptimized(this, 300);
+        
+        await System.Threading.Tasks.Task.WhenAll(slideTask, fadeTask);
+        
         this.IsVisible = false;
+        
+        // 重置状态
+        _isExpanded = false;
+        this.RenderTransform = new TranslateTransform(HiddenOffsetX, 0);
+        this.Opacity = 1.0;
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
