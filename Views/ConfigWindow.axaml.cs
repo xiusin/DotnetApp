@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using ConfigButtonDisplay.Infrastructure.Helpers;
 
 namespace ConfigButtonDisplay.Views;
 
@@ -81,9 +82,11 @@ public partial class ConfigWindow : Window
                 await viewModel.SaveAsync();
                 Console.WriteLine("Configuration saved successfully");
                 
-                // 显示成功提示
-                await ShowMessageDialog("配置已成功保存", "保存成功");
+                // 显示成功通知
+                await NotificationHelper.ShowSuccess(this, "配置已成功保存并应用", "保存成功");
                 
+                // 延迟关闭，让用户看到通知
+                await Task.Delay(500);
                 this.Close();
             }
         }
@@ -94,17 +97,17 @@ public partial class ConfigWindow : Window
             
             if (this.DataContext is ViewModels.ConfigViewModel viewModel && viewModel.LastValidationError != null)
             {
-                await ShowMessageDialog(viewModel.LastValidationError, "配置验证失败");
+                await NotificationHelper.ShowError(this, viewModel.LastValidationError, "配置验证失败");
             }
             else
             {
-                await ShowMessageDialog("配置验证失败，请检查输入的值", "配置验证失败");
+                await NotificationHelper.ShowError(this, "配置验证失败，请检查输入的值", "配置验证失败");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error saving configuration: {ex.Message}");
-            await ShowMessageDialog($"保存配置时发生错误：{ex.Message}", "保存失败");
+            await NotificationHelper.ShowError(this, $"保存配置时发生错误：{ex.Message}", "保存失败");
         }
     }
     
@@ -144,12 +147,16 @@ public partial class ConfigWindow : Window
                     }
                     
                     Console.WriteLine("Settings reset to defaults");
+                    
+                    // 显示成功通知
+                    await NotificationHelper.ShowSuccess(this, "所有设置已重置为默认值", "重置成功");
                 }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error resetting configuration: {ex.Message}");
+            await NotificationHelper.ShowError(this, $"重置设置时发生错误：{ex.Message}", "重置失败");
         }
     }
     

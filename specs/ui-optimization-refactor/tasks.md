@@ -439,7 +439,9 @@
   - _Requirements: 1.5_
   - _Commit: "配置依赖注入容器"_
 
-- [-] 37. 重构主窗口使用依赖注入
+- [x] 37. 重构主窗口使用依赖注入
+
+
 
   - 修改 `MainWindow` 构造函数接受 `IConfigurationService` 和 `IWindowPositionService`
   - 移除手动创建服务实例的代码
@@ -458,6 +460,7 @@
   - 添加配置加载失败的降级处理
   - _Requirements: 3.6, 5.2_
   - _Commit: "集成所有配置到主窗口"_
+
 
 - [ ] 39. 优化动画和过渡效果
   - 为配置窗口的 TabControl 添加切换动画

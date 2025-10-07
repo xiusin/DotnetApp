@@ -16,6 +16,7 @@ using ConfigButtonDisplay.Core.Interfaces;
 using ConfigButtonDisplay.Core.Services;
 using ConfigButtonDisplay.Core.Configuration;
 using ConfigButtonDisplay.Features.Debug.Controls;
+using ConfigButtonDisplay.Infrastructure.Helpers;
 
 namespace ConfigButtonDisplay;
 
@@ -817,11 +818,13 @@ public partial class MainWindow : Window
             }
             
             this.Get<TextBlock>("StatusTextBlock").Text = "配置已更新";
+            await NotificationHelper.ShowInfo(this, "配置已重新加载并应用", "配置更新");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error opening config window: {ex.Message}");
             this.Get<TextBlock>("StatusTextBlock").Text = $"打开配置窗口失败: {ex.Message}";
+            await NotificationHelper.ShowError(this, $"打开配置窗口失败：{ex.Message}", "错误");
         }
     }
     
