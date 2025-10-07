@@ -262,6 +262,7 @@
   - 添加热键设置（默认 Shift+Shift）
   - 添加窗口位置和大小设置
 
+
   - 绑定到 `ConfigViewModel` 的 AI 聊天配置
   - _Requirements: 3.3_
   - _Commit: "创建 AI 聊天设置面板"_
@@ -270,6 +271,7 @@
   - 创建 `Views/Panels/NoteTagPanel.axaml` UserControl
   - 添加"启用便签标签"复选框
   - 添加标签列表（可添加、编辑、删除标签）
+
   - 为每个标签添加文本和颜色设置
   - 添加标签位置设置
   - 绑定到 `ConfigViewModel` 的标签配置
@@ -279,6 +281,8 @@
 - [ ] 24. 创建边缘组件设置面板
   - 创建 `Views/Panels/EdgeComponentPanel.axaml` UserControl
   - 添加"启用边缘组件"复选框
+
+
   - 添加"自动显示"复选框和间隔时间设置
   - 添加边缘触发区域大小设置
   - 添加显示动画设置
