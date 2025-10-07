@@ -367,13 +367,16 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
   - _Commit: "移动键盘监控组件到 Features 目录"_
 
-- [-] 31. 移动便签标签组件到 Features 目录
+- [x] 31. 移动便签标签组件到 Features 目录
+
+
 
   - 将 `NoteTagComponent` 相关文件移动到 `Features/NoteTags/Controls/`
   - 更新命名空间为 `ConfigButtonDisplay.Features.NoteTags.Controls`
   - 更新 `MainWindow.axaml.cs` 中的引用
   - 验证编译通过
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
+
   - _Commit: "移动便签标签组件到 Features 目录"_
 
 - [ ] 32. 移动 AI 聊天组件到 Features 目录

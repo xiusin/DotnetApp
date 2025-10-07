@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ConfigButtonDisplay;
+namespace ConfigButtonDisplay.Features.AIChat.Controls;
 
 public class AIChatWindow : Window
 {

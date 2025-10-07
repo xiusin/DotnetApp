@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     // 新功能组件
     private TextSelectionPopover? _textSelectionPopover;
     private SimpleEdgeComponent? _edgeSwipeComponent;  // 改为SimpleEdgeComponent
-    private AIChatWindow? _aiChatWindow;
+    private Features.AIChat.Controls.AIChatWindow? _aiChatWindow;
     private ConfigPopover? _configPopover;
     private DebugOverlay? _debugOverlay;  // 使用基类类型
     private Timer? _edgeAutoShowTimer; // 边缘组件自动显示计时器
@@ -1000,7 +1000,7 @@ public partial class MainWindow : Window
             StartEdgeAutoShow();
             
             // 初始化AI聊天窗口
-            _aiChatWindow = new AIChatWindow();
+            _aiChatWindow = new Features.AIChat.Controls.AIChatWindow();
             
             // 初始化配置弹出框
             _configPopover = new ConfigPopover(this);
