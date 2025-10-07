@@ -96,11 +96,36 @@ public class ConfigViewModel : ViewModelBase
     /// </summary>
     private bool ValidateConfiguration()
     {
+        // 验证窗口设置
+        if (!ValidateWindowSettings())
+            return false;
+
+        // 验证键盘监控设置
+        if (!ValidateKeyboardMonitorSettings())
+            return false;
+
+        LastValidationError = null;
+        return true;
+    }
+
+    /// <summary>
+    /// 验证窗口设置
+    /// </summary>
+    private bool ValidateWindowSettings()
+    {
         // 验证窗口透明度范围
         if (AppSettings.Window.Opacity < 0.5 || AppSettings.Window.Opacity > 1.0)
         {
             LastValidationError = "窗口透明度必须在 0.5 到 1.0 之间";
-            Console.WriteLine(LastValidationError);
+            Console.WriteLine($"[验证失败] {LastValidationError}");
+            return false;
+        }
+
+        // 验证窗口位置
+        if (!IsValidPosition(AppSettings.Window.Position))
+        {
+            LastValidationError = "窗口位置必须是 RightEdge、LeftEdge 或 Custom";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
@@ -110,135 +135,185 @@ public class ConfigViewModel : ViewModelBase
             if (!AppSettings.Window.CustomX.HasValue || !AppSettings.Window.CustomY.HasValue)
             {
                 LastValidationError = "选择自定义位置时必须指定 X 和 Y 坐标";
-                Console.WriteLine(LastValidationError);
+                Console.WriteLine($"[验证失败] {LastValidationError}");
                 return false;
             }
 
             if (AppSettings.Window.CustomX < 0 || AppSettings.Window.CustomY < 0)
             {
                 LastValidationError = "自定义位置坐标必须为正数";
-                Console.WriteLine(LastValidationError);
+                Console.WriteLine($"[验证失败] {LastValidationError}");
                 return false;
             }
 
-            // 验证位置在屏幕范围内（简化验证，假设最大屏幕尺寸为 10000x10000）
-            if (AppSettings.Window.CustomX > 10000 || AppSettings.Window.CustomY > 10000)
+            // 验证位置在屏幕范围内
+            if (!IsCoordinateInScreenBounds(AppSettings.Window.CustomX.Value, AppSettings.Window.CustomY.Value))
             {
-                LastValidationError = "自定义位置坐标超出屏幕范围";
-                Console.WriteLine(LastValidationError);
+                LastValidationError = "自定义位置坐标超出屏幕范围（最大 10000x10000）";
+                Console.WriteLine($"[验证失败] {LastValidationError}");
                 return false;
             }
         }
 
-        // 验证键盘监控背景颜色格式
+        return true;
+    }
+
+    /// <summary>
+    /// 验证键盘监控设置
+    /// </summary>
+    private bool ValidateKeyboardMonitorSettings()
+    {
+        // 验证背景颜色格式
         if (!IsValidHexColor(AppSettings.KeyboardMonitor.BackgroundColor))
         {
-            LastValidationError = $"背景颜色格式无效: {AppSettings.KeyboardMonitor.BackgroundColor}。请使用 Hex 格式（如 #3182CE）";
-            Console.WriteLine(LastValidationError);
+            LastValidationError = $"背景颜色格式无效: {AppSettings.KeyboardMonitor.BackgroundColor}。请使用 Hex 格式（如 #3182CE 或 #FF3182CE）";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
-        // 验证键盘监控字体颜色格式
+        // 验证字体颜色格式
         if (!IsValidHexColor(AppSettings.KeyboardMonitor.FontColor))
         {
             LastValidationError = $"字体颜色格式无效: {AppSettings.KeyboardMonitor.FontColor}。请使用 Hex 格式（如 #FFFFFF）";
-            Console.WriteLine(LastValidationError);
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
-        // 验证键盘监控字体大小
+        // 验证字体大小
         if (AppSettings.KeyboardMonitor.FontSize < 12 || AppSettings.KeyboardMonitor.FontSize > 48)
         {
-            LastValidationError = "字体大小必须在 12 到 48 之间";
-            Console.WriteLine(LastValidationError);
+            LastValidationError = $"字体大小必须在 12 到 48 之间，当前值: {AppSettings.KeyboardMonitor.FontSize}";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
-        // 验证键盘监控透明度
+        // 验证透明度
         if (AppSettings.KeyboardMonitor.Opacity < 0.1 || AppSettings.KeyboardMonitor.Opacity > 1.0)
         {
-            LastValidationError = "键盘监控透明度必须在 0.1 到 1.0 之间";
-            Console.WriteLine(LastValidationError);
+            LastValidationError = $"键盘监控透明度必须在 0.1 到 1.0 之间，当前值: {AppSettings.KeyboardMonitor.Opacity:F2}";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
         // 验证显示时长
         if (AppSettings.KeyboardMonitor.DisplayDuration < 1 || AppSettings.KeyboardMonitor.DisplayDuration > 10)
         {
-            LastValidationError = "显示时长必须在 1 到 10 秒之间";
-            Console.WriteLine(LastValidationError);
+            LastValidationError = $"显示时长必须在 1 到 10 秒之间，当前值: {AppSettings.KeyboardMonitor.DisplayDuration}";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
         // 验证淡入动画时长
         if (AppSettings.KeyboardMonitor.FadeInDuration < 0.1 || AppSettings.KeyboardMonitor.FadeInDuration > 1.0)
         {
-            LastValidationError = "淡入动画时长必须在 0.1 到 1.0 秒之间";
-            Console.WriteLine(LastValidationError);
+            LastValidationError = $"淡入动画时长必须在 0.1 到 1.0 秒之间，当前值: {AppSettings.KeyboardMonitor.FadeInDuration:F2}";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
         // 验证淡出动画时长
         if (AppSettings.KeyboardMonitor.FadeOutDuration < 0.1 || AppSettings.KeyboardMonitor.FadeOutDuration > 1.0)
         {
-            LastValidationError = "淡出动画时长必须在 0.1 到 1.0 秒之间";
-            Console.WriteLine(LastValidationError);
+            LastValidationError = $"淡出动画时长必须在 0.1 到 1.0 秒之间，当前值: {AppSettings.KeyboardMonitor.FadeOutDuration:F2}";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
             return false;
         }
 
-        // 验证键盘监控自定义位置
+        // 验证显示位置
+        if (!IsValidDisplayPosition(AppSettings.KeyboardMonitor.DisplayPosition))
+        {
+            LastValidationError = "显示位置必须是 TopLeft、TopCenter、TopRight、BottomLeft、BottomCenter、BottomRight 或 Custom";
+            Console.WriteLine($"[验证失败] {LastValidationError}");
+            return false;
+        }
+
+        // 验证自定义显示位置
         if (AppSettings.KeyboardMonitor.DisplayPosition == "Custom")
         {
             if (!AppSettings.KeyboardMonitor.CustomDisplayX.HasValue || !AppSettings.KeyboardMonitor.CustomDisplayY.HasValue)
             {
                 LastValidationError = "选择自定义显示位置时必须指定 X 和 Y 坐标";
-                Console.WriteLine(LastValidationError);
+                Console.WriteLine($"[验证失败] {LastValidationError}");
                 return false;
             }
 
             if (AppSettings.KeyboardMonitor.CustomDisplayX < 0 || AppSettings.KeyboardMonitor.CustomDisplayY < 0)
             {
                 LastValidationError = "自定义显示位置坐标必须为正数";
-                Console.WriteLine(LastValidationError);
+                Console.WriteLine($"[验证失败] {LastValidationError}");
                 return false;
             }
 
-            if (AppSettings.KeyboardMonitor.CustomDisplayX > 10000 || AppSettings.KeyboardMonitor.CustomDisplayY > 10000)
+            if (!IsCoordinateInScreenBounds(AppSettings.KeyboardMonitor.CustomDisplayX.Value, AppSettings.KeyboardMonitor.CustomDisplayY.Value))
             {
-                LastValidationError = "自定义显示位置坐标超出屏幕范围";
-                Console.WriteLine(LastValidationError);
+                LastValidationError = "自定义显示位置坐标超出屏幕范围（最大 10000x10000）";
+                Console.WriteLine($"[验证失败] {LastValidationError}");
                 return false;
             }
         }
 
-        LastValidationError = null;
         return true;
+    }
+
+    /// <summary>
+    /// 验证位置字符串是否有效
+    /// </summary>
+    private static bool IsValidPosition(string position)
+    {
+        return position == "RightEdge" || position == "LeftEdge" || position == "Custom";
+    }
+
+    /// <summary>
+    /// 验证显示位置字符串是否有效
+    /// </summary>
+    private static bool IsValidDisplayPosition(string position)
+    {
+        return position == "TopLeft" || position == "TopCenter" || position == "TopRight" ||
+               position == "BottomLeft" || position == "BottomCenter" || position == "BottomRight" ||
+               position == "Custom";
+    }
+
+    /// <summary>
+    /// 验证坐标是否在屏幕范围内
+    /// </summary>
+    private static bool IsCoordinateInScreenBounds(int x, int y)
+    {
+        // 简化验证，假设最大屏幕尺寸为 10000x10000
+        return x >= 0 && x <= 10000 && y >= 0 && y <= 10000;
     }
 
     /// <summary>
     /// 验证 Hex 颜色格式
     /// </summary>
-    private bool IsValidHexColor(string color)
+    private static bool IsValidHexColor(string color)
     {
         if (string.IsNullOrWhiteSpace(color))
             return false;
 
         // 支持 #RGB, #RRGGBB, #AARRGGBB 格式
-        if (!color.StartsWith("#"))
+        if (!color.StartsWith('#'))
             return false;
 
-        var hex = color.Substring(1);
+        var hex = color[1..];
         if (hex.Length != 3 && hex.Length != 6 && hex.Length != 8)
             return false;
 
         // 验证是否为有效的十六进制字符
         foreach (char c in hex)
         {
-            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))
+            if (!IsHexDigit(c))
                 return false;
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// 检查字符是否为十六进制数字
+    /// </summary>
+    private static bool IsHexDigit(char c)
+    {
+        return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
     }
 
     /// <summary>
