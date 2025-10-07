@@ -147,7 +147,9 @@
 
 ## Phase 4: General Settings Panel
 
-- [-] 12. 创建通用设置面板
+- [x] 12. 创建通用设置面板
+
+
 
   - 创建 `Views/Panels/GeneralSettingsPanel.axaml` UserControl
 
@@ -159,6 +161,7 @@
   - 使用 Grid 布局：Label 列 (200px) + Control 列 (*)
   - _Requirements: 2.1, 2.4, 2.7_
   - _Commit: "创建通用设置面板"_
+
 
 
 - [ ] 13. 绑定通用设置到 ViewModel
