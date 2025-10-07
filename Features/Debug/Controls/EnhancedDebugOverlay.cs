@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace ConfigButtonDisplay;
+namespace ConfigButtonDisplay.Features.Debug.Controls;
 
 public class EnhancedDebugOverlay : DebugOverlay
 {

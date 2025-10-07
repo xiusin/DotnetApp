@@ -10,6 +10,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using ConfigButtonDisplay.Features.Debug.Controls;
 
 namespace ConfigButtonDisplay.Features.TextSelection.Controls;
 

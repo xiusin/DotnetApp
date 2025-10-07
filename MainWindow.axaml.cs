@@ -15,6 +15,7 @@ using Avalonia.Markup.Xaml;
 using ConfigButtonDisplay.Core.Interfaces;
 using ConfigButtonDisplay.Core.Services;
 using ConfigButtonDisplay.Core.Configuration;
+using ConfigButtonDisplay.Features.Debug.Controls;
 
 namespace ConfigButtonDisplay;
 

@@ -7,7 +7,7 @@ using Avalonia.Threading;
 using System;
 using System.Threading;
 
-namespace ConfigButtonDisplay;
+namespace ConfigButtonDisplay.Features.Debug.Controls;
 
 public class DebugOverlay : Window
 {

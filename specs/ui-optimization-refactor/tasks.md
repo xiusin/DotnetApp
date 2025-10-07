@@ -391,7 +391,8 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
   - _Commit: "移动 AI 聊天组件到 Features 目录"_
 
-- [-] 33. 移动边缘组件到 Features 目录
+- [x] 33. 移动边缘组件到 Features 目录
+
 
   - 将 `SimpleEdgeComponent` 相关文件移动到 `Features/EdgeComponents/Controls/`
   - 更新命名空间为 `ConfigButtonDisplay.Features.EdgeComponents.Controls`
@@ -399,6 +400,7 @@
   - 验证编译通过
   - _Requirements: 1.1, 1.2, 1.3, 1.6_
   - _Commit: "移动边缘组件到 Features 目录"_
+
 
 - [ ] 34. 移动文本选择组件到 Features 目录
   - 将 `TextSelectionPopover` 相关文件移动到 `Features/TextSelection/Controls/`
