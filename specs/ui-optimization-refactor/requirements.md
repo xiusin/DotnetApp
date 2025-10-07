@@ -66,8 +66,43 @@
 8. IF 配置包含无效值 THEN 系统 SHALL 使用默认值并提示用户
 9. WHEN 用户重置配置时 THEN 系统 SHALL 恢复所有设置到默认值
 10. WHEN 按键监控窗口显示时 THEN 系统 SHALL 根据用户配置的位置和样式进行渲染
+11. WHEN 应用首次启动时 THEN 系统 SHALL 在按键监控窗口显示欢迎语
+12. WHEN 欢迎语显示后 THEN 系统 SHALL 在3秒后自动淡出并开始正常的按键监控功能
 
-### Requirement 5: 配置持久化和迁移
+### Requirement 5: AI 聊天窗口快捷键控制
+
+**User Story:** 作为用户，我希望能够通过双击 Shift 键快速开关 AI 聊天窗口，并且可以自定义快捷键，以便快速访问 AI 聊天功能。
+
+#### Acceptance Criteria
+
+1. WHEN 用户双击 Shift 键时 THEN 系统 SHALL 切换 AI 聊天窗口的显示/隐藏状态
+2. WHEN AI 聊天窗口隐藏时双击 Shift THEN 系统 SHALL 显示 AI 聊天窗口并获取焦点
+3. WHEN AI 聊天窗口显示时双击 Shift THEN 系统 SHALL 隐藏 AI 聊天窗口
+4. WHEN 用户访问 AI 聊天配置时 THEN 系统 SHALL 提供快捷键自定义选项
+5. WHEN 用户配置快捷键时 THEN 系统 SHALL 支持单键双击（如 Shift+Shift）和组合键（如 Ctrl+Alt+A）
+6. WHEN 用户设置快捷键时 THEN 系统 SHALL 验证快捷键是否与系统或其他功能冲突
+7. IF 快捷键冲突 THEN 系统 SHALL 显示警告并阻止保存
+8. WHEN 快捷键被触发时 THEN 系统 SHALL 在 500ms 内响应并显示/隐藏窗口
+9. WHEN 用户保存快捷键配置时 THEN 系统 SHALL 立即应用新的快捷键绑定
+
+### Requirement 6: 便签标签组件显示和动画
+
+**User Story:** 作为用户，我希望便签标签组件能够正常显示在桌面上，并且具有流畅的滑动动画效果，以便更好地管理和查看我的便签。
+
+#### Acceptance Criteria
+
+1. WHEN 应用启动时 THEN 系统 SHALL 正确渲染所有已保存的便签标签
+2. WHEN 便签标签显示时 THEN 系统 SHALL 确保标签可见且不被其他窗口遮挡
+3. WHEN 用户创建新标签时 THEN 系统 SHALL 显示从右侧滑入的动画效果（300ms ease-out）
+4. WHEN 用户删除标签时 THEN 系统 SHALL 显示向右侧滑出的动画效果（300ms ease-in）
+5. WHEN 用户拖动标签时 THEN 系统 SHALL 显示平滑的跟随动画
+6. WHEN 标签位置改变时 THEN 系统 SHALL 使用缓动动画过渡到新位置（200ms ease-in-out）
+7. WHEN 鼠标悬停在标签上时 THEN 系统 SHALL 显示轻微的放大效果（scale 1.05）
+8. WHEN 标签内容更新时 THEN 系统 SHALL 保持标签的可见性和位置
+9. IF 标签渲染失败 THEN 系统 SHALL 记录错误日志并显示占位符
+10. WHEN 多个标签同时显示时 THEN 系统 SHALL 确保标签之间不重叠且布局合理
+
+### Requirement 7: 配置持久化和迁移
 
 **User Story:** 作为用户，我希望我的配置能够被保存并在应用重启后恢复，同时在版本升级时能够平滑迁移。
 
@@ -80,3 +115,17 @@
 5. WHEN 应用版本升级时 THEN 系统 SHALL 自动迁移旧版本配置到新格式
 6. WHEN 配置迁移发生时 THEN 系统 SHALL 保留用户的自定义设置
 7. WHEN 配置文件被外部修改时 THEN 系统 SHALL 检测变化并重新加载
+
+### Requirement 8: 开发流程和质量保证
+
+**User Story:** 作为开发者，我希望每个任务完成后都能通过编译验证并提交代码，以便确保代码质量和项目稳定性。
+
+#### Acceptance Criteria
+
+1. WHEN 完成任何代码任务时 THEN 开发者 SHALL 运行 `dotnet build` 验证编译
+2. WHEN 编译成功时 THEN 开发者 SHALL 使用任务名称作为提交消息进行 git commit
+3. IF 编译失败 THEN 开发者 SHALL 修复问题直到编译通过后再提交
+4. WHEN 提交代码时 THEN 系统 SHALL 确保所有文件都已正确添加到版本控制
+5. WHEN 任务涉及多个文件时 THEN 开发者 SHALL 确保所有相关文件都包含在同一次提交中
+6. WHEN 重构代码时 THEN 开发者 SHALL 确保功能行为保持不变
+7. WHEN 添加新功能时 THEN 开发者 SHALL 确保不破坏现有功能

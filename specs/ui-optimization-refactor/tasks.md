@@ -4,9 +4,12 @@
 
 ## Task Execution Rules
 
-- ✅ 每个任务完成后必须运行 `dotnet build` 确保编译通过
-- ✅ 编译通过后使用任务名称进行 git commit
-- ✅ 按顺序执行任务，确保每一步都稳定后再进行下一步
+- ✅ **每个任务完成后必须运行 `dotnet build` 确保编译通过**
+- ✅ **编译通过后使用任务名称进行 git commit**
+- ✅ **按顺序执行任务，确保每一步都稳定后再进行下一步**
+- ✅ **如果编译失败，必须修复问题直到编译通过后再提交**
+- ✅ **提交消息必须使用任务名称，保持简洁明确**
+- ✅ **每次提交只包含一个任务的更改，不要合并多个任务**
 
 ---
 
@@ -222,8 +225,11 @@
   - 添加"显示功能键"复选框（F1-F12）
   - 添加"显示字母数字键"复选框（A-Z, 0-9）
   - 添加"显示导航键"复选框（方向键、Home、End 等）
+  - 添加"启动时显示欢迎语"复选框
+  - 添加欢迎语内容 TextBox
+  - 添加欢迎语显示时长 Slider（1-10秒）
   - 使用 StackPanel 垂直排列复选框
-  - _Requirements: 4.4_
+  - _Requirements: 4.4, 4.11, 4.12_
   - _Commit: "添加按键过滤配置"_
 
 - [x] 19. 实现实时预览功能
@@ -265,23 +271,25 @@
 - [x] 22. 创建 AI 聊天设置面板
   - 创建 `Views/Panels/AIChatPanel.axaml` UserControl
   - 添加"启用 AI 聊天"复选框
-  - 添加热键设置（默认 Shift+Shift）
+  - 添加热键类型选择：RadioButton（双击 Shift / 自定义组合键）
+  - 添加自定义组合键配置：修饰键 CheckBox（Ctrl, Alt, Shift）和按键 ComboBox
+  - 添加双击间隔 Slider（200-1000ms）
   - 添加窗口位置和大小设置
-
-
+  - 显示当前快捷键预览
   - 绑定到 `ConfigViewModel` 的 AI 聊天配置
-  - _Requirements: 3.3_
+  - _Requirements: 5.4, 5.5, 5.6_
   - _Commit: "创建 AI 聊天设置面板"_
 
 - [x] 23. 创建标签管理设置面板
   - 创建 `Views/Panels/NoteTagPanel.axaml` UserControl
   - 添加"启用便签标签"复选框
+  - 添加"启用动画效果"复选框
+  - 添加动画时长 Slider（100-500ms）
+  - 添加动画缓动类型 ComboBox（EaseIn, EaseOut, EaseInOut）
   - 添加标签列表（可添加、编辑、删除标签）
-
-  - 为每个标签添加文本和颜色设置
-  - 添加标签位置设置
+  - 为每个标签添加文本、颜色和位置设置
   - 绑定到 `ConfigViewModel` 的标签配置
-  - _Requirements: 3.3_
+  - _Requirements: 6.3, 6.4, 6.6, 6.7_
   - _Commit: "创建标签管理设置面板"_
 
 - [x] 24. 创建边缘组件设置面板
@@ -451,52 +459,179 @@
   - _Requirements: 1.5_
   - _Commit: "重构主窗口使用依赖注入"_
 
-## Phase 10: Final Integration and Polish
+## Phase 10: AI Chat Hotkey Implementation
 
-- [x] 38. 集成所有配置到主窗口
+- [ ] 38. 创建快捷键服务基础架构
+  - 创建 `Core/Interfaces/IHotkeyService.cs` 接口
+  - 创建 `Core/Services/HotkeyService.cs` 实现
+  - 创建 `HotkeyConfig` 配置类
+  - 实现 `RegisterHotkey()` 和 `UnregisterHotkey()` 方法
+  - 实现 `IsHotkeyConflict()` 冲突检测方法
+  - _Requirements: 5.6, 5.7_
+  - _Commit: "创建快捷键服务基础架构"_
+
+- [ ] 39. 实现双击 Shift 检测
+  - 创建 `Infrastructure/Helpers/DoubleShiftDetector.cs` 类
+  - 实现 `OnKeyDown()` 方法检测双击事件
+  - 使用时间戳判断两次按键间隔
+  - 支持可配置的间隔时间（默认 500ms）
+  - 在 `MainWindow.axaml.cs` 中集成检测器
+  - _Requirements: 5.1, 5.8_
+  - _Commit: "实现双击 Shift 检测"_
+
+- [ ] 40. 实现 AI 聊天窗口切换逻辑
+  - 在 `MainWindow.axaml.cs` 中添加 `ToggleAIChatWindow()` 方法
+  - 实现 `ShowAIChatWindow()` 方法：创建窗口、定位、显示、获取焦点
+  - 实现 `HideAIChatWindow()` 方法：隐藏窗口
+  - 确保窗口单例模式（只创建一次）
+  - 在双击 Shift 事件中调用切换方法
+  - _Requirements: 5.2, 5.3, 5.8_
+  - _Commit: "实现 AI 聊天窗口切换逻辑"_
+
+- [ ] 41. 实现自定义组合键支持
+  - 在 `HotkeyService` 中添加组合键注册逻辑
+  - 实现修饰键（Ctrl, Alt, Shift）+ 普通键的检测
+  - 在 `KeyDown` 事件中检测组合键
+  - 支持从配置加载自定义快捷键
+  - 应用快捷键到 AI 聊天窗口
+  - _Requirements: 5.5, 5.9_
+  - _Commit: "实现自定义组合键支持"_
+
+- [ ] 42. 实现快捷键配置验证和冲突检测
+  - 在 `AIChatPanel` 中添加快捷键验证逻辑
+  - 检测与系统快捷键的冲突
+  - 检测与应用内其他快捷键的冲突
+  - 显示冲突警告对话框
+  - 阻止保存冲突的快捷键配置
+  - _Requirements: 5.6, 5.7_
+  - _Commit: "实现快捷键配置验证和冲突检测"_
+
+## Phase 11: NoteTag Animation Implementation
+
+- [ ] 43. 创建便签动画辅助类
+  - 在 `Infrastructure/Helpers/AnimationHelper.cs` 中添加 NoteTag 动画方法
+  - 实现 `SlideInFromRight()` 方法（300ms ease-out）
+  - 实现 `SlideOutToRight()` 方法（300ms ease-in）
+  - 实现 `ScaleOnHover()` 方法（scale 1.05, 200ms ease-in-out）
+  - 实现 `SmoothMove()` 方法用于位置变化动画
+  - _Requirements: 6.3, 6.4, 6.6, 6.7_
+  - _Commit: "创建便签动画辅助类"_
+
+- [ ] 44. 修复便签标签显示问题
+  - 检查 NoteTag 组件的 IsVisible 和 Opacity 属性
+  - 设置 NoteTag 的 ZIndex 为高优先级（1000+）
+  - 确保 NoteTag 使用 Canvas 或 Grid 进行绝对定位
+  - 添加 `EnsureNoteTagsVisible()` 方法强制刷新布局
+  - 在主窗口加载时调用确保可见性
+  - _Requirements: 6.1, 6.2, 6.9_
+  - _Commit: "修复便签标签显示问题"_
+
+- [ ] 45. 集成动画到 NoteTag 组件
+  - 修改 NoteTag 组件添加 `ShowAsync()` 方法
+  - 修改 NoteTag 组件添加 `HideAsync()` 方法
+  - 在创建标签时调用 `SlideInFromRight()` 动画
+  - 在删除标签时调用 `SlideOutToRight()` 动画
+  - 在 `OnPointerEntered` 中添加悬停缩放效果
+  - 在 `OnPointerExited` 中恢复原始大小
+  - _Requirements: 6.3, 6.4, 6.7_
+  - _Commit: "集成动画到 NoteTag 组件"_
+
+- [ ] 46. 实现标签拖动平滑动画
+  - 在 NoteTag 拖动事件中添加平滑跟随效果
+  - 使用 `SmoothMove()` 方法实现位置过渡
+  - 设置缓动函数为 ease-in-out
+  - 确保拖动时动画流畅不卡顿
+  - 保存拖动后的新位置到配置
+  - _Requirements: 6.5, 6.6, 6.8_
+  - _Commit: "实现标签拖动平滑动画"_
+
+- [ ] 47. 实现标签布局防重叠逻辑
+  - 创建标签布局管理器
+  - 检测标签之间的重叠
+  - 自动调整重叠标签的位置
+  - 使用动画过渡到新位置
+  - 确保所有标签在屏幕可见区域内
+  - _Requirements: 6.10_
+  - _Commit: "实现标签布局防重叠逻辑"_
+
+## Phase 12: Keyboard Monitor Welcome Message
+
+- [ ] 48. 实现欢迎消息显示逻辑
+  - 在 `KeyDisplayWindow.axaml.cs` 中添加 `ShowWelcomeMessageAsync()` 方法
+  - 添加 `_hasShownWelcome` 标志防止重复显示
+  - 从配置加载欢迎消息内容和显示时长
+  - 显示欢迎消息文本
+  - 使用 `FadeIn()` 动画淡入（300ms）
+  - _Requirements: 4.11_
+  - _Commit: "实现欢迎消息显示逻辑"_
+
+- [ ] 49. 实现欢迎消息自动隐藏
+  - 在显示欢迎消息后等待配置的时长（默认 3 秒）
+  - 使用 `FadeOut()` 动画淡出（300ms）
+  - 隐藏窗口
+  - 添加 `ResetWelcomeMessage()` 方法用于重置标志
+  - 确保欢迎消息不影响正常按键监控
+  - _Requirements: 4.12_
+  - _Commit: "实现欢迎消息自动隐藏"_
+
+- [ ] 50. 集成欢迎消息到主窗口启动流程
+  - 在 `MainWindow.OnOpened()` 中调用 `ShowWelcomeMessageAsync()`
+  - 确保欢迎消息在窗口完全加载后显示
+  - 欢迎消息显示完成后开始正常按键监控
+  - 添加配置选项控制是否显示欢迎消息
+  - 测试欢迎消息显示和隐藏流程
+  - _Requirements: 4.11, 4.12_
+  - _Commit: "集成欢迎消息到主窗口启动流程"_
+
+## Phase 13: Final Integration and Polish
+
+- [x] 51. 集成所有配置到主窗口
   - 在主窗口启动时加载所有模块配置
   - 根据配置启用/禁用各个功能模块
   - 确保配置更改后立即生效
   - 添加配置加载失败的降级处理
-  - _Requirements: 3.6, 5.2_
+  - _Requirements: 3.6, 7.2_
   - _Commit: "集成所有配置到主窗口"_
 
 
 
 
-- [ ] 39. 优化动画和过渡效果
+- [ ] 52. 优化动画和过渡效果
   - 为配置窗口的 TabControl 添加切换动画
   - 为主窗口的悬停效果添加缩放动画（scale 1.02）
-
-
-
   - 优化滑入动画的缓动函数
   - 确保所有动画流畅，帧率稳定
-  - _Requirements: 2.8, 3.4_
+  - 测试所有新增动画效果（NoteTag 滑动、AI 聊天窗口、欢迎消息）
+  - _Requirements: 2.8, 3.4, 6.3, 6.4_
   - _Commit: "优化动画和过渡效果"_
 
-- [ ] 40. 添加配置导入导出功能
+- [ ] 53. 添加配置导入导出功能
   - 在配置窗口添加"导出配置"按钮
   - 实现导出配置到 JSON 文件
   - 添加"导入配置"按钮
   - 实现从 JSON 文件导入配置
   - 导入时验证配置格式和版本
-  - _Requirements: 5.5, 5.6_
+  - _Requirements: 7.5, 7.6_
   - _Commit: "添加配置导入导出功能"_
 
-- [ ] 41. 完善错误提示和用户反馈
+- [ ] 54. 完善错误提示和用户反馈
   - 为所有可能失败的操作添加错误提示
   - 使用 Fluent Design 风格的通知组件
   - 添加操作成功的确认提示
   - 确保错误消息清晰易懂
-  - _Requirements: 3.7_
+  - 添加快捷键冲突警告提示
+  - 添加标签渲染失败的错误日志
+  - _Requirements: 3.7, 5.7, 6.9_
   - _Commit: "完善错误提示和用户反馈"_
 
-- [x] 42. 最终测试和文档更新
+- [ ] 55. 最终测试和文档更新
   - 运行完整的应用测试，验证所有功能
   - 测试配置保存和加载
   - 测试窗口定位和动画
   - 测试各个模块的配置应用
+  - 测试双击 Shift 快捷键和自定义快捷键
+  - 测试 NoteTag 显示和动画效果
+  - 测试按键监控欢迎消息
   - 更新 README.md 文档
   - 更新 IFLOW.md 项目文档
   - _Requirements: 所有需求_

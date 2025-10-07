@@ -92,6 +92,39 @@ public class KeyboardMonitorSettings
     public bool ShowModifiers { get; set; } = true;
     public bool ShowFunctionKeys { get; set; } = true;
     public bool ShowAlphaNumeric { get; set; } = true;
+    public bool ShowWelcomeMessage { get; set; } = true;
+    public string WelcomeMessage { get; set; } = "欢迎使用按键监控";
+    public double WelcomeMessageDuration { get; set; } = 3.0;
+}
+
+public class AIChatSettings
+{
+    public bool Enabled { get; set; } = true;
+    public string HotkeyType { get; set; } = "DoubleShift";  // DoubleShift, Combination
+    public string HotkeyModifiers { get; set; } = "";  // Ctrl, Alt, Shift (comma separated)
+    public string HotkeyKey { get; set; } = "";  // A-Z, F1-F12, etc.
+    public int DoubleKeyInterval { get; set; } = 500;  // ms
+    public string WindowPosition { get; set; } = "Center";
+    public int WindowWidth { get; set; } = 600;
+    public int WindowHeight { get; set; } = 400;
+}
+
+public class NoteTagSettings
+{
+    public bool Enabled { get; set; } = true;
+    public bool EnableAnimations { get; set; } = true;
+    public int SlideAnimationDuration { get; set; } = 300;  // ms
+    public string AnimationEasing { get; set; } = "EaseOut";
+    public List<NoteTag> Tags { get; set; } = new();
+}
+
+public class NoteTag
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Text { get; set; } = "";
+    public string Color { get; set; } = "#FFD700";
+    public int X { get; set; }
+    public int Y { get; set; }
 }
 ```
 
@@ -369,14 +402,30 @@ private void ApplyToKeyDisplayWindow()
     "showFunctionKeys": true,
     "showAlphaNumeric": true
   },
-  "modules": {
-    "noteTags": {
-      "enabled": true,
-      "tags": []
-    },
-    "aiChat": {
-      "enabled": true
-    }
+  "aiChat": {
+    "enabled": true,
+    "hotkeyType": "DoubleShift",
+    "hotkeyModifiers": "",
+    "hotkeyKey": "",
+    "doubleKeyInterval": 500,
+    "windowPosition": "Center",
+    "windowWidth": 600,
+    "windowHeight": 400
+  },
+  "noteTags": {
+    "enabled": true,
+    "enableAnimations": true,
+    "slideAnimationDuration": 300,
+    "animationEasing": "EaseOut",
+    "tags": [
+      {
+        "id": "tag-1",
+        "text": "示例便签",
+        "color": "#FFD700",
+        "x": 100,
+        "y": 100
+      }
+    ]
   }
 }
 ```
@@ -489,6 +538,365 @@ public PixelPoint CalculateRightEdgePosition(int width, int height)
 3. 更新引用
 4. 验证编译
 
+### 6. AI Chat Hotkey System
+
+#### Hotkey Service Interface
+
+```csharp
+public interface IHotkeyService
+{
+    void RegisterHotkey(string name, Action callback, HotkeyConfig config);
+    void UnregisterHotkey(string name);
+    bool IsHotkeyConflict(HotkeyConfig config);
+}
+
+public class HotkeyConfig
+{
+    public string Type { get; set; }  // DoubleShift, Combination
+    public List<string> Modifiers { get; set; } = new();
+    public string Key { get; set; }
+    public int DoubleKeyInterval { get; set; } = 500;
+}
+```
+
+#### Double-Shift Detection
+
+```csharp
+public class DoubleShiftDetector
+{
+    private DateTime _lastShiftPress = DateTime.MinValue;
+    private readonly int _interval = 500;  // ms
+    
+    public bool OnKeyDown(Key key)
+    {
+        if (key != Key.LeftShift && key != Key.RightShift)
+            return false;
+            
+        var now = DateTime.Now;
+        var elapsed = (now - _lastShiftPress).TotalMilliseconds;
+        
+        if (elapsed < _interval)
+        {
+            _lastShiftPress = DateTime.MinValue;  // Reset
+            return true;  // Double-shift detected
+        }
+        
+        _lastShiftPress = now;
+        return false;
+    }
+}
+```
+
+#### AI Chat Window Toggle
+
+```csharp
+private Window _aiChatWindow;
+
+private void ToggleAIChatWindow()
+{
+    if (_aiChatWindow == null || !_aiChatWindow.IsVisible)
+    {
+        ShowAIChatWindow();
+    }
+    else
+    {
+        HideAIChatWindow();
+    }
+}
+
+private void ShowAIChatWindow()
+{
+    if (_aiChatWindow == null)
+    {
+        _aiChatWindow = new AIChatWindow();
+        _aiChatWindow.Closed += (s, e) => _aiChatWindow = null;
+    }
+    
+    var settings = // Load from config
+    PositionWindow(_aiChatWindow, settings.WindowPosition);
+    _aiChatWindow.Show();
+    _aiChatWindow.Activate();
+    _aiChatWindow.Focus();
+}
+
+private void HideAIChatWindow()
+{
+    _aiChatWindow?.Hide();
+}
+```
+
+#### Hotkey Configuration Panel
+
+```xml
+<StackPanel Spacing="16">
+    <TextBlock Text="快捷键设置" FontSize="18" FontWeight="SemiBold"/>
+    
+    <RadioButton Content="双击 Shift 键" IsChecked="{Binding IsDoubleShift}"/>
+    <RadioButton Content="自定义组合键" IsChecked="{Binding IsCustomHotkey}"/>
+    
+    <StackPanel IsVisible="{Binding IsCustomHotkey}" Spacing="8">
+        <TextBlock Text="修饰键"/>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <CheckBox Content="Ctrl" IsChecked="{Binding UseCtrl}"/>
+            <CheckBox Content="Alt" IsChecked="{Binding UseAlt}"/>
+            <CheckBox Content="Shift" IsChecked="{Binding UseShift}"/>
+        </StackPanel>
+        
+        <TextBlock Text="按键"/>
+        <ComboBox SelectedItem="{Binding HotkeyKey}">
+            <ComboBoxItem Content="A"/>
+            <ComboBoxItem Content="B"/>
+            <!-- More keys... -->
+        </ComboBox>
+    </StackPanel>
+    
+    <TextBlock Text="双击间隔 (毫秒)" IsVisible="{Binding IsDoubleShift}"/>
+    <Slider Minimum="200" Maximum="1000" Value="{Binding DoubleKeyInterval}"
+            IsVisible="{Binding IsDoubleShift}"/>
+    
+    <Border Background="#FFF3F4F6" CornerRadius="8" Padding="12">
+        <TextBlock Text="{Binding HotkeyPreview}" FontWeight="SemiBold"/>
+    </Border>
+</StackPanel>
+```
+
+### 7. NoteTag Animation System
+
+#### Animation Helper Extensions
+
+```csharp
+public static class NoteTagAnimations
+{
+    public static async Task SlideInFromRight(Control control, int duration = 300)
+    {
+        var startX = control.Bounds.Right + 100;
+        var endX = control.Bounds.Left;
+        
+        var animation = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(duration),
+            Easing = new CubicEaseOut(),
+            Children =
+            {
+                new KeyFrame
+                {
+                    Cue = new Cue(0),
+                    Setters = { new Setter(Canvas.LeftProperty, startX) }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters = { new Setter(Canvas.LeftProperty, endX) }
+                }
+            }
+        };
+        
+        await animation.RunAsync(control);
+    }
+    
+    public static async Task SlideOutToRight(Control control, int duration = 300)
+    {
+        var startX = control.Bounds.Left;
+        var endX = control.Bounds.Right + 100;
+        
+        var animation = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(duration),
+            Easing = new CubicEaseIn(),
+            Children =
+            {
+                new KeyFrame
+                {
+                    Cue = new Cue(0),
+                    Setters = { new Setter(Canvas.LeftProperty, startX) }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters = { new Setter(Canvas.LeftProperty, endX) }
+                }
+            }
+        };
+        
+        await animation.RunAsync(control);
+    }
+    
+    public static async Task ScaleOnHover(Control control, double scale = 1.05)
+    {
+        var animation = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(200),
+            Easing = new CubicEaseInOut(),
+            Children =
+            {
+                new KeyFrame
+                {
+                    Cue = new Cue(1),
+                    Setters = 
+                    { 
+                        new Setter(ScaleTransform.ScaleXProperty, scale),
+                        new Setter(ScaleTransform.ScaleYProperty, scale)
+                    }
+                }
+            }
+        };
+        
+        await animation.RunAsync(control);
+    }
+}
+```
+
+#### NoteTag Component with Animations
+
+```csharp
+public class NoteTagControl : UserControl
+{
+    private NoteTagSettings _settings;
+    
+    public async Task ShowAsync()
+    {
+        this.IsVisible = true;
+        
+        if (_settings.EnableAnimations)
+        {
+            await NoteTagAnimations.SlideInFromRight(this, _settings.SlideAnimationDuration);
+        }
+    }
+    
+    public async Task HideAsync()
+    {
+        if (_settings.EnableAnimations)
+        {
+            await NoteTagAnimations.SlideOutToRight(this, _settings.SlideAnimationDuration);
+        }
+        
+        this.IsVisible = false;
+    }
+    
+    protected override void OnPointerEntered(PointerEventArgs e)
+    {
+        base.OnPointerEntered(e);
+        
+        if (_settings.EnableAnimations)
+        {
+            _ = NoteTagAnimations.ScaleOnHover(this, 1.05);
+        }
+    }
+    
+    protected override void OnPointerExited(PointerEventArgs e)
+    {
+        base.OnPointerExited(e);
+        
+        if (_settings.EnableAnimations)
+        {
+            _ = NoteTagAnimations.ScaleOnHover(this, 1.0);
+        }
+    }
+}
+```
+
+#### NoteTag Rendering Fix
+
+**Common Issues:**
+1. Z-Index conflicts - 确保 NoteTag 的 ZIndex 高于其他控件
+2. Visibility issues - 检查 IsVisible 和 Opacity 属性
+3. Layout problems - 使用 Canvas 或 Grid 进行绝对定位
+
+**Solution:**
+
+```csharp
+public void EnsureNoteTagsVisible()
+{
+    foreach (var tag in _noteTags)
+    {
+        // Set high Z-Index
+        Canvas.SetZIndex(tag, 1000);
+        
+        // Ensure visibility
+        tag.IsVisible = true;
+        tag.Opacity = 1.0;
+        
+        // Force layout update
+        tag.InvalidateVisual();
+        tag.InvalidateMeasure();
+        tag.InvalidateArrange();
+    }
+}
+```
+
+### 8. Keyboard Monitor Welcome Message
+
+#### Welcome Message Implementation
+
+```csharp
+public class KeyDisplayWindow : Window
+{
+    private bool _hasShownWelcome = false;
+    private KeyboardMonitorSettings _settings;
+    
+    public async Task ShowWelcomeMessageAsync()
+    {
+        if (!_settings.ShowWelcomeMessage || _hasShownWelcome)
+            return;
+            
+        _hasShownWelcome = true;
+        
+        // Display welcome message
+        KeyText.Text = _settings.WelcomeMessage;
+        this.Show();
+        
+        // Fade in
+        await AnimationHelper.FadeIn(this, 300);
+        
+        // Wait for duration
+        await Task.Delay((int)(_settings.WelcomeMessageDuration * 1000));
+        
+        // Fade out
+        await AnimationHelper.FadeOut(this, 300);
+        this.Hide();
+    }
+    
+    public void ResetWelcomeMessage()
+    {
+        _hasShownWelcome = false;
+    }
+}
+```
+
+#### Integration in MainWindow
+
+```csharp
+protected override async void OnOpened(EventArgs e)
+{
+    base.OnOpened(e);
+    
+    // ... other initialization ...
+    
+    // Show welcome message for keyboard monitor
+    if (_keyDisplayWindow != null)
+    {
+        await _keyDisplayWindow.ShowWelcomeMessageAsync();
+    }
+}
+```
+
+#### Configuration Panel
+
+```xml
+<StackPanel Spacing="16">
+    <CheckBox Content="启动时显示欢迎语" IsChecked="{Binding ShowWelcomeMessage}"/>
+    
+    <StackPanel IsVisible="{Binding ShowWelcomeMessage}" Spacing="8">
+        <TextBlock Text="欢迎语内容"/>
+        <TextBox Text="{Binding WelcomeMessage}" Watermark="输入欢迎语..."/>
+        
+        <TextBlock Text="显示时长 (秒)"/>
+        <Slider Minimum="1" Maximum="10" Value="{Binding WelcomeMessageDuration}"/>
+        <TextBlock Text="{Binding WelcomeMessageDuration, StringFormat='{}{0:F1} 秒'}"/>
+    </StackPanel>
+</StackPanel>
+```
+
 ## Design Decisions
 
 ### Why JSON Configuration?
@@ -515,6 +923,18 @@ public PixelPoint CalculateRightEdgePosition(int width, int height)
 - 不影响现有功能
 - 便于回滚
 
+### Why Double-Shift for AI Chat?
+
+- 直观易用，无需记忆复杂组合键
+- 不与系统快捷键冲突
+- 可配置为其他快捷键满足个性化需求
+
+### Why Avalonia Animations?
+
+- 原生支持，性能优化
+- GPU 加速，流畅体验
+- 声明式 API，易于维护
+
 ---
 
-*设计文档 v1.0 - 聚焦实现，无测试内容*
+*设计文档 v1.1 - 新增 AI 聊天快捷键、便签动画、欢迎消息设计*
