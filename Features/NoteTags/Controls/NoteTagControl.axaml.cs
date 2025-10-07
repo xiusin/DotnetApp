@@ -48,17 +48,25 @@ public partial class NoteTagControl : UserControl
         this.PointerPressed += OnPointerPressed;
     }
 
-    private void OnPointerEntered(object? sender, PointerEventArgs e)
+    private async void OnPointerEntered(object? sender, PointerEventArgs e)
     {
         // 触发悬停进入效果
         ApplyHoverEffect(true);
+        
+        // 添加悬停缩放动画
+        await Infrastructure.Helpers.AnimationHelper.ScaleToTarget(this, 1.05, 200);
+        
         TagPointerEnter?.Invoke(this, e);
     }
 
-    private void OnPointerExited(object? sender, PointerEventArgs e)
+    private async void OnPointerExited(object? sender, PointerEventArgs e)
     {
         // 触发悬停离开效果
         ApplyHoverEffect(false);
+        
+        // 恢复原始大小
+        await Infrastructure.Helpers.AnimationHelper.ScaleToTarget(this, 1.0, 200);
+        
         TagPointerLeave?.Invoke(this, e);
     }
 
@@ -153,6 +161,24 @@ public partial class NoteTagControl : UserControl
     public void SetHoverState(bool isHovered)
     {
         ApplyHoverEffect(isHovered);
+    }
+    
+    /// <summary>
+    /// 显示标签（带滑入动画）
+    /// </summary>
+    public async System.Threading.Tasks.Task ShowAsync()
+    {
+        this.IsVisible = true;
+        await Infrastructure.Helpers.AnimationHelper.SlideInFromRightForControl(this, 300);
+    }
+    
+    /// <summary>
+    /// 隐藏标签（带滑出动画）
+    /// </summary>
+    public async System.Threading.Tasks.Task HideAsync()
+    {
+        await Infrastructure.Helpers.AnimationHelper.SlideOutToRight(this, 300);
+        this.IsVisible = false;
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
