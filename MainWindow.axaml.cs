@@ -49,6 +49,9 @@ public partial class MainWindow : Window
     private readonly HashSet<Key> _pressedKeys = new();
     private KeyModifiers _lastModifiers = KeyModifiers.None;
     
+    // 双击 Shift 检测器
+    private DoubleShiftDetector? _doubleShiftDetector;
+    
     // 核心服务
     private readonly IConfigurationService _configurationService;
     private readonly IWindowPositionService _windowPositionService;
@@ -469,6 +472,13 @@ public partial class MainWindow : Window
         
         Dispatcher.UIThread.Post(() =>
         {
+            // 检测双击 Shift
+            if (_doubleShiftDetector != null && _doubleShiftDetector.OnKeyDown(e.Key))
+            {
+                // 双击 Shift 被检测到，切换 AI 聊天窗口
+                ToggleAIChatWindow();
+            }
+            
             _pressedKeys.Add(e.Key);
             _lastModifiers = e.KeyModifiers;
             _lastKeyEventTime = DateTime.Now;
@@ -498,6 +508,38 @@ public partial class MainWindow : Window
             _lastKeyEventTime = DateTime.Now;
             UpdateKeyDisplay();
         });
+    }
+    
+    /// <summary>
+    /// 切换 AI 聊天窗口的显示/隐藏状态
+    /// </summary>
+    private void ToggleAIChatWindow()
+    {
+        if (_aiChatWindow == null)
+            return;
+            
+        try
+        {
+            if (_aiChatWindow.IsVisible)
+            {
+                // 如果窗口已打开，则关闭
+                _aiChatWindow.HideChatWindow();
+                _debugOverlay?.LogEvent($"✅ AI聊天窗口已关闭（双击Shift）");
+                this.Get<TextBlock>("StatusTextBlock")?.SetValue(TextBlock.TextProperty, "AI聊天窗口已关闭");
+            }
+            else
+            {
+                // 如果窗口已关闭，则打开
+                _aiChatWindow.ShowChatWindow();
+                _debugOverlay?.LogEvent($"✅ AI聊天窗口已打开（双击Shift）");
+                this.Get<TextBlock>("StatusTextBlock")?.SetValue(TextBlock.TextProperty, "AI聊天窗口已打开");
+            }
+        }
+        catch (Exception ex)
+        {
+            _debugOverlay?.LogEvent($"❌ AI聊天窗口切换错误: {ex.Message}");
+            Console.WriteLine($"[MainWindow] ToggleAIChatWindow error: {ex.Message}");
+        }
     }
     
     private void UpdateKeyDisplay()
@@ -1016,6 +1058,10 @@ public partial class MainWindow : Window
             
             // 初始化AI聊天窗口
             _aiChatWindow = new Features.AIChat.Controls.AIChatWindow();
+            
+            // 初始化双击 Shift 检测器
+            _doubleShiftDetector = new DoubleShiftDetector();
+            _doubleShiftDetector.Interval = 500;  // 默认 500ms
             
             // 初始化配置弹出框
             _configPopover = new ConfigPopover(this);
