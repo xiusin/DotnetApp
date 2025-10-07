@@ -28,6 +28,16 @@ public class ConfigViewModel : ViewModelBase
             {
                 // 通知所有相关属性更改
                 OnPropertyChanged(nameof(WindowSettings));
+                OnPropertyChanged(nameof(KeyboardMonitorSettings));
+                
+                // 订阅 WindowSettings 的属性更改事件
+                if (_appSettings?.Window != null)
+                {
+                    _appSettings.Window.PropertyChanged += (s, e) => 
+                    {
+                        OnPropertyChanged(nameof(WindowSettings));
+                    };
+                }
             }
         }
     }
@@ -36,6 +46,11 @@ public class ConfigViewModel : ViewModelBase
     /// 窗口设置的便捷访问属性
     /// </summary>
     public WindowSettings WindowSettings => AppSettings.Window;
+    
+    /// <summary>
+    /// 键盘监控设置的便捷访问属性
+    /// </summary>
+    public KeyboardMonitorSettings KeyboardMonitorSettings => AppSettings.KeyboardMonitor;
 
     /// <summary>
     /// 加载配置

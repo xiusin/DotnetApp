@@ -169,6 +169,7 @@
 
 
 
+
 - [ ] 13. 绑定通用设置到 ViewModel
   - 在 `ConfigViewModel` 中添加 `WindowSettings` 属性
   - 在 `GeneralSettingsPanel.axaml` 中绑定控件到 `WindowSettings` 属性

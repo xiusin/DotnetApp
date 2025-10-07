@@ -3,9 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:ConfigButtonDisplay.ViewModels"
+             xmlns:converters="clr-namespace:ConfigButtonDisplay.Infrastructure.Converters"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:Class="ConfigButtonDisplay.Views.Panels.GeneralSettingsPanel"
              x:DataType="vm:ConfigViewModel">
+    
+    <UserControl.Resources>
+        <converters:StringEqualityConverter x:Key="StringEqualityConverter"/>
+    </UserControl.Resources>
     
     <ScrollViewer>
         <StackPanel Spacing="24" Margin="24">
@@ -37,13 +42,43 @@
                         
                         <ComboBox Grid.Column="1"
                                   x:Name="PositionComboBox"
-                                  SelectedItem="{Binding AppSettings.Window.Position}"
+                                  SelectedItem="{Binding WindowSettings.Position, Mode=TwoWay}"
                                   HorizontalAlignment="Stretch">
                             <x:String>RightEdge</x:String>
                             <x:String>LeftEdge</x:String>
                             <x:String>Custom</x:String>
                         </ComboBox>
                     </Grid>
+                    
+                    <!-- 自定义位置输入框 -->
+                    <StackPanel Spacing="8" 
+                                IsVisible="{Binding WindowSettings.Position, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Custom}">
+                        <TextBlock Text="自定义位置坐标:" 
+                                   FontSize="12" 
+                                   Foreground="#666666"/>
+                        
+                        <Grid ColumnDefinitions="Auto,*,16,Auto,*">
+                            <TextBlock Text="X:" 
+                                       VerticalAlignment="Center"
+                                       Grid.Column="0"
+                                       Margin="0,0,8,0"/>
+                            
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding WindowSettings.CustomX, Mode=TwoWay}"
+                                     Watermark="X 坐标"
+                                     VerticalAlignment="Center"/>
+                            
+                            <TextBlock Text="Y:" 
+                                       VerticalAlignment="Center"
+                                       Grid.Column="3"
+                                       Margin="0,0,8,0"/>
+                            
+                            <TextBox Grid.Column="4"
+                                     Text="{Binding WindowSettings.CustomY, Mode=TwoWay}"
+                                     Watermark="Y 坐标"
+                                     VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
             </Border>
             
@@ -62,7 +97,7 @@
                                    Grid.Column="0"/>
                         
                         <Slider Grid.Column="1"
-                                Value="{Binding AppSettings.Window.Opacity}"
+                                Value="{Binding WindowSettings.Opacity, Mode=TwoWay}"
                                 Minimum="0.5"
                                 Maximum="1.0"
                                 TickFrequency="0.05"
@@ -70,7 +105,7 @@
                                 VerticalAlignment="Center"/>
                         
                         <TextBlock Grid.Column="2"
-                                   Text="{Binding AppSettings.Window.Opacity, StringFormat='{}{0:P0}'}"
+                                   Text="{Binding WindowSettings.Opacity, StringFormat='{}{0:P0}'}"
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right"
                                    Margin="8,0,0,0"/>
@@ -88,11 +123,11 @@
                                FontWeight="SemiBold"/>
                     
                     <CheckBox Content="记住窗口位置"
-                              IsChecked="{Binding AppSettings.Window.RememberPosition}"
+                              IsChecked="{Binding WindowSettings.RememberPosition, Mode=TwoWay}"
                               ToolTip.Tip="启用后，窗口会记住您手动调整的位置"/>
                     
                     <CheckBox Content="始终置顶"
-                              IsChecked="{Binding AppSettings.Window.AlwaysOnTop}"
+                              IsChecked="{Binding WindowSettings.AlwaysOnTop, Mode=TwoWay}"
                               ToolTip.Tip="窗口将始终显示在其他窗口之上"/>
                 </StackPanel>
             </Border>
