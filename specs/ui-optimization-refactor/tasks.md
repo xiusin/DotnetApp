@@ -82,6 +82,8 @@
   - 创建 `Infrastructure/Helpers/AnimationHelper.cs` 动画辅助类
   - 实现 `SlideInFromRight()` 方法，从右侧滑入动画（300ms ease-out）
 
+
+
   - 在主窗口启动时调用滑入动画
   - 确保动画流畅，不阻塞 UI 线程
   - _Requirements: 2.8_
@@ -89,6 +91,7 @@
 
 - [ ] 7. 实现窗口位置保存和恢复
   - 在主窗口的 `PositionChanged` 事件中调用 `SavePosition()`
+
   - 使用防抖动机制避免频繁保存（500ms 延迟）
   - 在窗口启动时，如果 `RememberPosition` 为 true，加载保存的位置
   - 验证保存的位置在屏幕范围内，超出则使用默认位置
