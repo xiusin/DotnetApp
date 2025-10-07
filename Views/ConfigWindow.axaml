@@ -102,8 +102,8 @@
                             <TextBlock Text="AI 聊天" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
-                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
-                        <TextBlock Text="AI 聊天面板" FontSize="14" Foreground="#FF718096"/>
+                    <Border Background="#FAFBFC" CornerRadius="12">
+                        <panels:AIChatPanel/>
                     </Border>
                 </TabItem>
                 
