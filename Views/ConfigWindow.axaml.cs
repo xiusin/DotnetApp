@@ -80,13 +80,31 @@ public partial class ConfigWindow : Window
                 // 保存配置
                 await viewModel.SaveAsync();
                 Console.WriteLine("Configuration saved successfully");
+                
+                // 显示成功提示
+                await ShowMessageDialog("配置已成功保存", "保存成功");
+                
+                this.Close();
             }
+        }
+        catch (InvalidOperationException ex)
+        {
+            // 验证失败
+            Console.WriteLine($"Validation error: {ex.Message}");
             
-            this.Close();
+            if (this.DataContext is ViewModels.ConfigViewModel viewModel && viewModel.LastValidationError != null)
+            {
+                await ShowMessageDialog(viewModel.LastValidationError, "配置验证失败");
+            }
+            else
+            {
+                await ShowMessageDialog("配置验证失败，请检查输入的值", "配置验证失败");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error saving configuration: {ex.Message}");
+            await ShowMessageDialog($"保存配置时发生错误：{ex.Message}", "保存失败");
         }
     }
     
@@ -144,5 +162,16 @@ public partial class ConfigWindow : Window
         // 在实际应用中应该显示一个确认对话框
         Console.WriteLine($"Confirm dialog: {title} - {message}");
         return await Task.FromResult(true);
+    }
+    
+    /// <summary>
+    /// 显示消息对话框
+    /// </summary>
+    private async Task ShowMessageDialog(string message, string title)
+    {
+        // 简化实现：输出到控制台
+        // 在实际应用中应该显示一个消息对话框
+        Console.WriteLine($"Message dialog: {title} - {message}");
+        await Task.CompletedTask;
     }
 }

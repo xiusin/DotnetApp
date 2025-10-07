@@ -164,6 +164,8 @@
 
 
 
+
+
 - [ ] 13. 绑定通用设置到 ViewModel
   - 在 `ConfigViewModel` 中添加 `WindowSettings` 属性
   - 在 `GeneralSettingsPanel.axaml` 中绑定控件到 `WindowSettings` 属性
@@ -312,6 +314,7 @@
   - 显示保存进度指示器
   - 保存成功后显示提示消息
   - 保存失败时显示错误消息并保留配置窗口打开
+
   - 关闭配置窗口并通知主窗口重新加载配置
   - _Requirements: 3.6, 5.1_
 
