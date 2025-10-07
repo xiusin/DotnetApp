@@ -154,44 +154,66 @@
                     CornerRadius="12"
                     Padding="24,16"
                     Margin="16,0,16,16">
-                <StackPanel Orientation="Horizontal"
-                           HorizontalAlignment="Right"
-                           Spacing="12">
-                    <Button Name="SaveButton"
-                            Content="保存"
-                            Click="SaveButton_Click"
-                            Background="#FF3182CE"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="8"
-                            Padding="24,10"
-                            FontSize="14"
-                            FontWeight="Medium">
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#FF2C5AA0"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                    
-                    <Button Name="CancelButton"
-                            Content="取消"
-                            Click="CancelButton_Click"
+                <Grid ColumnDefinitions="*,Auto">
+                    <!-- 左侧重置按钮 -->
+                    <Button Grid.Column="0"
+                            Name="ResetButton"
+                            Content="重置为默认值"
+                            Click="ResetButton_Click"
                             Background="#F7FAFC"
-                            Foreground="#FF4A5568"
+                            Foreground="#FFE53E3E"
                             BorderThickness="1"
                             BorderBrush="#E2E8F0"
                             CornerRadius="8"
                             Padding="24,10"
                             FontSize="14"
-                            FontWeight="Medium">
+                            FontWeight="Medium"
+                            HorizontalAlignment="Left">
                         <Button.Styles>
                             <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#EDF2F7"/>
+                                <Setter Property="Background" Value="#FFF5F5"/>
                             </Style>
                         </Button.Styles>
                     </Button>
-                </StackPanel>
+                    
+                    <!-- 右侧保存和取消按钮 -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                        <Button Name="SaveButton"
+                                Content="保存"
+                                Click="SaveButton_Click"
+                                Background="#FF3182CE"
+                                Foreground="White"
+                                BorderThickness="0"
+                                CornerRadius="8"
+                                Padding="24,10"
+                                FontSize="14"
+                                FontWeight="Medium">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#FF2C5AA0"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                        
+                        <Button Name="CancelButton"
+                                Content="取消"
+                                Click="CancelButton_Click"
+                                Background="#F7FAFC"
+                                Foreground="#FF4A5568"
+                                BorderThickness="1"
+                                BorderBrush="#E2E8F0"
+                                CornerRadius="8"
+                                Padding="24,10"
+                                FontSize="14"
+                                FontWeight="Medium">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#EDF2F7"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
     </Border>

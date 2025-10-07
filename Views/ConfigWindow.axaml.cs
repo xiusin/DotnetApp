@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -95,5 +96,53 @@ public partial class ConfigWindow : Window
     private void CancelButton_Click(object? sender, RoutedEventArgs e)
     {
         this.Close();
+    }
+    
+    /// <summary>
+    /// 重置按钮点击事件
+    /// </summary>
+    private async void ResetButton_Click(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // 显示确认对话框
+            var result = await ShowConfirmDialog("确定要重置所有设置到默认值吗？", "重置设置");
+            
+            if (result)
+            {
+                Console.WriteLine("Reset button clicked - confirmed");
+                
+                // 获取 ViewModel
+                if (this.DataContext is ViewModels.ConfigViewModel viewModel)
+                {
+                    // 重置配置
+                    viewModel.Reset();
+                    
+                    // 重新加载到面板
+                    var keyboardPanel = this.FindControl<Panels.KeyboardMonitorPanel>("KeyboardMonitorPanel");
+                    if (keyboardPanel != null && viewModel.AppSettings?.KeyboardMonitor != null)
+                    {
+                        keyboardPanel.SetSettings(viewModel.AppSettings.KeyboardMonitor);
+                    }
+                    
+                    Console.WriteLine("Settings reset to defaults");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error resetting configuration: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 显示确认对话框
+    /// </summary>
+    private async Task<bool> ShowConfirmDialog(string message, string title)
+    {
+        // 简化实现：直接返回 true
+        // 在实际应用中应该显示一个确认对话框
+        Console.WriteLine($"Confirm dialog: {title} - {message}");
+        return await Task.FromResult(true);
     }
 }

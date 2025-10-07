@@ -239,7 +239,9 @@
   - _Requirements: 4.7_
   - _Commit: "实现配置应用到 KeyDisplayWindow"_
 
-- [ ] 21. 实现按键过滤逻辑
+- [x] 21. 实现按键过滤逻辑
+
+
   - 在 `MainWindow.axaml.cs` 的 `FormatKeyCombination()` 方法中添加过滤逻辑
   - 根据 `KeyboardMonitorSettings.ShowModifiers` 决定是否显示修饰键
   - 根据 `ShowFunctionKeys` 过滤功能键
@@ -292,6 +294,7 @@
 
 ## Phase 7: Configuration Persistence
 
+
 - [ ] 26. 实现配置保存逻辑
   - 在 `ConfigWindow.axaml.cs` 的保存按钮点击事件中调用 `ConfigViewModel.SaveAsync()`
   - 显示保存进度指示器
@@ -299,6 +302,7 @@
   - 保存失败时显示错误消息并保留配置窗口打开
   - 关闭配置窗口并通知主窗口重新加载配置
   - _Requirements: 3.6, 5.1_
+
   - _Commit: "实现配置保存逻辑"_
 
 - [ ] 27. 实现配置重置功能
