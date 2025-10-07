@@ -102,11 +102,14 @@
 ## Phase 3: Configuration Window Foundation
 
 
+
+
 - [ ] 8. 创建配置窗口基础结构
   - 创建 `Views/ConfigWindow.axaml` 和 `Views/ConfigWindow.axaml.cs`
   - 设置窗口属性：`SystemDecorations="None"`, `Background="Transparent"`
   - 创建 Fluent Design 风格的 Border 容器（圆角、阴影）
   - 创建 Grid 布局：Header (Auto), Content (*), Footer (Auto)
+
   - 添加标题栏（包含标题文本和关闭按钮）
   - 添加底部按钮栏（保存、取消按钮）
   - _Requirements: 3.1, 3.8_
