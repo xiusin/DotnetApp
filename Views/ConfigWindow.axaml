@@ -115,8 +115,8 @@
                             <TextBlock Text="标签管理" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
-                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
-                        <TextBlock Text="标签管理面板" FontSize="14" Foreground="#FF718096"/>
+                    <Border Background="#FAFBFC" CornerRadius="12">
+                        <panels:NoteTagPanel/>
                     </Border>
                 </TabItem>
                 
@@ -128,8 +128,8 @@
                             <TextBlock Text="边缘组件" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
-                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
-                        <TextBlock Text="边缘组件面板" FontSize="14" Foreground="#FF718096"/>
+                    <Border Background="#FAFBFC" CornerRadius="12">
+                        <panels:EdgeComponentPanel/>
                     </Border>
                 </TabItem>
                 
@@ -141,8 +141,8 @@
                             <TextBlock Text="调试选项" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
-                    <Border Background="#FAFBFC" CornerRadius="12" Padding="24">
-                        <TextBlock Text="调试选项面板" FontSize="14" Foreground="#FF718096"/>
+                    <Border Background="#FAFBFC" CornerRadius="12">
+                        <panels:DebugPanel/>
                     </Border>
                 </TabItem>
                 

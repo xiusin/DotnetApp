@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+             x:Class="ConfigButtonDisplay.Views.Panels.NoteTagPanel">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" Margin="24">
+            <StackPanel Spacing="8">
+                <TextBlock Text="标签管理" FontSize="20" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <TextBlock Text="配置便签标签的显示和行为" FontSize="14" Foreground="#FF718096"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="基本设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <ToggleSwitch Name="EnabledToggle" OnContent="已启用" OffContent="已禁用" IsChecked="True"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="标签位置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <Grid ColumnDefinitions="150,*">
+                    <TextBlock Grid.Column="0" Text="显示位置" VerticalAlignment="Center" Foreground="#FF4A5568"/>
+                    <ComboBox Grid.Column="1" Name="PositionComboBox" SelectedIndex="0">
+                        <ComboBoxItem Content="屏幕左侧"/>
+                        <ComboBoxItem Content="屏幕右侧"/>
+                    </ComboBox>
+                </Grid>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="标签列表" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <TextBlock Text="最多支持 3 个标签" FontSize="13" Foreground="#FF718096"/>
+                <StackPanel Spacing="8">
+                    <TextBox Name="Tag1TextBox" Watermark="标签 1 文本" Text="功能标签 1"/>
+                    <TextBox Name="Tag2TextBox" Watermark="标签 2 文本" Text="功能标签 2"/>
+                    <TextBox Name="Tag3TextBox" Watermark="标签 3 文本" Text="功能标签 3"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+             x:Class="ConfigButtonDisplay.Views.Panels.DebugPanel">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" Margin="24">
+            <StackPanel Spacing="8">
+                <TextBlock Text="调试选项" FontSize="20" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <TextBlock Text="配置调试和日志功能" FontSize="14" Foreground="#FF718096"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="调试模式" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <ToggleSwitch Name="DebugModeToggle" OnContent="已启用" OffContent="已禁用" IsChecked="False"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="调试覆盖层" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <CheckBox Name="ShowOverlayCheckBox" Content="显示调试覆盖层" IsChecked="False"/>
+                <CheckBox Name="ShowFpsCheckBox" Content="显示 FPS 计数器" IsChecked="False"/>
+                <CheckBox Name="ShowMemoryCheckBox" Content="显示内存使用" IsChecked="False"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="日志设置" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <Grid ColumnDefinitions="150,*">
+                    <TextBlock Grid.Column="0" Text="日志级别" VerticalAlignment="Center" Foreground="#FF4A5568"/>
+                    <ComboBox Grid.Column="1" Name="LogLevelComboBox" SelectedIndex="1">
+                        <ComboBoxItem Content="详细 (Verbose)"/>
+                        <ComboBoxItem Content="信息 (Info)"/>
+                        <ComboBoxItem Content="警告 (Warning)"/>
+                        <ComboBoxItem Content="错误 (Error)"/>
+                    </ComboBox>
+                </Grid>
+            </StackPanel>
+            
+            <StackPanel Spacing="12">
+                <TextBlock Text="操作" FontSize="16" FontWeight="SemiBold" Foreground="#FF2D3748"/>
+                <Button Content="清除日志" Background="#F7FAFC" Foreground="#FF4A5568" BorderThickness="1" BorderBrush="#E2E8F0" CornerRadius="8" Padding="16,8">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#EDF2F7"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </StackPanel>
+            
+            <Border Background="#FFF5F5" BorderBrush="#FEB2B2" BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="⚠️ 注意" FontSize="14" FontWeight="SemiBold" Foreground="#C53030"/>
+                    <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="#C53030">
+                        调试模式会影响性能，仅在开发和测试时启用。
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

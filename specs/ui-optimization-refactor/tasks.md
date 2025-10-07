@@ -253,11 +253,15 @@
 
 ## Phase 6: Other Module Settings Panels
 
+
+
+
 - [ ] 22. 创建 AI 聊天设置面板
   - 创建 `Views/Panels/AIChatPanel.axaml` UserControl
   - 添加"启用 AI 聊天"复选框
   - 添加热键设置（默认 Shift+Shift）
   - 添加窗口位置和大小设置
+
   - 绑定到 `ConfigViewModel` 的 AI 聊天配置
   - _Requirements: 3.3_
   - _Commit: "创建 AI 聊天设置面板"_
