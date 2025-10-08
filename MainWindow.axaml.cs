@@ -1133,7 +1133,7 @@ public partial class MainWindow : Window
             _debugOverlay?.LogEvent("✅ 边缘滑动组件已初始化");
             
             // 启动边缘组件自动显示（可选）
-            StartEdgeAutoShow();
+            // StartEdgeAutoShow(); // 修复：禁用自动显示，避免随机弹出
             
             // 初始化AI聊天窗口
             _aiChatWindow = new Features.AIChat.Controls.AIChatWindow();

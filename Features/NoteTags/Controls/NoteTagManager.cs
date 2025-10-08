@@ -526,16 +526,16 @@ public class NoteTagManager
             var screenBounds = primaryScreen.Bounds;
             System.Console.WriteLine($"[NoteTagManager] 屏幕信息: 左上角({screenBounds.X}, {screenBounds.Y}), 尺寸({screenBounds.Width}x{screenBounds.Height})");
 
-            // 计算便签位置 - 将便签垂直排列在屏幕左侧，只显示10px边缘
+            // 计算便签位置 - 将便签垂直排列在屏幕左侧，紧贴边缘
             var totalHeight = 3 * 90 + 2 * 10; // 3个便签窗口 + 间距
             var startY = screenBounds.Y + (screenBounds.Height - totalHeight) / 2;
             
             for (int i = 0; i < _tagWindows.Length; i++)
             {
                 // 初始位置：只显示10px在屏幕内（其余160px隐藏在屏幕外）
-                _hiddenPositions[i] = new PixelPoint(screenBounds.X - 150, startY + i * 100);
-                // 完全显示位置：完整显示便签
-                _positions[i] = new PixelPoint(screenBounds.X + 10, startY + i * 100);
+                _hiddenPositions[i] = new PixelPoint(screenBounds.X - 160, startY + i * 100);
+                // 完全显示位置：完整显示便签，紧贴屏幕边缘
+                _positions[i] = new PixelPoint(screenBounds.X, startY + i * 100);
                 
                 var window = _tagWindows[i];
                 if (window != null)

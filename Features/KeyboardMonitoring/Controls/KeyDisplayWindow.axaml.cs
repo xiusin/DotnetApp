@@ -15,7 +15,7 @@ public partial class KeyDisplayWindow : Window
     private Timer? _autoHideTimer;
     private const int AUTO_HIDE_DELAY = 2000; // 2秒自动隐藏
     private bool _isContentVisible = false;
-    public bool ForceFullWidth = true;
+    public bool ForceFullWidth = false; // 修复：默认不使用全屏宽度
     
     // 欢迎消息相关
     private bool _hasShownWelcome = false;
@@ -76,30 +76,17 @@ public partial class KeyDisplayWindow : Window
     /// </summary>
     private void AdjustWindowWidth(string text)
     {
-        // 全屏宽度模式：用于调试内容显示是否正确
-        if (ForceFullWidth)
-        {
-            var screens = Screens?.All;
-            if (screens != null && screens.Count > 0)
-            {
-                var primary = screens[0];
-                this.Width = primary.Bounds.Width;
-                PositionWindowAtBottomCenter();
-                return;
-            }
-        }
-
         if (DisplayTextBlock != null && !string.IsNullOrEmpty(text))
         {
             // 根据文本长度估算宽度
-            var baseWidth = 120; // 最小宽度
-            var charWidth = 20; // 每个字符约20px
-            var estimatedWidth = Math.Max(baseWidth, text.Length * charWidth + 48); // 48px为padding
+            var baseWidth = 200; // 最小宽度增加到200
+            var charWidth = 15; // 每个字符约15px（更紧凑）
+            var estimatedWidth = Math.Max(baseWidth, text.Length * charWidth + 60); // 60px为padding
 
-            // 提高上限以适配更长文本
-            var finalWidth = Math.Min(800, Math.Max(120, estimatedWidth));
+            // 限制最大宽度为600px，避免超出屏幕
+            var finalWidth = Math.Min(600, Math.Max(200, estimatedWidth));
 
-            this.Width = finalWidth;
+            Width = finalWidth;
 
             // 重新定位到底部居中
             PositionWindowAtBottomCenter();

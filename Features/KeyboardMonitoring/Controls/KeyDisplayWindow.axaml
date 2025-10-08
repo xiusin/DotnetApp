@@ -2,36 +2,45 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="80"
+        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="56"
         x:Class="ConfigButtonDisplay.Features.KeyboardMonitoring.Controls.KeyDisplayWindow"
         Title="按键显示"
         WindowStartupLocation="Manual"
         CanResize="False"
         ShowInTaskbar="False"
         Topmost="True"
-        MinWidth="100"
-        MaxWidth="99999"
-        Height="64"
+        MinWidth="200"
+        MaxWidth="600"
+        MinHeight="48"
+        MaxHeight="48"
         SystemDecorations="None"
         Focusable="False"
-        Background="#00000000"
-        SizeToContent="Manual"
+        ShowActivated="False"
+        Background="Transparent"
+        SizeToContent="Width"
         Opacity="1">
     
-    <!-- 半透明圆角窗体设计 -->
+    <!-- 半透明高斯模糊黑色背景 -->
     <Border x:Name="MainBorder" 
             CornerRadius="8"
             BorderThickness="1"
-            BorderBrush="#33FFFFFF"
+            BorderBrush="#40FFFFFF"
             Margin="0"
-            Padding="14,12"
-            BoxShadow="0 4 16 0 #30000000"
+            Padding="20,10"
             ClipToBounds="True"
-            Background="#000000EE">
+            Background="#E6000000">
+        <Border.Effect>
+            <DropShadowEffect Color="#60000000" 
+                              OffsetX="0" 
+                              OffsetY="4" 
+                              BlurRadius="16" 
+                              Opacity="0.4"/>
+        </Border.Effect>
         
+        <!-- 按键文本 - 白色 -->
         <TextBlock x:Name="DisplayTextBlock" 
                   Text=""
-                  FontSize="20"
+                  FontSize="16"
                   FontWeight="SemiBold"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
