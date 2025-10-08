@@ -2,52 +2,70 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="56"
+        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="48"
         x:Class="ConfigButtonDisplay.Features.KeyboardMonitoring.Controls.KeyDisplayWindow"
         Title="按键显示"
         WindowStartupLocation="Manual"
         CanResize="False"
         ShowInTaskbar="False"
         Topmost="True"
-        MinWidth="200"
-        MaxWidth="600"
+        MinWidth="100"
+        MaxWidth="800"
         MinHeight="48"
         MaxHeight="48"
         SystemDecorations="None"
         Focusable="False"
         ShowActivated="False"
         Background="Transparent"
-        SizeToContent="Width"
+        SizeToContent="WidthAndHeight"
         Opacity="1">
     
-    <!-- 半透明高斯模糊黑色背景 -->
-    <Border x:Name="MainBorder" 
-            CornerRadius="8"
-            BorderThickness="1"
-            BorderBrush="#40FFFFFF"
-            Margin="0"
-            Padding="20,10"
-            ClipToBounds="True"
-            Background="#E6000000">
-        <Border.Effect>
-            <DropShadowEffect Color="#60000000" 
-                              OffsetX="0" 
-                              OffsetY="4" 
-                              BlurRadius="16" 
-                              Opacity="0.4"/>
-        </Border.Effect>
+    <!-- Acrylic 亚克力背景效果 -->
+    <Panel>
+        <!-- 阴影层 -->
+        <Border CornerRadius="8"
+                Margin="0"
+                Background="Transparent">
+            <Border.Effect>
+                <DropShadowEffect Color="#80000000" 
+                                  OffsetX="0" 
+                                  OffsetY="6" 
+                                  BlurRadius="24" 
+                                  Opacity="0.5"/>
+            </Border.Effect>
+        </Border>
         
-        <!-- 按键文本 - 白色 -->
-        <TextBlock x:Name="DisplayTextBlock" 
-                  Text=""
-                  FontSize="16"
-                  FontWeight="SemiBold"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  TextAlignment="Center"
-                  TextWrapping="NoWrap"
-                  Foreground="White"
-                  FontFamily="Segoe UI, Microsoft YaHei, Arial, sans-serif"
-                  TextTrimming="CharacterEllipsis"/>
-    </Border>
+        <!-- Acrylic 背景 -->
+        <ExperimentalAcrylicBorder x:Name="MainBorder"
+                                   CornerRadius="8"
+                                   Margin="0">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="#000000"
+                    TintOpacity="0.85"
+                    MaterialOpacity="0.95"
+                    FallbackColor="#DD000000"/>
+            </ExperimentalAcrylicBorder.Material>
+            
+            <!-- 内容容器 -->
+            <Border BorderThickness="0"
+                    CornerRadius="8"
+                    Padding="24,10"
+                    Background="Transparent">
+                
+                <!-- 按键文本 - 白色 -->
+                <TextBlock x:Name="DisplayTextBlock" 
+                          Text=""
+                          FontSize="16"
+                          FontWeight="SemiBold"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          TextAlignment="Center"
+                          TextWrapping="NoWrap"
+                          Foreground="White"
+                          FontFamily="Segoe UI, Microsoft YaHei, Arial, sans-serif"/>
+            </Border>
+        </ExperimentalAcrylicBorder>
+    </Panel>
 </Window>

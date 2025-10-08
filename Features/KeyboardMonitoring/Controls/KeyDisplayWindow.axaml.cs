@@ -16,7 +16,7 @@ public partial class KeyDisplayWindow : Window
     private const int AUTO_HIDE_DELAY = 2000; // 2秒自动隐藏
     private bool _isContentVisible = false;
     public bool ForceFullWidth = false; // 修复：默认不使用全屏宽度
-    
+
     // 欢迎消息相关
     private bool _hasShownWelcome = false;
     private Core.Configuration.KeyboardMonitorSettings? _settings;
@@ -31,23 +31,23 @@ public partial class KeyDisplayWindow : Window
             this.Owner = desktop.MainWindow;
         }
 
-        this.Closing += (s, e) => 
+        this.Closing += (s, e) =>
         {
             // 阻止关闭窗口，只隐藏
             e.Cancel = true;
             HideWindow();
         };
-        
+
         // 初始化窗口位置到屏幕底部居中
         this.Loaded += OnWindowLoaded;
     }
-    
+
     private void OnWindowLoaded(object? sender, RoutedEventArgs e)
     {
         // 异步定位到底部居中，避免初次显示时尺寸尚未应用导致位置偏差
         Dispatcher.UIThread.Post(() => PositionWindowAtBottomCenter());
     }
-    
+
     /// <summary>
     /// 将窗口定位到屏幕底部居中
     /// </summary>
@@ -59,18 +59,18 @@ public partial class KeyDisplayWindow : Window
             var primaryScreen = screens[0];
             var screenBounds = primaryScreen.Bounds;
             var workingArea = primaryScreen.WorkingArea;
-            
+
             // 计算底部居中位置
             var windowWidth = (int)this.Width;
             var windowHeight = (int)this.Height;
-            
+
             var x = screenBounds.X + (screenBounds.Width - windowWidth) / 2;
             var y = workingArea.Y + workingArea.Height - windowHeight - 60; // 距离底部60px
-            
+
             this.Position = new PixelPoint(x, y);
         }
     }
-    
+
     /// <summary>
     /// 根据内容动态调整窗口宽度
     /// </summary>
@@ -92,7 +92,7 @@ public partial class KeyDisplayWindow : Window
             PositionWindowAtBottomCenter();
         }
     }
-    
+
     public void UpdateContent(string text, Color backgroundColor, double fontSize)
     {
         if (DisplayTextBlock != null)
@@ -100,21 +100,18 @@ public partial class KeyDisplayWindow : Window
             DisplayTextBlock.Text = text;
             DisplayTextBlock.FontSize = fontSize;
         }
-        
+
         if (MainBorder != null)
         {
             if (!string.IsNullOrEmpty(text))
             {
-                // 使用 Acrylic 背景，不在代码里覆盖背景色；仅设置边框与尺寸
-                MainBorder.BorderBrush = new SolidColorBrush(Color.Parse("#33FFFFFF"));
-                
                 // 动态调整窗口宽度
                 AdjustWindowWidth(text);
-                
+
                 // 显示窗口并启动自动隐藏计时器
                 ShowWindow();
                 StartAutoHideTimer();
-                
+
                 _isContentVisible = true;
             }
             else
@@ -125,7 +122,7 @@ public partial class KeyDisplayWindow : Window
             }
         }
     }
-    
+
     /// <summary>
     /// 显示窗口
     /// </summary>
@@ -137,14 +134,14 @@ public partial class KeyDisplayWindow : Window
         this.Opacity = 1;
         this.WindowState = WindowState.Normal;
         PositionWindowAtBottomCenter();
-        
+
         // 确保窗口在最顶层（不主动抢占焦点）并轻抖刷新Z序
         this.Topmost = true;
         this.Topmost = false;
         this.Topmost = true;
         Console.WriteLine($"[KeyDisplayWindow] Visible={this.IsVisible}, Opacity={this.Opacity}, Topmost={this.Topmost}, State={this.WindowState}, Size={this.Width}x{this.Height}, Position=({this.Position.X},{this.Position.Y})");
     }
-    
+
     /// <summary>
     /// 隐藏窗口
     /// </summary>
@@ -154,11 +151,11 @@ public partial class KeyDisplayWindow : Window
         {
             this.Hide();
         }
-        
+
         // 停止自动隐藏计时器
         StopAutoHideTimer();
     }
-    
+
     /// <summary>
     /// 启动2秒自动隐藏计时器
     /// </summary>
@@ -166,7 +163,7 @@ public partial class KeyDisplayWindow : Window
     {
         // 先停止现有计时器
         StopAutoHideTimer();
-        
+
         _autoHideTimer = new Timer(_ =>
         {
             Dispatcher.UIThread.Post(() =>
@@ -175,7 +172,7 @@ public partial class KeyDisplayWindow : Window
                 {
                     HideWindow();
                     _isContentVisible = false;
-                    
+
                     // 清空内容
                     if (DisplayTextBlock != null)
                     {
@@ -185,7 +182,7 @@ public partial class KeyDisplayWindow : Window
             });
         }, null, AUTO_HIDE_DELAY, Timeout.Infinite);
     }
-    
+
     /// <summary>
     /// 停止自动隐藏计时器
     /// </summary>
@@ -194,7 +191,7 @@ public partial class KeyDisplayWindow : Window
         _autoHideTimer?.Dispose();
         _autoHideTimer = null;
     }
-    
+
     /// <summary>
     /// 重新触发显示（用于再次按键时）
     /// </summary>
@@ -206,7 +203,7 @@ public partial class KeyDisplayWindow : Window
             StartAutoHideTimer();
         }
     }
-    
+
     /// <summary>
     /// 显示欢迎消息
     /// </summary>
@@ -214,9 +211,9 @@ public partial class KeyDisplayWindow : Window
     {
         if (_settings == null || !_settings.ShowWelcomeMessage || _hasShownWelcome)
             return;
-            
+
         _hasShownWelcome = true;
-        
+
         try
         {
             // 显示欢迎消息
@@ -224,25 +221,25 @@ public partial class KeyDisplayWindow : Window
             {
                 DisplayTextBlock.Text = _settings.WelcomeMessage ?? "欢迎使用按键监控";
             }
-            
+
             // 显示窗口
             ShowWindow();
             _isContentVisible = true;
-            
+
             // 淡入动画
             await Infrastructure.Helpers.AnimationHelper.FadeIn(this, 300);
-            
+
             // 等待显示时长
             var duration = (int)(_settings.WelcomeMessageDuration * 1000);
             await System.Threading.Tasks.Task.Delay(duration);
-            
+
             // 淡出动画
             await Infrastructure.Helpers.AnimationHelper.FadeOut(this, 300);
-            
+
             // 隐藏窗口
             HideWindow();
             _isContentVisible = false;
-            
+
             // 清空文本
             if (DisplayTextBlock != null)
             {
@@ -254,7 +251,7 @@ public partial class KeyDisplayWindow : Window
             Console.WriteLine($"[KeyDisplayWindow] ShowWelcomeMessageAsync error: {ex.Message}");
         }
     }
-    
+
     /// <summary>
     /// 重置欢迎消息标志
     /// </summary>
@@ -262,7 +259,7 @@ public partial class KeyDisplayWindow : Window
     {
         _hasShownWelcome = false;
     }
-    
+
     /// <summary>
     /// 兜底：确保窗口可见并计时隐藏（用于按钮强制显示）
     /// </summary>
@@ -273,7 +270,7 @@ public partial class KeyDisplayWindow : Window
         ShowWindow();
         StartAutoHideTimer();
     }
-    
+
     /// <summary>
     /// 更新键盘监控设置
     /// </summary>
@@ -290,13 +287,13 @@ public partial class KeyDisplayWindow : Window
         try
         {
             Console.WriteLine($"Updating KeyDisplayWindow settings: Position={settings.DisplayPosition}, FontSize={settings.FontSize}");
-            
+
             // 更新显示位置
             UpdateDisplayPosition(settings.DisplayPosition, settings.CustomDisplayX, settings.CustomDisplayY);
-            
+
             // 更新自动隐藏时长（将在下次显示时生效）
             // AUTO_HIDE_DELAY 是常量，这里我们可以存储设置供后续使用
-            
+
             Console.WriteLine("KeyDisplayWindow settings updated successfully");
         }
         catch (Exception ex)
@@ -304,7 +301,7 @@ public partial class KeyDisplayWindow : Window
             Console.WriteLine($"Error updating KeyDisplayWindow settings: {ex.Message}");
         }
     }
-    
+
     /// <summary>
     /// 更新显示位置
     /// </summary>
@@ -312,17 +309,17 @@ public partial class KeyDisplayWindow : Window
     {
         var positionService = new Core.Services.WindowPositionService();
         var newPosition = positionService.CalculatePosition(position, (int)this.Width, (int)this.Height);
-        
+
         // 如果是自定义位置且提供了坐标
         if (position == "Custom" && customX.HasValue && customY.HasValue)
         {
             newPosition = new PixelPoint(customX.Value, customY.Value);
         }
-        
+
         this.Position = newPosition;
         Console.WriteLine($"KeyDisplayWindow positioned at: X={newPosition.X}, Y={newPosition.Y}");
     }
-    
+
     protected override void OnClosed(EventArgs e)
     {
         StopAutoHideTimer();
